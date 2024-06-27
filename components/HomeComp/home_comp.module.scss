@@ -1,0 +1,84 @@
+@import '../../global.scss';
+.home_comp{
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .top{
+        position: absolute;
+        width: 100%;
+        top: 0;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .item{
+            display: flex;
+            .act{
+                padding: 10px;
+                background: $divColor;
+                margin: 5px;
+                cursor: pointer;
+            }
+        }
+    }
+    .body{
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .right{
+            width: 30%;
+            height: 80%;
+            //border: 2px solid $mainColor;
+            //border-radius: 10px;
+            background: $divColor;
+            .items{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 15px;
+                .item{
+                    width: 90%;
+                    padding: 15px;
+                    background: $mainColor;
+                    //border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                    .ticket{
+                        color: white;
+                        font-size: 20px;
+                    }
+                    .name{
+                        color: white;
+                        font-size: 15px;
+                        font-weight: 300;
+                    }
+                }
+            }
+        }
+        .left{
+            width: 60%;
+            //border: 2px solid $mainColor;
+            height: 80%;
+            //border-radius: 10px;
+            padding: 10px;
+            background: $divColor;
+        }
+    }
+    .adverts{
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+    }
+}

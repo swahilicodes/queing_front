@@ -1,0 +1,111 @@
+@import '../../global.scss';
+.categories{
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    .items{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        .item{
+            background: $divColor;
+            float: left;
+            margin-left: 10px;
+            padding: 20px;
+            cursor: pointer;
+        }
+    }
+    .overlay{
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .content{
+            //position: relative;
+            background: white;
+            .top{
+                width: 100%;
+                //position: absolute;
+                background: $mainColor;
+                padding: 15px;
+                top: 0;
+                h1{
+                    font-size: 20px;
+                    color: white;
+                    font-weight: 300;
+                }
+            }
+            .contents{
+                width: 100%;
+                .bar{
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    .right{
+                        background: $divColor;
+                        padding: 10px;
+                        cursor: pointer;
+                        margin: 20px;
+                        .icon{
+                            color: $mainColor;
+                        }
+                    }
+                    .left{
+                        margin: 20px;
+                    }
+                }
+                .keyBoard{
+                    width: 100%;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    justify-content: space-between;
+                    .key{
+                        background: $divColor;
+                        padding: 10px;
+                        margin: 20px;
+                        color: $mainColor;
+                        width: 20%;
+                        text-align: center;
+                        cursor: pointer;
+                    }
+                }
+                .action{
+                    width: 100%;
+                    margin: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    button{
+                        width: 70%;
+                        background: $mainColor;
+                        outline: none;
+                        border: none;
+                        color: white;
+                        padding: 20px;
+                        cursor: pointer;
+                    }
+                    .cleara{
+                        width: 20%;
+                        background: $mainColor;
+                        color: white;
+                        padding: 20px;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+}
