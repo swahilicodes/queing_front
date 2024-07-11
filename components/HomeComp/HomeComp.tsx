@@ -6,7 +6,7 @@ import useFetchData from '@/custom_hooks/fetch';
 
 export default function HomeComp() {
     const [isFullScreen, setIsFullScreen] = useState(false);
-    const {data:queue,loading,error} = useFetchData("http://localhost:5000/queues/getAll")
+    const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
 
     const toggleFullScreen = () => {
      const element:any = document.documentElement;
@@ -35,7 +35,37 @@ export default function HomeComp() {
     };
   return (
     <div className={styles.home_comp}>
-        <div className={styles.top}>
+      <div className={styles.top_home_comp}>
+        <h1>MUHIMBILI NATIONAL HOSPITAL MLOGANZILA</h1>
+      </div>
+      <div className={styles.home_comp_body}>
+        <div className={styles.home_comp_body_left}>
+          <h1>001</h1>
+        </div>
+        <div className={styles.home_comp_body_right}>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket</th>
+                <th>Service</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                queue.map((item:any,index:number)=> (
+                  <tr key={index}>
+                    <td>{item.ticket_no}</td>
+                    <td>{item.category}</td>
+                    <td className={styles.status}>{item.status}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+        {/* <div className={styles.top}>
             <div className={styles.item}>Foleni Muhimbili</div>
             <div className={styles.item}>
                 <div className={styles.act}>Doctor</div>
@@ -54,15 +84,15 @@ export default function HomeComp() {
                             queue.map((item:any,index:number)=> (
                                 <div className={styles.item} key={index}>
                                     <div className={styles.ticket}>{item.ticket_no.toUpperCase()}</div>
-                                    <div className={styles.name}>{item.name.toUpperCase()}</div>
-                                </div>
+                                    {/* <div className={styles.name}>{item.name.toUpperCase()}</div> */}
+                                {/* </div>
                             ))
                         }
                     </div>
                 }
             </div>
         </div>
-        <div className={styles.adverts}><AdvertScroller/></div>
+        <div className={styles.adverts}><AdvertScroller/></div> */} 
     </div>
   )
 }

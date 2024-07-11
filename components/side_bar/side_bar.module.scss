@@ -1,0 +1,59 @@
+@import '../../global.scss';
+.side_bar{
+    width: 100%;
+    background-color: $mainColor;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .logo{
+        position: absolute;
+        top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 10px;
+        img{
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+        .title{
+            h1{
+                color: white;
+                font-size: 18px;
+            }
+        }
+    }
+    .links{
+        width: 100%;
+        ul{
+            width: 100%;
+            li{
+                list-style: none;
+                font-size: 20px;
+                transition: all .5s ease-in-out;
+                margin: 15px 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                width: 100%;
+                cursor: pointer;
+                .icon{
+                    width: 20%;
+                }
+                .link{
+                    width: 60%;
+                }
+                &.active{
+                    color: white;
+                }
+                &:hover{
+                    color: white;
+                }
+            }
+        }
+    }
+}

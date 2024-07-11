@@ -1,0 +1,29 @@
+@import '../../global.scss';
+.dashboard{
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    .dash{
+        float: left;
+        padding: 20px;
+        background: $divColor;
+        width: 45%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        margin: 20px 0;
+        .left{
+            p{
+                margin: 10px 0;
+            }
+        }
+        .right{
+            .icon{
+                color: $mainColor;
+            }
+        }
+    }
+}

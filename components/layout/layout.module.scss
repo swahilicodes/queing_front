@@ -1,0 +1,15 @@
+.layout{
+    width: 100vw;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .side{
+        width: 10%;
+        min-height: 100%;
+    }
+    .children{
+        width: 90%;
+    }
+}

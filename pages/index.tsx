@@ -108,8 +108,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Categories/>
-        {/* <HomeComp/> */}
+        {/*<Categories/>*/}
+        <HomeComp/>
       </main>
     </div>
   );
