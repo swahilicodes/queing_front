@@ -4,7 +4,7 @@ import Link from 'next/link'
 import cx from 'classnames'
 import { useRouter } from 'next/router'
 import { GoGitMergeQueue } from 'react-icons/go'
-import { MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
+import { MdOutlineCountertops, MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
 import { FaThList } from 'react-icons/fa'
 
 export default function SideBar() {
@@ -39,6 +39,10 @@ export default function SideBar() {
                 <li className={cx(styles.link,router.pathname==="/services" && styles.active)}>
                     <MdOutlineRoomService className={styles.icon}/>
                     <Link href="/services" className={styles.link}>Services</Link>
+                </li>
+                <li className={cx(styles.link,router.pathname==="/counters" && styles.active)}>
+                    <MdOutlineCountertops className={styles.icon}/>
+                    <Link href="/counters" className={styles.link}>Counters</Link>
                 </li>
             </ul>
         </div>

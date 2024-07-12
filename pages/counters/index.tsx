@@ -25,7 +25,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/services/create_service",{name}).then((data:any)=> {
+    axios.post("http://localhost:5000/counters/create_counter",{name}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -39,7 +39,7 @@ useEffect(()=> {
     })
  }
  const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/services/delete_service/${id}`).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/delete_counter/${id}`).then((data:any)=> {
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
@@ -53,7 +53,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{name}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error:any)=> {
@@ -80,7 +80,7 @@ useEffect(()=> {
   };
  const getServices  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/services/get_services",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/counters/get_counters",{params: {page,pagesize}}).then((data:any)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -98,7 +98,7 @@ useEffect(()=> {
   return (
     <div className={styles.services}>
         <div className={styles.service_top}>
-            <div className={styles.service_left}>Services</div>
+            <div className={styles.service_left}>Counters</div>
             <div className={styles.service_right} onClick={()=> setAdd(!isAdd)}>
                 <p>Add new</p>
             </div>
@@ -162,43 +162,43 @@ useEffect(()=> {
                 fetchLoading
                 ? <div className={styles.loader}>loading...</div>
                 : <div className={styles.check}>
-                {
-                    services.length>0 
-                    ? <div className={styles.services_list}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            services.map((data:any,index:number)=> (
-                                <tr key={index} className={cx(index%2===0 && styles.active)}>
-                                    <td>{data.id}</td>
-                                    <td>{data.name}</td>
-                                    <td>
-                                        <div className={styles.delete} onClick={()=> handleDelete(data.id)}><MdDelete className={styles.icon}/></div> 
-                                        <div className={styles.edit} onClick={()=> handleEdit(data.id,data.name)}><FiEdit2 className={styles.icon}/></div> 
-                                    </td>
+                    {
+                        services.length>0 
+                        ? <div className={styles.services_list}>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Action</th>
                                 </tr>
-                            ))
-                        }
-                        </tbody>
-                    </table>
-                    <div className={styles.pagination}>
-                        {Array.from({ length: Math.ceil(totalItems / pagesize) }).map((_, index) => (
-                        <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={cx(index+1===page && styles.active)}>
-                            {index + 1}
-                        </button>
-                        ))}
-            </div>
-                </div> 
-                    : <div className={styles.message}>No Services</div>
-                }
-            </div>
+                            </thead>
+                            <tbody>
+                            {
+                                services.map((data:any,index:number)=> (
+                                    <tr key={index} className={cx(index%2===0 && styles.active)}>
+                                        <td>{data.id}</td>
+                                        <td>{data.name}</td>
+                                        <td>
+                                            <div className={styles.delete} onClick={()=> handleDelete(data.id)}><MdDelete className={styles.icon}/></div> 
+                                            <div className={styles.edit} onClick={()=> handleEdit(data.id,data.name)}><FiEdit2 className={styles.icon}/></div> 
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                            </tbody>
+                        </table>
+                        <div className={styles.pagination}>
+                            {Array.from({ length: Math.ceil(totalItems / pagesize) }).map((_, index) => (
+                            <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={cx(index+1===page && styles.active)}>
+                                {index + 1}
+                            </button>
+                            ))}
+                </div>
+                    </div> 
+                        : <div className={styles.message}>No Counters</div>
+                    }
+                </div>
             }
         </div>
     </div>

@@ -96,97 +96,97 @@
         justify-content: center;
         height: 100%;
         .check{
-            width: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .message{
+            font-size: 20px;
+            color: $mainBold;
+        }
+        .services_list{
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            .message{
-                font-size: 20px;
-                color: $mainBold;
-            }
-            .services_list{
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
+            width: 100%;
+            table{
                 width: 100%;
-                table{
+                thead{
                     width: 100%;
-                    thead{
-                        width: 100%;
-                    tr{
-                        width: 100%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        background: $mainBold;
-                        padding: 5px;
-                        th{
-                            color: white;
-                            font-weight: 400;
-                            font-size: 18px;
-                            text-align: right;
-                        }
-                    }
-                    }
-                    tbody{
-                        width: 100%;
-                    tr{
-                        width: 100%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        padding: 5px;
-                        background: $divColor;
-                        &.active{
-                            background: white;
-                        }
-                        td{
-                            font-weight: 400;
-                            display: flex;
-                            text-align: left;
-                            .delete{
-                                background: red;
-                                padding: 3px;
-                                color: white;
-                                cursor: pointer;
-                                margin-right: 10px;
-                                .icon{
-                                    color: white;
-                                }
-                            }
-                            .edit{
-                                background: green;
-                                padding: 3px;
-                                color: white;
-                                cursor: pointer;
-                                .icon{
-                                    color: white;
-                                }
-                            }
-                        }
-                    }
-                    }
-                }
-                .pagination{
+                tr{
                     width: 100%;
                     display: flex;
-                    align-items: flex-start;
-                    button{
-                        padding: 10px;
-                        margin: 5px;
-                        cursor: pointer;
-                        outline: none;
-                        border: none;
-                        background: $divColor;
-                        &.active{
-                            background: $mainBold;
+                    align-items: center;
+                    justify-content: space-between;
+                    background: $mainBold;
+                    padding: 5px;
+                    th{
+                        color: white;
+                        font-weight: 400;
+                        font-size: 18px;
+                        text-align: right;
+                    }
+                }
+                }
+                tbody{
+                    width: 100%;
+                tr{
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 5px;
+                    background: $divColor;
+                    &.active{
+                        background: white;
+                    }
+                    td{
+                        font-weight: 400;
+                        display: flex;
+                        text-align: left;
+                        .delete{
+                            background: red;
+                            padding: 3px;
                             color: white;
+                            cursor: pointer;
+                            margin-right: 10px;
+                            .icon{
+                                color: white;
+                            }
                         }
+                        .edit{
+                            background: green;
+                            padding: 3px;
+                            color: white;
+                            cursor: pointer;
+                            .icon{
+                                color: white;
+                            }
+                        }
+                    }
+                }
+                }
+            }
+            .pagination{
+                width: 100%;
+                display: flex;
+                align-items: flex-start;
+                button{
+                    padding: 10px;
+                    margin: 5px;
+                    cursor: pointer;
+                    outline: none;
+                    border: none;
+                    background: $divColor;
+                    &.active{
+                        background: $mainBold;
+                        color: white;
                     }
                 }
             }
         }
+    }
     }
 }
 @keyframes move {
