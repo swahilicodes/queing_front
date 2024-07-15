@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'oswald';
+    src: url('../public/fonts/oswald/Oswald-Bold.ttf') format('oswald');
+    font-style: normal;
+  }
+@font-face {
+    font-family: 'roboto';
+    src: url('../public/fonts/roboto/Roboto-Regular.ttf') format('oswald');
+    font-style: normal;
+  }

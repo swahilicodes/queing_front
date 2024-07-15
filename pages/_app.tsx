@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import Layout from "@/components/layout/layout";
 import { RecoilRoot } from "recoil";
 import {Open_Sans} from '@next/font/google'
+import '../styles/fonts.css'
 
 const roboto = Open_Sans({
   subsets: ['latin'],

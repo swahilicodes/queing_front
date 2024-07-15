@@ -1,116 +1,97 @@
-import Head from "next/head";
-import { Inter } from "next/font/google";
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './index.module.scss'
-import { useEffect, useState } from "react";
-import axios, { Axios } from "axios";
-import HomeComp from "@/components/HomeComp/HomeComp";
-import Categories from "@/components/Categories/categories";
-
-const inter = Inter({ subsets: ["latin"] });
+import { MdZoomInMap } from 'react-icons/md';
+import useFetchData from '@/custom_hooks/fetch';
 
 export default function Home() {
-  const [patients, setPatients] = useState([])
-  const [queue, setQueue] = useState([])
-  const [vitals,setVitals] = useState(["Outpatient","Dental"])
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
+    const [isFullScreen, setIsFullScreen] = useState(false);
+    const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
 
-  useEffect(()=> {
-    getQueue()
-    getPatients()
-  },[])
-
-  function generateName(clinic:string) {
-    const firstChar = clinic.charAt(0);
-    const randomNumbers = [];
-    for (let i = 0; i < 3; i++) {
-        randomNumbers.push(Math.floor(Math.random() * 10));
-    }
-    const name = firstChar + randomNumbers.join('');
-
-    return name;
-}
-
-
-  const getPatients = async () => {
-    axios.get('http://localhost:5000/patients/get_patients').then((data:any) => {
-        setPatients(data.data)
-    }).catch((error) => {
-        if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
-        } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+    const toggleFullScreen = () => {
+     const element:any = document.documentElement;
+      if (!isFullScreen) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (element.mozRequestFullScreen) { /* Firefox */
+          element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+          element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) { /* IE/Edge */
+          element.msRequestFullscreen();
         }
-    })
-}
-  const getQueue = async () => {
-    axios.get('http://localhost:5000/queues/getAll').then((data:any) => {
-      setQueue(data.data)
-        setInterval(()=> {
-          // manipulate()
-        },1000)
-    }).catch((error) => {
-        if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            //alert(error.response.data.error);
-        } else {
-            console.log(`there is an error message ${error.message}`)
-            //alert(error.message);
+      } else {
+        if (element.exitFullscreen) {
+          element.exitFullscreen();
+        } else if (element.mozCancelFullScreen) { /* Firefox */
+          element.mozCancelFullScreen();
+        } else if (element.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+          element.webkitExitFullscreen();
+        } else if (element.msExitFullscreen) { /* IE/Edge */
+          element.msExitFullscreen();
         }
-    })
-}
-  const createQueue = async (e:React.FormEvent) => {
-    e.preventDefault()
-    console.log('creating queue')
-    if(patients.length>0){
-      patients.forEach((pt:any)=> {
-        if(queue.some((obj:any) => obj.mr_no === pt.mr_no)){
-          console.log('user exists',pt.mr_no)
-        }else{
-        let status
-        let name = generateName(pt.clinic)
-        if(vitals.includes(pt.clinic)){
-          status="vitaling"
-        }else{
-          status="waiting"
-        }
-        axios.post('http://localhost:5000/queues/create_queue',{name:pt.name,clinic:pt.clinic,age: pt.age,mr_no:pt.mr_no, sex:pt.sex,reg_date:pt.reg_date,reg_time:pt.reg_time,consulting_doctor:pt.consult_doctor,ticket_no:name,status:status}).then((data:any) => {
-          setQueue(data.data)
-            setInterval(()=> {
-              console.log(queue)
-              // manipulate()
-            },1000)
-        }).catch((error) => {
-            if (error.response && error.response.status === 400) {
-                console.log(`there is an error ${error.message}`)
-                alert(error.response.data.error);
-            } else {
-                console.log(`there is an error message ${error.message}`)
-                alert(error.message);
-            }
-        })
-        }
-      })
-    }else{
-      console.log('no users')
-    }
-}
+      }
+      setIsFullScreen(!isFullScreen);
+    };
   return (
     <div className={styles.index}>
-      <Head>
-        <title>Muhimbili Queuing System</title>
-        <meta name="description" content="Generated by create next app" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main>
-        {/*<Categories/>*/}
-        <HomeComp/>
-      </main>
+      <div className={styles.top_home_comp}>
+        <h1>MUHIMBILI NATIONAL HOSPITAL MLOGANZILA</h1>
+      </div>
+      <div className={styles.home_comp_body}>
+        <div className={styles.home_comp_body_left}>
+          <h1>001</h1>
+        </div>
+        <div className={styles.home_comp_body_right}>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket</th>
+                <th>Service</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                queue.map((item:any,index:number)=> (
+                  <tr key={index}>
+                    <td>{item.ticket_no}</td>
+                    <td>{item.category}</td>
+                    <td className={styles.status}>{item.status}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+        {/* <div className={styles.top}>
+            <div className={styles.item}>Foleni Muhimbili</div>
+            <div className={styles.item}>
+                <div className={styles.act}>Doctor</div>
+                <div className={styles.act}>Nurse</div>
+                <div className={styles.act} id="fullScreenButton" onClick={toggleFullScreen}><MdZoomInMap/></div>
+            </div>
+        </div>
+        <div className={styles.body}>
+            <div className={styles.left}></div>
+            <div className={styles.right}>
+                {
+                    loading
+                    ? <p>loading...</p>
+                    : <div className={styles.items}>
+                        {
+                            queue.map((item:any,index:number)=> (
+                                <div className={styles.item} key={index}>
+                                    <div className={styles.ticket}>{item.ticket_no.toUpperCase()}</div>
+                                    {/* <div className={styles.name}>{item.name.toUpperCase()}</div> */}
+                                {/* </div>
+                            ))
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <div className={styles.adverts}><AdvertScroller/></div> */} 
     </div>
-  );
+  )
 }

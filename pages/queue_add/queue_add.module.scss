@@ -1,6 +1,6 @@
 @import '../../global.scss';
-.categories{
-    width: 100vw;
+.queue_add{
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,18 +77,26 @@
         align-items: center;
         justify-content: center;
         .content{
-            //position: relative;
+            position: fixed;
             background: white;
+            animation: fall .5s ease-in-out;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
             .top{
                 width: 100%;
                 //position: absolute;
-                background: $mainColor;
+                background: $mainBold;
                 padding: 15px;
                 top: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 h1{
                     font-size: 20px;
                     color: white;
-                    font-weight: 300;
+                    font-weight: 400;
+                    font-family: "roboto";
                 }
             }
             .conts{
@@ -148,17 +156,19 @@
                         width: 20%;
                         text-align: center;
                         cursor: pointer;
+                        font-weight: 600;
                     }
                 }
                 .action{
                     width: 100%;
-                    margin: 20px;
+                    margin: 20px 0;
+                    padding: 0 20px;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
                     button{
                         width: 70%;
-                        background: $mainColor;
+                        background: $mainBold;
                         outline: none;
                         border: none;
                         color: white;
@@ -167,10 +177,13 @@
                     }
                     .cleara{
                         width: 20%;
-                        background: $mainColor;
+                        background: $mainBold;
                         color: white;
                         padding: 20px;
                         cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                     }
                 }
             }
@@ -183,6 +196,14 @@
     }
     100% {
         opacity: 1;
+    }
+}
+@keyframes fall {
+    0% {
+        top: -100px;
+    }
+    100% {
+        top: 50%;
     }
 }
 @keyframes icon {

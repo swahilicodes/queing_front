@@ -1,0 +1,53 @@
+@import '../../global.scss';
+.login{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    form{
+        width: 30%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        @include mobile{
+            width: 90%;
+        }
+        .add_item{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin: 10px 0;
+            label {
+                font-size: 18px;
+                color: #333;
+                margin-bottom: 8px;
+                display: block;
+              }
+            
+              input[type="text"],input[type="password"] {
+                width: 100%;
+                padding: 15px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+                &:focus{
+                    border: 1px solid $mainBold;
+                }
+              }
+        }
+        button{
+            width: 100%;
+            padding: 15px;
+            border-radius: 4px;
+            background: $mainBold;
+            color: white;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            text-align: center;
+            margin: 2px 0;
+        }
+    }
+}

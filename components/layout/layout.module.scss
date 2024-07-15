@@ -1,3 +1,4 @@
+@import '../../global.scss';
 .layout{
     width: 100vw;
     position: relative;
@@ -8,8 +9,28 @@
     .side{
         width: 10%;
         min-height: 100%;
+        transition: all .5s ease-in-out;
+        &.full{
+            display: none;
+        }
     }
     .children{
         width: 90%;
+        transition: all .5s ease-in-out;
+        &.full{
+            width: 100%;
+        }
+    }
+    .full_button{
+        position: fixed;
+        bottom: 50px;
+        right: 20px;
+        background: $divColor;
+        cursor: pointer;
+        padding: 3px;
+        border-radius: 10px;
+        .icon{
+            color: $mainBold;
+        }
     }
 }
