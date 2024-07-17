@@ -15,6 +15,7 @@ import * as htmlToImage from 'html-to-image';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import cx from 'classnames'
 import useFetchData from '@/custom_hooks/fetch'
+import html2canvas from 'html2canvas'
 
 export default function QueueAdd() {
   const {data:services,loading,error} = useFetchData("http://localhost:5000/services/get_all_services")
@@ -57,8 +58,10 @@ export default function QueueAdd() {
         setQr(true)
         setInterval(()=> {
             setSuccess(false)
-            convert1()
-        },1000)
+            handleCapture()
+            //handleConvertToImage()
+            //convert1()
+        },5000)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -70,37 +73,54 @@ export default function QueueAdd() {
     })
   }
 
-  const convert1 = () => {
-    const formData:any = formRef.current;
-    htmlToImage.toPng(formData)
-  .then(async function (dataUrl) {
-    var img = new Image();
-    img.src = dataUrl;
-    var doc = new jsPDF();
-    var img = new Image();
-    img.onload = function() {
-        var imgWidth = doc.internal.pageSize.getWidth();
-        var imgHeight = img.height * imgWidth / img.width;
-        doc.addImage(dataUrl, 0, 0, imgWidth, imgHeight);
-        doc.save("ticket.pdf")
-        setQr(false)
-        router.reload()
-    };
-    img.src = dataUrl;
-  }).catch((error)=> {
-    console.error('oops, something went wrong!', error.message);
-  })
-  }
+  const handleCapture = () => {
+    const form:any = document.getElementById('myFrame');
+    html2canvas(form).then((canvas) => {
+      var a  = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'image.png';
+      a.click();
+      setQr(false)
+      router.reload()
+    });
+  };
+
+//   const convert1 = () => {
+//     const formData:any = formRef.current;
+//     htmlToImage.toPng(formData)
+//   .then(async function (dataUrl) {
+//     var img = new Image();
+//     img.src = dataUrl;
+//     var doc = new jsPDF();
+//     var img = new Image();
+//     img.onload = function() {
+//         var imgWidth = doc.internal.pageSize.getWidth();
+//         var imgHeight = img.height * imgWidth / img.width;
+//         doc.addImage(dataUrl, 0, 0, imgWidth, imgHeight);
+//         doc.save("ticket.pdf")
+//         setQr(false)
+//         router.reload()
+//     };
+//     img.src = dataUrl;
+//   }).catch((error)=> {
+//     console.error('oops, something went wrong!', error.message);
+//   })
+//   }
 
   return (
     <div className={styles.queue_add}>
-        <div className={styles.top}>
+        <div className={styles.top_notch}>
             <div className={styles.item}>
-                <div className={styles.logo}></div>
+                <div className={styles.logo}>
+                    <img src="/mnh.png" alt="" />
+                </div>
+            </div>
+            <div className={styles.title}>
+                <h1>MUHIMBILI NATIONAL HOSPITAL MLOGANZILA</h1>
             </div>
         </div>
         {
-         <div className={cx(styles.printable, isQr && styles.active)}>
+         <div className={cx(styles.printable, isQr && styles.active)} style={{background:"white"}}>
                 <form id='myFrame' ref={formRef}>
                     <h1>MNH MLOGANZILA</h1>
                     <div className={styles.contents}>

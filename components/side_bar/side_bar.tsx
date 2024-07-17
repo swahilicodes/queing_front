@@ -4,11 +4,12 @@ import Link from 'next/link'
 import cx from 'classnames'
 import { useRouter } from 'next/router'
 import { GoGitMergeQueue } from 'react-icons/go'
-import { MdOutlineCountertops, MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
+import { MdOutlineAdminPanelSettings, MdOutlineCountertops, MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
 import { FaSignInAlt, FaThList } from 'react-icons/fa'
 import { HiMiniUserGroup } from 'react-icons/hi2'
 import { useRecoilValue } from 'recoil'
 import currentUserState from '@/store/atoms/currentUser'
+import { FiSettings } from 'react-icons/fi'
 
 export default function SideBar() {
  const router = useRouter()
@@ -30,14 +31,12 @@ export default function SideBar() {
                     <Link href="/" className={styles.link}>Home</Link>
                 </li>)
                 }
-                {
-                    currentUser.role==="attendant" && (<li className={cx(styles.link,router.pathname==="/queue_add" && styles.active)}>
+                <li className={cx(styles.link,router.pathname==="/queue_add" && styles.active)}>
                     <MdOutlineRemoveFromQueue className={styles.icon}/>
                     <Link href="/queue_add" className={styles.link}>Queue</Link>
-                </li>)
-                }
+                </li>
                 {
-                  currentUser.role==="admin" && (<li className={cx(styles.link,router.pathname==="/queue_list" && styles.active)}>
+                  (currentUser.role ==="admin" || currentUser.role ==="attendant") && (<li className={cx(styles.link,router.pathname==="/queue_list" && styles.active)}>
                   <FaThList className={styles.icon}/>
                   <Link href="/queue_list" className={styles.link}>Queue List</Link>
               </li>)  
@@ -61,7 +60,7 @@ export default function SideBar() {
                 </li>)
                 }
                 {
-                    currentUser.role === "admin" && (<li className={cx(styles.link,router.pathname==="/attendants" && styles.active)}>
+                    (currentUser.role === "admin" || currentUser.role==="attendant") && (<li className={cx(styles.link,router.pathname==="/attendants" && styles.active)}>
                     <HiMiniUserGroup className={styles.icon}/>
                     <Link href="/attendants" className={styles.link}>Attendants</Link>
                 </li>)
@@ -70,6 +69,16 @@ export default function SideBar() {
                     <FaSignInAlt className={styles.icon}/>
                     <Link href="/login" className={styles.link}>Login</Link>
                 </li>
+                <li className={cx(styles.link,router.pathname==="/settings" && styles.active)}>
+                    <FiSettings className={styles.icon}/>
+                    <Link href="/settings" className={styles.link}>Settings</Link>
+                </li>
+                {
+                    (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/admins" && styles.active)}>
+                    <MdOutlineAdminPanelSettings className={styles.icon}/>
+                    <Link href="/admins" className={styles.link}>Admins</Link>
+                </li>)
+                }
             </ul>
         </div>
     </div>

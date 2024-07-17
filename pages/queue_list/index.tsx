@@ -1,19 +1,53 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './queue_list.module.scss'
 import useFetchData from '@/custom_hooks/fetch'
 import { FaMicrophoneAlt } from 'react-icons/fa'
 import { MdOutlineEdit } from 'react-icons/md'
 import cx from 'classnames'
+import { PiSpeakerHighDuotone } from 'react-icons/pi'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import currentUserState from '@/store/atoms/currentUser'
+import axios from 'axios'
 
 export default function QueueList() {
-  const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+  //const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+  //const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getCatTickets")
   const [namba, setNumber] = useState(0)
   const [talking, setTalking] = useState(false)
+  const currentUser:any = useRecoilValue(currentUserState)
+  const [page,setPage] = useState(1)
+  const [pagesize,setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0);
+  const [tickets,setTickets] = useState([])
+  const [loading,setLoading] = useState(false)
+
+  useEffect(()=> {
+    getTickets()
+  },[])
+
+  const getTickets = () => {
+    console.log('current user ',currentUser)
+    setLoading(true)
+    axios.get("http://localhost:5000/tickets/getCatTickets",{params: {page,pagesize,category:currentUser.service??"Radiology"}}).then((data)=> {
+      setTickets(data.data.data)
+      // console.log(data.data.data)
+      setLoading(false)
+    }).catch((error)=> {
+      setLoading(false)
+      if (error.response && error.response.status === 400) {
+        console.log(`there is an error ${error.message}`)
+        alert(error.response.data.error);
+    } else {
+        console.log(`there is an error message ${error.message}`)
+        alert(error.message);
+    }
+    })
+  }
 
   const handleSpeak = (namba:any) => {
     setTalking(true)
     setNumber(namba)
-    const text = `mteja mwenye namba ${namba} nenda kwenye derisha namba tatu`
+    const text = `mteja mwenye namba ${namba} nenda kwenye derisha namba ${currentUser.counter}`
     if ('speechSynthesis' in window) {
       const synthesis = window.speechSynthesis;
 
@@ -42,12 +76,16 @@ export default function QueueList() {
   };
   return (
     <div className={styles.queue_list}>
+      <div className={styles.top}>
+        <div className={styles.side}>Tickets</div>
+        <div className={styles.side}>({tickets.length})</div>
+      </div>
         {
             loading
             ? <div className={styles.loader}>loading...</div>
             : <div className={styles.wrap}>
                 {
-                    data.length<1
+                    tickets.length<1
                     ? <div className={styles.message}>there are no people on the queue</div>
                     : <div className={styles.list}>
                         <table>
@@ -62,14 +100,16 @@ export default function QueueList() {
                             </thead>
                             <tbody>
                             {
-                            data.map((item:any,index:number)=> (
-                                    <tr key={index}>
+                            tickets.map((item:any,index:number)=> (
+                                    <tr key={index} className={cx(index%2===0 && styles.even)}>
                                         <td>{item.id}</td>
                                         <td>{item.ticket_no}</td>
                                         <td>{item.category}</td>
                                         <td>{item.status}</td>
                                         <td className={styles.action}>
-                                            <div className={cx(styles.icon_wrap,namba===item.ticket_no && styles.active)} onClick={()=>handleSpeak(item.ticket_no)}><FaMicrophoneAlt className={styles.action_icon}/></div>
+                                            {
+                                              index===0 && (<div className={cx(styles.icon_wrap,namba===item.ticket_no && styles.active)} onClick={()=>handleSpeak(item.ticket_no)}><PiSpeakerHighDuotone className={styles.action_icon}/></div>)
+                                            }
                                             <div className={cx(styles.icon_wrap,namba===item.ticket_no  && styles.active)}><MdOutlineEdit className={styles.action_icon}/></div>
                                         </td>
                                     </tr>

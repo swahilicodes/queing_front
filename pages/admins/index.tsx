@@ -7,7 +7,7 @@ import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
 import useFetchData from '@/custom_hooks/fetch'
 
-export default function Attendants() {
+export default function Admins() {
 const [name,setName] = useState("")
 const [phone,setPhone] = useState("")
 const [service,setService] = useState("")
@@ -31,9 +31,9 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/attendants/create_attendant",{name,phone,service,counter,role:"attendant"}).then((data:any)=> {
+    axios.post("http://localhost:5000/admins/create_admin",{name,phone,service,counter,role:"admin"}).then((data:any)=> {
         setAdd(false)
-        //router.reload()
+        router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -45,7 +45,7 @@ useEffect(()=> {
     })
  }
  const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/attendants/delete_attendant/${id}`).then((data:any)=> {
+    axios.put(`http://localhost:5000/admins/delete_admin/${id}`).then((data:any)=> {
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
@@ -86,7 +86,7 @@ useEffect(()=> {
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/attendants/get_attendants",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/admins/get_admins",{params: {page,pagesize}}).then((data:any)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -104,7 +104,7 @@ useEffect(()=> {
   return (
     <div className={styles.services}>
         <div className={styles.service_top}>
-            <div className={styles.service_left}>Services</div>
+            <div className={styles.service_left}>Admins</div>
             <div className={styles.service_right} onClick={()=> setAdd(!isAdd)}>
                 <p>Add new</p>
             </div>

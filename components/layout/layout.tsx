@@ -9,33 +9,59 @@ import axios from 'axios'
 import currentUserState from '@/store/atoms/currentUser'
 import cx from 'classnames'
 import { TiZoomInOutline, TiZoomOut } from 'react-icons/ti'
+import io from 'socket.io-client';
+import fs from 'fs'
+import path from 'path'
 
 export default function Layout({children}:any) {
   const [full, setFull] = useRecoilState(isFull)
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
+  //const socket = io('http://localhost:5000',{});
+  const socket = io('http://localhost:5000'); // Replace with your backend URL
+
   useEffect(() => {
     checkAuth()
+    validRoutes()
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.on('data', (data) => {
+      console.log('there is new data ',data)
+    });
+
+    return () => {
+      socket.disconnect();
+    };
 }, []);
 
 const checkAuth = () => {
     const token:any = localStorage.getItem("token")
     if (isTokenExpired(token)) {
-        router.push('/login')
+        // router.push('/login')
     } else {
         const decoded:any = jwtDecode(token)
         getAdmin(decoded.phone)
-        if(router.pathname !== '/login'){
-            router.push(router.pathname)
-        }else{
-            router.push('/')
-        }
+        // if(router.pathname !== '/login'){
+        //     router.push(router.pathname)
+        // }else{
+        //     router.push('/')
+        // }
     }
+}
+
+const validRoutes = () => {
+  const defaultPage = localStorage.getItem('page')
+  if(defaultPage){
+    router.push(`${defaultPage}`)
+  }else{
+    router.push(`/`)
+  }
 }
 const getAdmin = (phone: string) => {
   axios.get('http://localhost:5000/users/get_user',{params: {phone}}).then((data) => {
       setCurrentUser(data.data)
-      console.log(currentUser)
   }).catch((error) => {
       if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`)
@@ -48,10 +74,8 @@ const getAdmin = (phone: string) => {
 }
   function isTokenExpired(token: any) {
     if (!token) {
-      console.log('no token')
         return true; // Consider expired if no token is present
     }else{
-      console.log('there is token',token)
       try {
         const decodedToken: any = jwtDecode(token);
         const currentTime = Date.now() / 1000; // Convert milliseconds to seconds

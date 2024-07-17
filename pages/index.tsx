@@ -64,34 +64,6 @@ export default function Home() {
           </table>
         </div>
       </div>
-        {/* <div className={styles.top}>
-            <div className={styles.item}>Foleni Muhimbili</div>
-            <div className={styles.item}>
-                <div className={styles.act}>Doctor</div>
-                <div className={styles.act}>Nurse</div>
-                <div className={styles.act} id="fullScreenButton" onClick={toggleFullScreen}><MdZoomInMap/></div>
-            </div>
-        </div>
-        <div className={styles.body}>
-            <div className={styles.left}></div>
-            <div className={styles.right}>
-                {
-                    loading
-                    ? <p>loading...</p>
-                    : <div className={styles.items}>
-                        {
-                            queue.map((item:any,index:number)=> (
-                                <div className={styles.item} key={index}>
-                                    <div className={styles.ticket}>{item.ticket_no.toUpperCase()}</div>
-                                    {/* <div className={styles.name}>{item.name.toUpperCase()}</div> */}
-                                {/* </div>
-                            ))
-                        }
-                    </div>
-                }
-            </div>
-        </div>
-        <div className={styles.adverts}><AdvertScroller/></div> */} 
     </div>
   )
 }

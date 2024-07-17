@@ -17,30 +17,30 @@ function Printable({data}:any) {
  const formRef = useRef<HTMLFormElement>(null);
  
  useEffect(()=> {
-    convert1()
+    //convert1()
     setInterval(()=> {
         router.push('/')
     },5000)
  },[])
-  const convert1 = () => {
-    const formData:any = formRef.current;
-    htmlToImage.toPng(formData)
-  .then(async function (dataUrl) {
-    var img = new Image();
-    img.src = dataUrl;
-    var doc = new jsPDF();
-    var img = new Image();
-    img.onload = function() {
-        var imgWidth = doc.internal.pageSize.getWidth();
-        var imgHeight = img.height * imgWidth / img.width;
-        doc.addImage(dataUrl, 0, 0, imgWidth, imgHeight);
-        doc.save("ticket.pdf")
-    };
-    img.src = dataUrl;
-  }).catch((error)=> {
-    console.error('oops, something went wrong!', error.message);
-  })
-  }
+  // const convert1 = () => {
+  //   const formData:any = formRef.current;
+  //   htmlToImage.toPng(formData)
+  // .then(async function (dataUrl) {
+  //   var img = new Image();
+  //   img.src = dataUrl;
+  //   var doc = new jsPDF();
+  //   var img = new Image();
+  //   img.onload = function() {
+  //       var imgWidth = doc.internal.pageSize.getWidth();
+  //       var imgHeight = img.height * imgWidth / img.width;
+  //       doc.addImage(dataUrl, 0, 0, imgWidth, imgHeight);
+  //       doc.save("ticket.pdf")
+  //   };
+  //   img.src = dataUrl;
+  // }).catch((error)=> {
+  //   console.error('oops, something went wrong!', error.message);
+  // })
+  // }
   return (
     <div className={styles.printable}>
         <form id='myFrame' ref={formRef}>
