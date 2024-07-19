@@ -25,12 +25,16 @@ export default function SideBar() {
         </div>
         <div className={styles.links}>
             <ul>
-                {
+               <li className={cx(styles.link,router.pathname==="/" && styles.active)}>
+                    <GoGitMergeQueue className={styles.icon}/>
+                    <Link href="/" className={styles.link}>Home</Link>
+                </li>
+                {/* {
                     (currentUser.role==="attendant" || currentUser.role === undefined) && (<li className={cx(styles.link,router.pathname==="/" && styles.active)}>
                     <GoGitMergeQueue className={styles.icon}/>
                     <Link href="/" className={styles.link}>Home</Link>
                 </li>)
-                }
+                } */}
                 <li className={cx(styles.link,router.pathname==="/queue_add" && styles.active)}>
                     <MdOutlineRemoveFromQueue className={styles.icon}/>
                     <Link href="/queue_add" className={styles.link}>Queue</Link>
@@ -69,10 +73,12 @@ export default function SideBar() {
                     <FaSignInAlt className={styles.icon}/>
                     <Link href="/login" className={styles.link}>Login</Link>
                 </li>
-                <li className={cx(styles.link,router.pathname==="/settings" && styles.active)}>
+                {
+                    (currentUser !== undefined && currentUser.role === "admin") && (<li className={cx(styles.link,router.pathname==="/settings" && styles.active)}>
                     <FiSettings className={styles.icon}/>
                     <Link href="/settings" className={styles.link}>Settings</Link>
-                </li>
+                </li>)
+                }
                 {
                     (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/admins" && styles.active)}>
                     <MdOutlineAdminPanelSettings className={styles.icon}/>

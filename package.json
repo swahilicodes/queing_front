@@ -12,6 +12,7 @@
     "@next/font": "^14.2.4",
     "@types/jspdf": "^2.0.0",
     "axios": "^1.7.2",
+    "bcryptjs": "^2.4.3",
     "classnames": "^2.5.1",
     "html-to-image": "^1.11.11",
     "html2canvas": "^1.4.1",
@@ -29,6 +30,7 @@
     "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/pdfkit": "^0.13.4",
     "@types/react": "^18",

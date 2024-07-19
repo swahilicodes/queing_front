@@ -26,64 +26,137 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        min-height: 50vh;
         .list{
             width: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            table{
+            min-height: 100%;
+            .list_wrap{
+                display: flex;
                 width: 100%;
-                padding: 0 20px;
-                border-collapse: collapse;
-                background-color: $divColor;
-                thead{
-                    width: 100%;
-                    background: $mainBold;
-                    tr{
+                min-height: 100%;
+                table{
+                    width: 80%;
+                    padding: 0 20px;
+                    border-collapse: collapse;
+                    //background-color: $divColor;
+                    height: 50vh;
+                    thead{
                         width: 100%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        padding: 15px 2px;
-                        th{
-                            color: white;
-                            font-weight: 400;
+                        background: $mainBold;
+                        tr{
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            padding: 15px 2px;
+                            th{
+                                color: white;
+                                font-weight: 400;
+                                width: 25%;
+                                text-align: left;
+                            }
                         }
                     }
-                }
-                tbody{
-                    width: 100%;
-                    tr{
+                    tbody{
                         width: 100%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        padding: 15px 10px;
-                        &.even{
-                            background: white;
-                        }
-                        // th{
-                        //     color: white;
-                        //     font-weight: 400;
-                        // }
-                        .action{
+                        tr{
+                            width: 100%;
                             display: flex;
-                            .icon_wrap{
-                                margin: 0 5px;
-                                cursor: pointer;
-                                background: $mainBold;
-                                padding: 5px;
-                                transition: all .5s ease-in-out;
-                                &.active{
-                                    background: green;
-                                }
-                                .action_icon{
-                                    color: white;
+                            align-items: center;
+                            justify-content: space-between;
+                            padding: 15px 10px;
+                            &.even{
+                                background: $divColor;
+                            }
+                            td{
+                                text-align: left;
+                                width: 25%;
+                            }
+                            .action{
+                                display: flex;
+                                .icon_wrap{
+                                    margin: 0 5px;
+                                    cursor: pointer;
+                                    background: $mainBold;
+                                    padding: 5px;
+                                    transition: all .5s ease-in-out;
+                                    &.active{
+                                        background: green;
+                                    }
+                                    .action_icon{
+                                        color: white;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                .saving{
+                    width: 20%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-start;
+                    .save_full{
+                        width: 85%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 20px;
+                        background: $divColor;
+                        h4{
+                            color: $mainColor;
+                            font-weight: 400;
+                            margin-bottom: 20px;
+                            font-size: 14px;
+                        }
+                        h1{
+                            color: $mainBold;
+                        }
+                    }
+                    .call{
+                        width: 85%;
+                        background: #47df47;
+                        padding: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        color: white;
+                        margin: 10px 0;
+                    }
+                    .two_other{
+                        width: 85%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        .item{
+                            background: blue;
+                            padding: 10px;
+                            cursor: pointer;
+                            color: white;
+                        }
+                        .item_red{
+                            background: red;
+                            padding: 10px;
+                            cursor: pointer;
+                            color: white;
+                        }
+                    }
+                }
+            }
+            .list_botoms{
+                width: 100%;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: $divColor;
             }
         }
     }

@@ -6,6 +6,11 @@ import useFetchData from '@/custom_hooks/fetch';
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
     const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    const [cats,setCats] = useState<any>([])
+
+    useEffect(()=> {
+      console.log(queue)
+    })
 
     const toggleFullScreen = () => {
      const element:any = document.documentElement;
@@ -32,12 +37,43 @@ export default function Home() {
       }
       setIsFullScreen(!isFullScreen);
     };
+
+  let folen
+  if(loading){
+    folen = <p>loading...</p>
+  }else if(!loading && queue.length !== 0 ){
+    folen = <div className={styles.cats}>
+      <table>
+        <thead>
+        <tr>
+        {
+          Array.from(new Set(queue.map((item:any )=> item.category))).map((item:any,index:number)=> (
+            <th>{item}</th>
+          ))
+        }
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {
+              Array.from(new Set(queue.map((item:any )=> item.category))).map((item:any,index:number)=> (
+                <td>{item}</td>
+              ))
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  }else{
+    folen = <p>ashalalaaaaaaaa</p>
+  }
   return (
     <div className={styles.index}>
-      <div className={styles.top_home_comp}>
+      {folen}
+      {/* <div className={styles.top_home_comp}>
         <h1>MUHIMBILI NATIONAL HOSPITAL MLOGANZILA</h1>
-      </div>
-      <div className={styles.home_comp_body}>
+      </div> */}
+      {/* <div className={styles.home_comp_body}>
         <div className={styles.home_comp_body_left}>
           <h1>001</h1>
         </div>
@@ -63,7 +99,7 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -8,32 +8,37 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 import currentUserState from '@/store/atoms/currentUser'
 import cx from 'classnames'
-import { TiZoomInOutline, TiZoomOut } from 'react-icons/ti'
 import io from 'socket.io-client';
-import fs from 'fs'
-import path from 'path'
+import Profile from '../profile/profile'
+import isUserState from '@/store/atoms/isUser'
+import isExpandState from '@/store/atoms/isExpand'
+import { MdOutlineAdd } from 'react-icons/md'
+import { GoPerson, GoPersonAdd, GoZoomIn, GoZoomOut } from 'react-icons/go'
+import { FaMinus } from 'react-icons/fa'
 
 export default function Layout({children}:any) {
   const [full, setFull] = useRecoilState(isFull)
+  const [isUser, setUser] = useRecoilState(isUserState)
+  const [isExpand, setExpand] = useRecoilState(isExpandState)
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
-  //const socket = io('http://localhost:5000',{});
-  const socket = io('http://localhost:5000'); // Replace with your backend URL
+  const socket = io('http://localhost:5000');
 
   useEffect(() => {
     checkAuth()
     validRoutes()
     socket.on('connect', () => {
       console.log('Connected to server');
+      socket.emit('data', 'Hello Server');
     });
 
-    socket.on('data', (data) => {
-      console.log('there is new data ',data)
+    socket.on('data', (msg) => {
+      console.log('Message from server: ' + msg);
     });
 
-    return () => {
-      socket.disconnect();
-    };
+    // return () => {
+    //   socket.disconnect();
+    // };
 }, []);
 
 const checkAuth = () => {
@@ -88,11 +93,45 @@ const getAdmin = (phone: string) => {
 }
   return (
     <div className={styles.layout}>
+      {
+        isUser && (<div className={styles.profile_page}>
+          <Profile/>
+        </div>)
+      }
       <div className={cx(styles.side,full && styles.full)}>
         <SideBar/>
       </div>
       <div className={cx(styles.children,full && styles.full)}>{children}</div>
-      <div className={styles.full_button} onClick={()=> setFull(!full)}>{full?<TiZoomOut className={styles.icon} size={25}/>:<TiZoomInOutline className={styles.icon} size={25}/>}</div>
+      <div className={styles.expand}>
+      {
+        isExpand && (<div className={styles.absa}>
+          <div className={styles.absa_icons}>
+            <div className={styles.absa_icon} onClick={()=> setFull(!full)}>
+              {
+                full
+                ? <GoZoomOut className={styles.absa_icon_}/>
+                : <GoZoomIn className={styles.absa_icon_}/>
+              }
+            </div>
+            <div className={styles.absa_icon} onClick={()=> setUser(!isUser)}>
+             {
+              isUser 
+              ?<GoPerson className={styles.absa_icon_}/>
+              : <GoPersonAdd className={styles.absa_icon_}/>
+             }
+            </div>
+          </div>
+        </div>)
+      }
+      <div className={styles.absa_default} onClick={()=> setExpand(!isExpand)}>
+        {
+          isExpand
+          ? <FaMinus className={styles.expa_icon}/>
+          : <MdOutlineAdd className={styles.expa_icon}/>
+        }
+      </div>
+      </div>
+      {/* <div className={styles.full_button} onClick={()=> setFull(!full)}>{full?<TiZoomOut className={styles.icon} size={25}/>:<TiZoomInOutline className={styles.icon} size={25}/>}</div> */}
     </div>
   )
 }

@@ -8,6 +8,8 @@ import { PiSpeakerHighDuotone } from 'react-icons/pi'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import currentUserState from '@/store/atoms/currentUser'
 import axios from 'axios'
+import { useRouter } from 'next/router' 
+import io from 'socket.io-client';
 
 export default function QueueList() {
   //const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
@@ -17,13 +19,15 @@ export default function QueueList() {
   const currentUser:any = useRecoilValue(currentUserState)
   const [page,setPage] = useState(1)
   const [pagesize,setPageSize] = useState(10)
-  const [totalItems, setTotalItems] = useState(0);
-  const [tickets,setTickets] = useState([])
+  const [totalItems, setTotalItems] = useState<any>(0);
+  const [tickets,setTickets] = useState<any>([])
   const [loading,setLoading] = useState(false)
+  const router = useRouter()
+  const socket = io('http://localhost:5000');
 
-  useEffect(()=> {
+  useEffect(() => {
     getTickets()
-  },[])
+  }, []);
 
   const getTickets = () => {
     console.log('current user ',currentUser)
@@ -34,6 +38,22 @@ export default function QueueList() {
       setLoading(false)
     }).catch((error)=> {
       setLoading(false)
+      if (error.response && error.response.status === 400) {
+        console.log(`there is an error ${error.message}`)
+        alert(error.response.data.error);
+    } else {
+        console.log(`there is an error message ${error.message}`)
+        alert(error.message);
+    }
+    })
+  }
+
+  const editTicket = (id:string) => {
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`).then((data:any)=> {
+      socket.emit("data",data.data.phone)
+      //console.log(data)
+      //router.reload()
+    }).catch((error)=> {
       if (error.response && error.response.status === 400) {
         console.log(`there is an error ${error.message}`)
         alert(error.response.data.error);
@@ -77,8 +97,8 @@ export default function QueueList() {
   return (
     <div className={styles.queue_list}>
       <div className={styles.top}>
-        <div className={styles.side}>Tickets</div>
-        <div className={styles.side}>({tickets.length})</div>
+        <div className={styles.side}>{currentUser.name},Queue List</div>
+        <div className={styles.side}>({currentUser.counter})</div>
       </div>
         {
             loading
@@ -88,14 +108,25 @@ export default function QueueList() {
                     tickets.length<1
                     ? <div className={styles.message}>there are no people on the queue</div>
                     : <div className={styles.list}>
+                        <div className={styles.list_wrap}>
+                        <div className={styles.saving}>
+                          <div className={styles.save_full}>
+                            <h4>Saving Now</h4>
+                            <h1>{tickets[0].ticket_no}</h1>
+                          </div>
+                          <div className={styles.call} onClick={()=>handleSpeak(tickets[0].ticket_no)}>Call</div>
+                          <div className={styles.two_other}>
+                            <div className={styles.item}>Pending</div>
+                            <div className={styles.item_red} onClick={()=> editTicket(tickets[0].id)}>Finish</div>
+                          </div>
+                        </div>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>TICKET</th>
-                                    <th>SERVICE</th>
-                                    <th>STATUS</th>
-                                    <th>ACTION</th>
+                                    <th>#</th>
+                                    <th>ticket</th>
+                                    <th>clinic</th>
+                                    <th>phone</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -105,18 +136,25 @@ export default function QueueList() {
                                         <td>{item.id}</td>
                                         <td>{item.ticket_no}</td>
                                         <td>{item.category}</td>
-                                        <td>{item.status}</td>
-                                        <td className={styles.action}>
+                                        <td>{item.phone}</td>
+                                        {/* <td className={styles.action}>
                                             {
                                               index===0 && (<div className={cx(styles.icon_wrap,namba===item.ticket_no && styles.active)} onClick={()=>handleSpeak(item.ticket_no)}><PiSpeakerHighDuotone className={styles.action_icon}/></div>)
                                             }
-                                            <div className={cx(styles.icon_wrap,namba===item.ticket_no  && styles.active)}><MdOutlineEdit className={styles.action_icon}/></div>
-                                        </td>
+                                            <div className={cx(styles.icon_wrap,namba===item.ticket_no  && styles.active)} onClick={()=> editTicket(item.id)}><MdOutlineEdit className={styles.action_icon}/></div>
+                                        </td> */}
                                     </tr>
                                 ))
                             }
                             </tbody>
                         </table>
+                        </div>
+                        <div className={styles.list_botoms}>
+                          <div className={styles.list_botom}>On Queue: 1</div>
+                          <div className={styles.list_botom}>Attended: 56</div>
+                          <div className={styles.list_botom}>Pending: 0</div>
+                          <div className={styles.list_botom}>Remaining: 50</div>
+                        </div>
                     </div>
                 }
             </div>
