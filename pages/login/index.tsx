@@ -12,7 +12,7 @@ export default function Login() {
     e.preventDefault()
     axios.post("http://localhost:5000/users/login",{phone,password:pass}).then((data:any)=> {
         localStorage.setItem("token",data.data)
-        router.reload()
+        router.push("/")
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)

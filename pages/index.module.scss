@@ -5,31 +5,103 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    background: $mainColor;
+    position: relative;
     .cats{
         width: 100%;
         table{
             width: 100%;
             thead{
                 width: 100%;
+                background: $mainBold;
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 tr{
                     width: 100%;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    border: 1px solid grey;
-                    padding: 20px;
+                    //padding: 20px 15px;
+                    height: 90%;
+                    th{
+                        background: $secondColor;
+                        text-align: center;
+                        width: 20%;
+                        //padding: 0 15px;
+                        color: $divColor;
+                        font-size: 40px;
+                        font-weight: 400;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        .th_item{
+                            background: $mainBold;
+                            width: 99%;
+                            height: 95%;
+                        }
+                    }
                 }
             }
             tbody{
                 width: 100%;
+                background: $mainColor;
                 tr{
                     width: 100%;
                     display: flex;
-                    align-items: center;
+                    align-items: flex-start;
                     justify-content: space-between;
-                    background: $divColor;
-                    padding: 20px;
+                    //padding: 0 20px;
+                    td{
+                        width: 100%;
+                        text-align: left;
+                        width: 20%;
+                    }
                 }
+            }
+        }
+    }
+    .color_expla{
+        position: fixed;
+        bottom: 0;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 20px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .item{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .color_left{
+                width: 35px;
+                height: 35px;
+                background: $divColor;
+                &.main{
+                    background: $secondColor;
+                }
+                &.gold{
+                    background: $goldColor;
+                }
+                &.red{
+                    background: red;
+                }
+                &.green{
+                    background: green;
+                }
+                &.yellow{
+                    background: yellow;
+                }
+            }
+            .color_right{
+                margin-left: 10px;
+                color: white;
+                font-size: 40px;
             }
         }
     }

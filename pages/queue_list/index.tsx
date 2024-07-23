@@ -10,6 +10,10 @@ import currentUserState from '@/store/atoms/currentUser'
 import axios from 'axios'
 import { useRouter } from 'next/router' 
 import io from 'socket.io-client';
+import { GiSpeaker } from 'react-icons/gi'
+import isFull from '@/store/atoms/isFull'
+import { IoArrowRedoOutline } from 'react-icons/io5'
+import Ticket_Category_Length from '@/components/ticket_category_length/ticket_category_length'
 
 export default function QueueList() {
   //const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
@@ -24,15 +28,17 @@ export default function QueueList() {
   const [loading,setLoading] = useState(false)
   const router = useRouter()
   const socket = io('http://localhost:5000');
+  const [status, setStatus] = useState("waiting")
+  const full = useRecoilValue(isFull)
 
   useEffect(() => {
     getTickets()
-  }, []);
+  }, [status]);
 
   const getTickets = () => {
     console.log('current user ',currentUser)
     setLoading(true)
-    axios.get("http://localhost:5000/tickets/getCatTickets",{params: {page,pagesize,category:currentUser.service??"Radiology"}}).then((data)=> {
+    axios.get("http://localhost:5000/tickets/getCatTickets",{params: {page,pagesize,category:currentUser.service??"Radiology",status}}).then((data)=> {
       setTickets(data.data.data)
       // console.log(data.data.data)
       setLoading(false)
@@ -50,7 +56,7 @@ export default function QueueList() {
 
   const editTicket = (id:string) => {
     axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`).then((data:any)=> {
-      socket.emit("data",data.data.phone)
+      socket.emit("data",{data:data.data,route:"tickets"})
       //console.log(data)
       //router.reload()
     }).catch((error)=> {
@@ -86,10 +92,10 @@ export default function QueueList() {
         console.warn('Swahili female voice not found.');
       }
 
-      synthesis.speak(utterance);
+      synthesis.speak(utterance)
       setInterval(()=> {
         setTalking(false)
-      },5000)
+      },9000)
     } else {
       console.error('Speech synthesis not supported.');
     }
@@ -97,8 +103,17 @@ export default function QueueList() {
   return (
     <div className={styles.queue_list}>
       <div className={styles.top}>
-        <div className={styles.side}>{currentUser.name},Queue List</div>
-        <div className={styles.side}>({currentUser.counter})</div>
+        <div className={styles.side}>{currentUser.name}/{currentUser.counter}</div>
+        {/* <div className={styles.side}>({currentUser.counter})</div> */}
+        <div className={styles.side}>
+          <label>Status:</label>
+          <select onChange={e => setStatus(e.target.value)} value={status}>
+            <option value="waiting">waiting</option>
+            <option value="done">done</option>
+            <option value="cancelled">cancelled</option>
+            <option value="pending">pending</option>
+          </select>
+        </div>
       </div>
         {
             loading
@@ -107,20 +122,25 @@ export default function QueueList() {
                 {
                     tickets.length<1
                     ? <div className={styles.message}>there are no people on the queue</div>
-                    : <div className={styles.list}>
+                    : <div className={styles.list_queue_list}>
                         <div className={styles.list_wrap}>
-                        <div className={styles.saving}>
+                        <div className={cx(styles.saving,full && styles.full)}>
+                          <div className={styles.saving_wrap}>
                           <div className={styles.save_full}>
                             <h4>Saving Now</h4>
                             <h1>{tickets[0].ticket_no}</h1>
                           </div>
-                          <div className={styles.call} onClick={()=>handleSpeak(tickets[0].ticket_no)}>Call</div>
+                          <div className={styles.call} onClick={()=>handleSpeak(tickets[0].ticket_no)}>
+                            <GiSpeaker size={150} className={cx(styles.click_icon,talking && styles.active)}/>
+                          </div>
                           <div className={styles.two_other}>
                             <div className={styles.item}>Pending</div>
-                            <div className={styles.item_red} onClick={()=> editTicket(tickets[0].id)}>Finish</div>
+                            <div className={styles.item_red} onClick={()=> editTicket(tickets[0].id)}>Cancel</div>
+                          </div>
+                          <div className={styles.finish}>Finish</div>
                           </div>
                         </div>
-                        <table>
+                        <table className={cx(styles.table,full && styles.full)}>
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -158,6 +178,27 @@ export default function QueueList() {
                     </div>
                 }
             </div>
+        }
+        {
+          tickets.length > 0 && (<div className={styles.bottom_desc}>
+            <div className={styles.top}>
+              <div className={styles.item}>
+                <p>On Queue: <span> <Ticket_Category_Length category={currentUser.service} status='waiting'/> </span> </p>
+              </div>
+              <div className={styles.item}>
+                <p>Attended: <span><Ticket_Category_Length category={currentUser.service} status='done'/></span> </p>
+              </div>
+              <div className={styles.item}>
+                <p>Pending: <span><Ticket_Category_Length category={currentUser.service} status='pending'/></span> </p>
+              </div>
+              <div className={styles.item}>
+                <p>Cancelled: <span><Ticket_Category_Length category={currentUser.service} status='cancelled'/></span> </p>
+              </div>
+              <div className={styles.item_out}>
+                <IoArrowRedoOutline className={styles.icon}/>
+              </div>
+            </div>
+          </div>)
         }
     </div>
   )

@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import styles from './index.module.scss'
 import { MdZoomInMap } from 'react-icons/md';
 import useFetchData from '@/custom_hooks/fetch';
+import CatTickets from '@/components/cat_tickets/cat_tickets';
+import cx from 'classnames'
 
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
@@ -9,7 +11,7 @@ export default function Home() {
     const [cats,setCats] = useState<any>([])
 
     useEffect(()=> {
-      console.log(queue)
+      //console.log(queue)
     })
 
     const toggleFullScreen = () => {
@@ -48,7 +50,11 @@ export default function Home() {
         <tr>
         {
           Array.from(new Set(queue.map((item:any )=> item.category))).map((item:any,index:number)=> (
-            <th>{item}</th>
+            <th>
+              <div className={styles.th_item}>
+              {item.toUpperCase()}
+              </div>
+            </th>
           ))
         }
         </tr>
@@ -56,8 +62,8 @@ export default function Home() {
         <tbody>
           <tr>
             {
-              Array.from(new Set(queue.map((item:any )=> item.category))).map((item:any,index:number)=> (
-                <td>{item}</td>
+              Array.from(new Set(queue.map((item:any,index:number)=> item.category))).map((item:any,index:number)=> (
+                <td className={cx(index%2===0 && styles.even)}> <CatTickets category={item}/> </td>
               ))
             }
           </tr>
@@ -70,36 +76,28 @@ export default function Home() {
   return (
     <div className={styles.index}>
       {folen}
-      {/* <div className={styles.top_home_comp}>
-        <h1>MUHIMBILI NATIONAL HOSPITAL MLOGANZILA</h1>
-      </div> */}
-      {/* <div className={styles.home_comp_body}>
-        <div className={styles.home_comp_body_left}>
-          <h1>001</h1>
+      <div className={styles.color_expla}>
+        <div className={styles.item}>
+          <div className={cx(styles.color_left,styles.main)}></div>
+          <div className={styles.color_right}>Code</div>
         </div>
-        <div className={styles.home_comp_body_right}>
-          <table>
-            <thead>
-              <tr>
-                <th>Ticket</th>
-                <th>Service</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                queue.map((item:any,index:number)=> (
-                  <tr key={index}>
-                    <td>{item.ticket_no}</td>
-                    <td>{item.category}</td>
-                    <td className={styles.status}>{item.status}</td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
+        <div className={styles.item}>
+          <div className={cx(styles.color_left,styles.gold)}></div>
+          <div className={styles.color_right}>Counter</div>
         </div>
-      </div> */}
+        <div className={styles.item}>
+          <div className={cx(styles.color_left,styles.red)}></div>
+          <div className={styles.color_right}>Serving</div>
+        </div>
+        <div className={styles.item}>
+          <div className={cx(styles.color_left,styles.green)}></div>
+          <div className={styles.color_right}>Ready</div>
+        </div>
+        <div className={styles.item}>
+          <div className={cx(styles.color_left,styles.yellow)}></div>
+          <div className={styles.color_right}>Get Ready</div>
+        </div>
+      </div>
     </div>
   )
 }

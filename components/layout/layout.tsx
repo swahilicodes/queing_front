@@ -26,7 +26,7 @@ export default function Layout({children}:any) {
 
   useEffect(() => {
     checkAuth()
-    validRoutes()
+    // validRoutes()
     socket.on('connect', () => {
       console.log('Connected to server');
       socket.emit('data', 'Hello Server');

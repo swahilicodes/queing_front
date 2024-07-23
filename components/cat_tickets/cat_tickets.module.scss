@@ -1,0 +1,67 @@
+@import '../../global.scss';
+.cat_tickets{
+    width: 100%;
+    position: relative;
+    .cat_ticket{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        height: 60px;
+        background: $mainBold;
+        //box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        //border: 2px solid grey;
+        // border-bottom: 3px solid blue;
+        .left{
+            margin: 5px 0;
+            color: #FF5D00;
+            font-size: 50px;
+            padding: 25px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 85%;
+            font-weight: 600;
+            span{
+                color: #B09900;
+                font-weight: 400;
+            }
+            .cat_ticket_icon{
+                color: #E5DDAC;
+            }
+        }
+        .right{
+            width: 40px;
+            height: 90%;
+            background: $mainColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            font-weight: 600;
+            margin-right: 2px;
+            &.red{
+                background: red;
+            }
+            &.green{
+                background: green;
+            }
+            &.yellow{
+                background: yellow;
+            }
+        }
+        // &.even{
+        //     background: $divColor;
+        // }
+    }
+    .color_description{
+        position: fixed;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        bottom: 0;
+    }
+}
