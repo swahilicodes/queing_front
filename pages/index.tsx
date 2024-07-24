@@ -79,23 +79,23 @@ export default function Home() {
       <div className={styles.color_expla}>
         <div className={styles.item}>
           <div className={cx(styles.color_left,styles.main)}></div>
-          <div className={styles.color_right}>Code</div>
+          <div className={styles.color_right}>Namba</div>
         </div>
         <div className={styles.item}>
           <div className={cx(styles.color_left,styles.gold)}></div>
-          <div className={styles.color_right}>Counter</div>
+          <div className={styles.color_right}>Dirisha</div>
         </div>
         <div className={styles.item}>
           <div className={cx(styles.color_left,styles.red)}></div>
-          <div className={styles.color_right}>Serving</div>
+          <div className={styles.color_right}>Anahudumiwa</div>
         </div>
         <div className={styles.item}>
           <div className={cx(styles.color_left,styles.green)}></div>
-          <div className={styles.color_right}>Ready</div>
+          <div className={styles.color_right}>Anaefata</div>
         </div>
         <div className={styles.item}>
           <div className={cx(styles.color_left,styles.yellow)}></div>
-          <div className={styles.color_right}>Get Ready</div>
+          <div className={styles.color_right}>Kaa Tayari</div>
         </div>
       </div>
     </div>

@@ -1,0 +1,32 @@
+@import '../../../global.scss';
+.cubes{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .cube {
+        width: 20px;
+        height: 20px;
+        background-color: $mainColor;
+        margin: 0 10px;
+        animation: snakeRoll 1s infinite ease-in-out;
+      }
+      
+      .cube:nth-child(2) {
+        animation-delay: 0.2s;
+        background-color: $secondColor;
+      }
+      
+      .cube:nth-child(3) {
+        animation-delay: 0.4s;
+        background-color: $goldColor;
+      }
+}
+@keyframes snakeRoll {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(20px);
+    }
+}

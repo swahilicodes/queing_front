@@ -25,39 +25,33 @@ useEffect(()=> {
     checkStatus()
 },[category])
  const getTickets = () => {
-    axios.get('http://localhost:5000/tickets/getCatTickets',{params: {page,pagesize,category}}).then((data:any)=> {
+    axios.get('http://localhost:5000/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
         setData(data.data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.response.data.error}`)
             //alert(error.response.data.error);
         } else {
-            console.log(`there is an error message ${error.message}`)
+            console.log(error.message)
             //alert(error.message);
         }
     })
  }
  const getCounter = () => {
-    console.log(category)
     axios.get('http://localhost:5000/tickets/getTicketCounter',{params: {category:category}}).then((data:any)=> {
-        console.log(data.data)
         setService(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.response.data.error}`)
             //alert(error.response.data.error);
         } else {
-            console.log(`there is an error message ${error.message}`)
+            console.log(error.message)
             //alert(error.message);
         }
     })
  }
 
  const checkStatus = () => {
-    // socket.on('connect', () => {
-    //     console.log('Connected to server');
-    //     socket.emit('data', 'Hello Server');
-    //   });
       socket.on('data', (msg) => {
         if(msg){
             console.log(msg.route)

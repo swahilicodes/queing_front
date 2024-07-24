@@ -14,6 +14,7 @@ import { GiSpeaker } from 'react-icons/gi'
 import isFull from '@/store/atoms/isFull'
 import { IoArrowRedoOutline } from 'react-icons/io5'
 import Ticket_Category_Length from '@/components/ticket_category_length/ticket_category_length'
+import Cubes from '@/components/loaders/cubes/cubes'
 
 export default function QueueList() {
   //const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
@@ -30,20 +31,41 @@ export default function QueueList() {
   const socket = io('http://localhost:5000');
   const [status, setStatus] = useState("waiting")
   const full = useRecoilValue(isFull)
+  const [edLoading,setEdLoading] = useState(false)
 
   useEffect(() => {
     getTickets()
   }, [status]);
 
   const getTickets = () => {
-    console.log('current user ',currentUser)
+    const service:any = localStorage.getItem("user_service")
     setLoading(true)
-    axios.get("http://localhost:5000/tickets/getCatTickets",{params: {page,pagesize,category:currentUser.service??"Radiology",status}}).then((data)=> {
+    axios.get("http://localhost:5000/tickets/getCatTickets",{params: {page,pagesize,category:currentUser.service??service,status},}).then((data)=> {
       setTickets(data.data.data)
       // console.log(data.data.data)
       setLoading(false)
     }).catch((error)=> {
       setLoading(false)
+      if (error.response && error.response.status === 400) {
+        console.log(`there is an error ${error.response.data.error}`)
+        //alert(error.response.data.error);
+    } else {
+        console.log(`there is an error message ${error.message}`)
+        //alert(error.message);
+    }
+    })
+  }
+
+  const editTicket = (id:string,status:string) => {
+    setEdLoading(true)
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`,{status}).then((data:any)=> {
+      socket.emit("data",{data:data.data,route:"tickets"})
+      setInterval(()=> {
+        setEdLoading(false)
+        router.reload()
+      },3000)
+    }).catch((error)=> {
+      setEdLoading(false)
       if (error.response && error.response.status === 400) {
         console.log(`there is an error ${error.message}`)
         alert(error.response.data.error);
@@ -54,20 +76,8 @@ export default function QueueList() {
     })
   }
 
-  const editTicket = (id:string) => {
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`).then((data:any)=> {
-      socket.emit("data",{data:data.data,route:"tickets"})
-      //console.log(data)
-      //router.reload()
-    }).catch((error)=> {
-      if (error.response && error.response.status === 400) {
-        console.log(`there is an error ${error.message}`)
-        alert(error.response.data.error);
-    } else {
-        console.log(`there is an error message ${error.message}`)
-        alert(error.message);
-    }
-    })
+  const prepare = (id:string,status:string) => {
+    editTicket(id,status)
   }
 
   const handleSpeak = (namba:any) => {
@@ -102,6 +112,15 @@ export default function QueueList() {
   };
   return (
     <div className={styles.queue_list}>
+      {
+        edLoading && (
+          <div className={styles.overlay}>
+            <div className={styles.conts}>
+              <Cubes/>
+            </div>
+          </div>
+        )
+      }
       <div className={styles.top}>
         <div className={styles.side}>{currentUser.name}/{currentUser.counter}</div>
         {/* <div className={styles.side}>({currentUser.counter})</div> */}
@@ -121,7 +140,12 @@ export default function QueueList() {
             : <div className={styles.wrap}>
                 {
                     tickets.length<1
-                    ? <div className={styles.message}>there are no people on the queue</div>
+                    ? <div className={styles.message}>
+                      <div className={styles.image}>
+                        <img src="/nodata.svg" alt="" />
+                      </div>
+                      <p>there are no people on the queue</p>
+                    </div>
                     : <div className={styles.list_queue_list}>
                         <div className={styles.list_wrap}>
                         <div className={cx(styles.saving,full && styles.full)}>
@@ -134,10 +158,10 @@ export default function QueueList() {
                             <GiSpeaker size={150} className={cx(styles.click_icon,talking && styles.active)}/>
                           </div>
                           <div className={styles.two_other}>
-                            <div className={styles.item}>Pending</div>
-                            <div className={styles.item_red} onClick={()=> editTicket(tickets[0].id)}>Cancel</div>
+                            <div className={styles.item} onClick={()=> prepare(tickets[0].id,"pending")}>Pending</div>
+                            <div className={styles.item_red} onClick={()=> prepare(tickets[0].id,"cancelled")}>Cancel</div>
                           </div>
-                          <div className={styles.finish}>Finish</div>
+                          <div className={styles.finish} onClick={()=> prepare(tickets[0].id,"done")}>Finish</div>
                           </div>
                         </div>
                         <table className={cx(styles.table,full && styles.full)}>

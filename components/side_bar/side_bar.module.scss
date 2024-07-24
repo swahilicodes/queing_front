@@ -1,12 +1,14 @@
 @import '../../global.scss';
 .side_bar{
     width: 100%;
-    background-color: $divColor;
+    background-color: white;
     height: 100vh;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 5px 0 5px -5px rgba(0, 0, 0, 0.3);
+    //box-shadow: 10px 0 10px rgba(0, 0, 0, 0.1);
     .logo{
         position: absolute;
         top: 20px;

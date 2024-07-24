@@ -24,8 +24,10 @@
         }
     }
     .children{
-        width: 90%;
+        width: 89.9%;
         transition: all .5s ease-in-out;
+        height: 100vh;
+        box-shadow: -3px 0 3px rgba(0, 0, 0, 0.1);
         &.full{
             width: 100%;
         }

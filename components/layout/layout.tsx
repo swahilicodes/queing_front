@@ -21,8 +21,11 @@ export default function Layout({children}:any) {
   const [isUser, setUser] = useRecoilState(isUserState)
   const [isExpand, setExpand] = useRecoilState(isExpandState)
   const router = useRouter()
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
+  const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const socket = io('http://localhost:5000');
+  const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/','/settings']
+  const attendantRoutes = ['/queue_list','/queue_add','/']
 
   useEffect(() => {
     checkAuth()
@@ -39,34 +42,62 @@ export default function Layout({children}:any) {
     // return () => {
     //   socket.disconnect();
     // };
+    // router.events.on('routeChangeStart', validRoutes);
+
+    // return () => {
+    //   router.events.off('routeChangeStart', validRoutes);
+    // };
 }, []);
 
 const checkAuth = () => {
     const token:any = localStorage.getItem("token")
     if (isTokenExpired(token)) {
-        // router.push('/login')
+        validRoutes()
     } else {
         const decoded:any = jwtDecode(token)
         getAdmin(decoded.phone)
-        // if(router.pathname !== '/login'){
-        //     router.push(router.pathname)
-        // }else{
-        //     router.push('/')
-        // }
+        validRoutes()
     }
 }
 
 const validRoutes = () => {
+  const path = router.pathname
   const defaultPage = localStorage.getItem('page')
-  if(defaultPage){
-    router.push(`${defaultPage}`)
+  console.log('current user role ',currentUser.role)
+  if(!currentUser){
+    if(defaultPage){
+      router.push(`${defaultPage}`)
+    }else{
+      router.push(`/`)
+    }
   }else{
-    router.push(`/`)
+    if(restrictedRoutes.includes(path)){
+      if(currentUser.role ==="admin" && adminRoutes.includes(path)){
+        router.push(path)
+      }else if(currentUser.role ==="attendant" && attendantRoutes.includes(path)){
+        router.push(path)
+      }else{
+        router.push('/')
+      }
+    }else{
+      if(defaultPage){
+        router.push(`${defaultPage}`)
+      }else{
+        router.push(`/`)
+      }
+    }
   }
 }
 const getAdmin = (phone: string) => {
+  const user = localStorage.getItem('user_service')
   axios.get('http://localhost:5000/users/get_user',{params: {phone}}).then((data) => {
       setCurrentUser(data.data)
+      if(user){
+        localStorage.removeItem('user_service')
+        localStorage.setItem("user_service",data.data.service)
+      }else{
+        localStorage.setItem("user_service",data.data.service)
+      }
   }).catch((error) => {
       if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`)

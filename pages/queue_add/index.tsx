@@ -16,6 +16,7 @@ import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import cx from 'classnames'
 import useFetchData from '@/custom_hooks/fetch'
 import html2canvas from 'html2canvas'
+import io from 'socket.io-client'
 
 export default function QueueAdd() {
   const {data:services,loading,error} = useFetchData("http://localhost:5000/services/get_all_services")
@@ -30,6 +31,7 @@ export default function QueueAdd() {
   const formRef = useRef<HTMLFormElement>(null);
   const date = new Date(qr.createdAt);
  const qrData = `phone:${qr.phone},clinic:${qr.category}`
+ const socket = io('http://localhost:5000');
 
   const enterNumber = (cat:string,) => {
     setcat(cat)
@@ -81,6 +83,7 @@ export default function QueueAdd() {
       a.download = 'image.png';
       a.click();
       setQr(false)
+      socket.emit("data",{data:{},route:"tickets"})
       router.reload()
     });
   };
