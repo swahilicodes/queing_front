@@ -269,6 +269,23 @@
                                 opacity: .8;
                             }
                         }
+                        .reload{
+                            width: 90%;
+                            background: $mainBold;
+                            padding: 15px;
+                            margin: 10px 0;
+                            cursor: pointer;
+                            text-align: center;
+                            color: white;
+                            transition: all .5s ease-in-out;
+                            &:hover{
+                                opacity: .8;
+                            }
+                            .icon{
+                                animation: circle .5s infinite;
+                                color: white;
+                            }
+                        }
                     }
                 }
             }
@@ -321,5 +338,13 @@
                 }
             }
         }
+    }
+}
+@keyframes circle {
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{
+        transform: rotate(180deg);
     }
 }

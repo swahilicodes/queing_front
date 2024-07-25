@@ -15,6 +15,7 @@ import isFull from '@/store/atoms/isFull'
 import { IoArrowRedoOutline } from 'react-icons/io5'
 import Ticket_Category_Length from '@/components/ticket_category_length/ticket_category_length'
 import Cubes from '@/components/loaders/cubes/cubes'
+import { SlRefresh } from 'react-icons/sl'
 
 export default function QueueList() {
   //const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
@@ -32,10 +33,26 @@ export default function QueueList() {
   const [status, setStatus] = useState("waiting")
   const full = useRecoilValue(isFull)
   const [edLoading,setEdLoading] = useState(false)
+  const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
     getTickets()
+    // socket.on('data', (msg) => {
+    //   if(msg){
+    //       if(msg.route==="tickets"){
+    //           router.reload()
+    //       }
+    //   }
+    // });
   }, [status]);
+
+  const reloda = () => {
+    setRefresh(true)
+    setInterval(()=> {
+      setRefresh(false)
+      router.reload()
+    },2000)
+  }
 
   const getTickets = () => {
     const service:any = localStorage.getItem("user_service")
@@ -158,10 +175,11 @@ export default function QueueList() {
                             <GiSpeaker size={150} className={cx(styles.click_icon,talking && styles.active)}/>
                           </div>
                           <div className={styles.two_other}>
-                            <div className={styles.item} onClick={()=> prepare(tickets[0].id,"pending")}>Pending</div>
+                            <div className={styles.item} onClick={()=> prepare(tickets[0].id,"pending")}>Pend</div>
                             <div className={styles.item_red} onClick={()=> prepare(tickets[0].id,"cancelled")}>Cancel</div>
                           </div>
                           <div className={styles.finish} onClick={()=> prepare(tickets[0].id,"done")}>Finish</div>
+                          <div className={styles.reload} onClick={()=> reloda()}>{refresh?<SlRefresh className={styles.icon}/>:"Refresh"}</div>
                           </div>
                         </div>
                         <table className={cx(styles.table,full && styles.full)}>

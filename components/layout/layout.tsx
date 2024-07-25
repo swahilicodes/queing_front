@@ -1,5 +1,5 @@
 import isFull from '@/store/atoms/isFull'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import styles from './layout.module.scss'
 import SideBar from '../side_bar/side_bar'
@@ -12,9 +12,11 @@ import io from 'socket.io-client';
 import Profile from '../profile/profile'
 import isUserState from '@/store/atoms/isUser'
 import isExpandState from '@/store/atoms/isExpand'
-import { MdOutlineAdd } from 'react-icons/md'
+import { MdErrorOutline, MdOutlineAdd } from 'react-icons/md'
 import { GoPerson, GoPersonAdd, GoZoomIn, GoZoomOut } from 'react-icons/go'
 import { FaMinus } from 'react-icons/fa'
+import errorState from '@/store/atoms/error'
+import { BiSolidError } from 'react-icons/bi'
 
 export default function Layout({children}:any) {
   const [full, setFull] = useRecoilState(isFull)
@@ -24,8 +26,10 @@ export default function Layout({children}:any) {
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const socket = io('http://localhost:5000');
   const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/','/settings']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/']
   const attendantRoutes = ['/queue_list','/queue_add','/']
+  const [error,setError] = useRecoilState(errorState)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -38,6 +42,9 @@ export default function Layout({children}:any) {
     socket.on('data', (msg) => {
       console.log('Message from server: ' + msg);
     });
+    if(error.trim() !==""){
+      setIsError(true)
+    }
 
     // return () => {
     //   socket.disconnect();
@@ -47,7 +54,7 @@ export default function Layout({children}:any) {
     // return () => {
     //   router.events.off('routeChangeStart', validRoutes);
     // };
-}, []);
+}, [error]);
 
 const checkAuth = () => {
     const token:any = localStorage.getItem("token")
@@ -62,6 +69,7 @@ const checkAuth = () => {
 
 const validRoutes = () => {
   const path = router.pathname
+  const user = localStorage.getItem('user_role')
   const defaultPage = localStorage.getItem('page')
   console.log('current user role ',currentUser.role)
   if(!currentUser){
@@ -72,12 +80,12 @@ const validRoutes = () => {
     }
   }else{
     if(restrictedRoutes.includes(path)){
-      if(currentUser.role ==="admin" && adminRoutes.includes(path)){
-        router.push(path)
-      }else if(currentUser.role ==="attendant" && attendantRoutes.includes(path)){
-        router.push(path)
-      }else{
+      if(user==="admin" && !adminRoutes.includes(path)){
         router.push('/')
+      }else if(user ==="attendant" && !attendantRoutes.includes(path)){
+        router.push('/')
+      }else{
+        router.push(path)
       }
     }else{
       if(defaultPage){
@@ -94,9 +102,12 @@ const getAdmin = (phone: string) => {
       setCurrentUser(data.data)
       if(user){
         localStorage.removeItem('user_service')
+        localStorage.removeItem('user_role')
         localStorage.setItem("user_service",data.data.service)
+        localStorage.setItem("user_role",data.data.role)
       }else{
         localStorage.setItem("user_service",data.data.service)
+        localStorage.setItem("user_role",data.data.role)
       }
   }).catch((error) => {
       if (error.response && error.response.status === 400) {
@@ -132,7 +143,25 @@ const getAdmin = (phone: string) => {
       <div className={cx(styles.side,full && styles.full)}>
         <SideBar/>
       </div>
-      <div className={cx(styles.children,full && styles.full)}>{children}</div>
+      <div className={cx(styles.children,full && styles.full)}>
+        {children}
+        {
+        isError && (
+          <div className={styles.error_overlay}>
+            <div className={styles.error_content}>
+              <div className={styles.error_top}>
+                <BiSolidError className={styles.icon} size={60}/>
+              </div>
+              <div className={styles.error_conta}>
+                <h1>Ooooh Sorry!</h1>
+                <p>{error??"there is an error"}</p>
+              </div>
+              <div className={styles.close} onClick={()=> setIsError(!isError)}>ok</div>
+            </div>
+          </div>
+        )
+      }
+      </div>
       <div className={styles.expand}>
       {
         isExpand && (<div className={styles.absa}>

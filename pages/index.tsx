@@ -8,7 +8,6 @@ import cx from 'classnames'
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
     const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
-    const [cats,setCats] = useState<any>([])
 
     useEffect(()=> {
       //console.log(queue)
@@ -71,7 +70,7 @@ export default function Home() {
       </table>
     </div>
   }else{
-    folen = <p>ashalalaaaaaaaa</p>
+    folen = <p>Nothing Here</p>
   }
   return (
     <div className={styles.index}>

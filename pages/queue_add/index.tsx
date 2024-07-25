@@ -88,28 +88,6 @@ export default function QueueAdd() {
     });
   };
 
-//   const convert1 = () => {
-//     const formData:any = formRef.current;
-//     htmlToImage.toPng(formData)
-//   .then(async function (dataUrl) {
-//     var img = new Image();
-//     img.src = dataUrl;
-//     var doc = new jsPDF();
-//     var img = new Image();
-//     img.onload = function() {
-//         var imgWidth = doc.internal.pageSize.getWidth();
-//         var imgHeight = img.height * imgWidth / img.width;
-//         doc.addImage(dataUrl, 0, 0, imgWidth, imgHeight);
-//         doc.save("ticket.pdf")
-//         setQr(false)
-//         router.reload()
-//     };
-//     img.src = dataUrl;
-//   }).catch((error)=> {
-//     console.error('oops, something went wrong!', error.message);
-//   })
-//   }
-
   return (
     <div className={styles.queue_add}>
         <div className={styles.top_notch}>

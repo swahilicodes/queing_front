@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import styles from './login.module.scss'
 import axios from 'axios'
 import { useRouter } from 'next/router'
+import { useRecoilState } from 'recoil'
+import errorState from '@/store/atoms/error'
 
 export default function Login() {
  const [phone, setPhone] = useState('')
  const [pass, setPass] = useState('')
  const router = useRouter()
+ const [error,setError] = useRecoilState(errorState)
 
  const login = (e:React.FormEvent) => {
     e.preventDefault()
@@ -16,10 +19,10 @@ export default function Login() {
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setError(error.response.data.error);
         } else {
             console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setError(error.message);
         }
     })
  }
