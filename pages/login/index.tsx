@@ -28,7 +28,35 @@ export default function Login() {
  }
   return (
     <div className={styles.login}>
-        <form onSubmit={login}>
+        <form className={styles.form} onSubmit={login}>
+        <h2 className={styles.title}>Login</h2>
+        <div className={styles.inputGroup}>
+          <label htmlFor="phone" className={styles.label}>Phone</label>
+          <input
+            type="tel"
+            id="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className={styles.input}
+            placeholder="Enter your phone number"
+            required
+          />
+        </div>
+        <div className={styles.inputGroup}>
+          <label htmlFor="password" className={styles.label}>Password</label>
+          <input
+            type="password"
+            id="password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+            className={styles.input}
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+        <button type="submit" className={styles.button}>Login</button>
+      </form>
+        {/* <form onSubmit={login}>
         <div className={styles.add_item}>
         <label htmlFor="name">Enter name</label>
         <input 
@@ -52,7 +80,7 @@ export default function Login() {
         />
         </div>
         <button type='submit'>submit</button>
-        </form>
+        </form> */}
     </div>
   )
 }

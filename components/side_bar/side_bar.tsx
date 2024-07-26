@@ -4,7 +4,7 @@ import Link from 'next/link'
 import cx from 'classnames'
 import { useRouter } from 'next/router'
 import { GoGitMergeQueue } from 'react-icons/go'
-import { MdOutlineAdminPanelSettings, MdOutlineCountertops, MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
+import { MdOutlineAdminPanelSettings, MdOutlineCountertops, MdOutlineQueuePlayNext, MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
 import { FaSignInAlt, FaThList } from 'react-icons/fa'
 import { HiMiniUserGroup } from 'react-icons/hi2'
 import { useRecoilValue } from 'recoil'
@@ -41,7 +41,7 @@ export default function SideBar() {
                 </li>
                 {
                   (currentUser.role ==="admin" || currentUser.role ==="attendant") && (<li className={cx(styles.link,router.pathname==="/queue_list" && styles.active)}>
-                  <FaThList className={styles.icon}/>
+                  <MdOutlineQueuePlayNext className={styles.icon}/>
                   <Link href="/queue_list" className={styles.link}>Queue List</Link>
               </li>)  
                 }

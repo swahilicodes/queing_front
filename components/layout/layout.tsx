@@ -25,9 +25,9 @@ export default function Layout({children}:any) {
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const socket = io('http://localhost:5000');
-  const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/']
-  const attendantRoutes = ['/queue_list','/queue_add','/']
+  const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/','/login']
+  const attendantRoutes = ['/queue_list','/queue_add','/','/login']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
 
@@ -133,6 +133,11 @@ const getAdmin = (phone: string) => {
     }
     }
 }
+
+const clearError = () => {
+  setError("")
+  setIsError(false)
+}
   return (
     <div className={styles.layout}>
       {
@@ -156,7 +161,7 @@ const getAdmin = (phone: string) => {
                 <h1>Ooooh Sorry!</h1>
                 <p>{error??"there is an error"}</p>
               </div>
-              <div className={styles.close} onClick={()=> setIsError(!isError)}>ok</div>
+              <div className={styles.close} onClick={()=> clearError()}>ok</div>
             </div>
           </div>
         )
