@@ -1,18 +1,16 @@
 .adverta{
     width: 100%;
-    background: black;
     padding: 20px;
     overflow: hidden;
     white-space: nowrap;
     .advert {
-        display: inline-block;
+        display: none;
         padding: 10px;
-        transition: transform 0.5s ease-in-out;
+        //transition: transform 0.5s ease-in-out;
         color: white;
-        animation: marquee 20s linear infinite;
+        //animation: marquee 20s linear infinite;
+        &.active{
+          display: inline-block;
+        }
       }
-}
-@keyframes marquee {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); } 
 }

@@ -85,6 +85,12 @@ export default function SideBar() {
                     <Link href="/admins" className={styles.link}>Admins</Link>
                 </li>)
                 }
+                {
+                    (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/adverts" && styles.active)}>
+                    <MdOutlineAdminPanelSettings className={styles.icon}/>
+                    <Link href="/adverts" className={styles.link}>Adverts</Link>
+                </li>)
+                }
             </ul>
         </div>
     </div>

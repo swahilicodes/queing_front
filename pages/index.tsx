@@ -4,10 +4,12 @@ import { MdZoomInMap } from 'react-icons/md';
 import useFetchData from '@/custom_hooks/fetch';
 import CatTickets from '@/components/cat_tickets/cat_tickets';
 import cx from 'classnames'
+import AdvertScroller from '@/components/adverts/advert';
 
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
     const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    const date = new Date()
 
     useEffect(()=> {
       //console.log(queue)
@@ -95,6 +97,14 @@ export default function Home() {
         <div className={styles.item}>
           <div className={cx(styles.color_left,styles.yellow)}></div>
           <div className={styles.color_right}>Kaa Tayari</div>
+        </div>
+      </div>
+      <div className={styles.ads}>
+        <div className={styles.ad}> <AdvertScroller/> </div>
+        <div className={styles.time}>
+          MATANGAZO
+          {/* <div className={styles.time_date}>{date.getDate()}/{date.getMonth()}/{date.getFullYear()}</div>
+          <div className={styles.time_time}>{date.getHours().toString().padStart(2, '0')}<span>:</span>{date.getMinutes().toString().padStart(2, '0')}<span>:</span>{date.getSeconds().toString().padStart(2, '0')}</div> */}
         </div>
       </div>
     </div>

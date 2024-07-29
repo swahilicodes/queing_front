@@ -7,6 +7,7 @@
     justify-content: center;
     background: $mainColor;
     position: relative;
+    overflow: hidden;
     .cats{
         width: 100%;
         table{
@@ -65,7 +66,7 @@
     }
     .color_expla{
         position: absolute;
-        bottom: 0;
+        bottom: 70px;
         align-items: center;
         justify-content: space-between;
         width: 100%;
@@ -105,4 +106,44 @@
             }
         }
     }
+    .ads{
+        background: $mainBold;
+        height: 70px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        bottom: 0;
+        .ad{
+            display: inline-block;
+            padding: 10px;
+            color: white;
+            animation: scroll 20s linear infinite;
+            font-size: 30px;
+        }
+        .time{
+            position: inherit;
+            right: 0;
+            height: 100%;
+            width: 200px;
+            background: linear-gradient(to right, $mainBold, $secondColor);
+            color: white;
+            font-size: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-family: "Roboto";
+        }
+    }
 }
+@keyframes scroll {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }

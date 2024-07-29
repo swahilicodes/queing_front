@@ -25,35 +25,14 @@ export default function Layout({children}:any) {
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const socket = io('http://localhost:5000');
-  const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/','/login']
+  const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/','/login','/adverts']
   const attendantRoutes = ['/queue_list','/queue_add','/','/login']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     checkAuth()
-    // validRoutes()
-    socket.on('connect', () => {
-      console.log('Connected to server');
-      socket.emit('data', 'Hello Server');
-    });
-
-    socket.on('data', (msg) => {
-      console.log('Message from server: ' + msg);
-    });
-    if(error.trim() !==""){
-      setIsError(true)
-    }
-
-    // return () => {
-    //   socket.disconnect();
-    // };
-    // router.events.on('routeChangeStart', validRoutes);
-
-    // return () => {
-    //   router.events.off('routeChangeStart', validRoutes);
-    // };
 }, [error]);
 
 const checkAuth = () => {
