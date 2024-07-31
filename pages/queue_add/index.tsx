@@ -30,6 +30,7 @@ export default function QueueAdd() {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null);
   const date = new Date(qr.createdAt);
+  const month = date.getMonth()+1
  const qrData = `phone:${qr.phone},clinic:${qr.category}`
  const socket = io('http://localhost:5000');
 
@@ -80,13 +81,30 @@ export default function QueueAdd() {
     html2canvas(form).then((canvas) => {
       var a  = document.createElement('a');
       a.href = canvas.toDataURL('image/png');
-      a.download = 'image.png';
-      a.click();
+    //   a.download = 'image.png';
+    //   a.click();
       setQr(false)
+      printImage(a.href)
+      //window.print()
       socket.emit("data",{data:{},route:"tickets"})
       router.reload()
     });
   };
+
+  function printImage(src:any) {
+    var win:any = window.open('about:blank', `${src}`);
+    win.document.open();
+    win.document.write([
+        '<html>',
+        '   <head>',
+        '   </head>',
+        '   <body onload="window.print()" onafterprint="window.close()">',
+        '       <img src="' + src + '"/>',
+        '   </body>',
+        '</html>'
+    ].join(''));
+    win.document.close();
+}
 
   return (
     <div className={styles.queue_add}>
@@ -109,7 +127,7 @@ export default function QueueAdd() {
                     <div className={styles.qr}><QRCode value={qrData} /></div>
                     <p>Karibu Hospitali ya Taifa Muhimbili Mloganzila</p>
                     </div>
-                    <p className={styles.date}>{date.getDate() }/{date.getMonth()+1}/{date.getUTCFullYear()}   <span>{date.getHours()}:{date.getMinutes()}</span></p>
+                    <p className={styles.date}>{date.getDate().toString().padStart(2, '0') }/{month.toString().padStart(2, '0')}/{date.getUTCFullYear()}   <span>{date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}</span></p>
                 </form>
             </div>
         }

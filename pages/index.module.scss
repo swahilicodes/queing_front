@@ -8,6 +8,86 @@
     background: $mainColor;
     position: relative;
     overflow: hidden;
+    .cats_loader{
+        width: 100%;
+        table{
+            width: 100%;
+            thead{
+                width: 100%;
+                background: $mainBold;
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                tr{
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    //padding: 20px 15px;
+                    height: 90%;
+                    th{
+                        position: relative;
+                        overflow: hidden;
+                        background: linear-gradient(to right, $mainBold,$secondColor);
+                        width: 20%;
+                        height: 100%;
+                        .shimmer{
+                            position: absolute;
+                            top: 0;
+                            left: -100%;
+                            width: 100%;
+                            height: 100%;
+                            background: linear-gradient(
+                                to right,
+                                rgba(255, 255, 255, 0) 0%,
+                                rgba(255, 255, 255, 0.4) 50%,
+                                rgba(255, 255, 255, 0) 100%
+                            );
+                            animation: shimmer 1.5s infinite;
+                        }
+                    }
+                }
+            }
+            tbody{
+                width: 100%;
+                height: 70px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                tr{
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    //padding: 20px 15px;
+                    height: 90%;
+                    td{
+                        position: relative;
+                        overflow: hidden;
+                        background: linear-gradient(to right, $mainBold,$mainColor);
+                        width: 20%;
+                        height: 100%;
+                        .shimmer{
+                            position: absolute;
+                            top: 0;
+                            left: -100%;
+                            width: 100%;
+                            height: 100%;
+                            background: linear-gradient(
+                                to right,
+                                rgba(255, 255, 255, 0) 0%,
+                                rgba(255, 255, 255, 0.4) 50%,
+                                rgba(255, 255, 255, 0) 100%
+                            );
+                            animation: shimmer 1.5s infinite;
+                        }
+                    }
+                }
+            }
+        }  
+    }
     .cats{
         width: 100%;
         table{
@@ -145,5 +225,13 @@
     }
     100% {
       transform: translateX(-100%);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
     }
   }

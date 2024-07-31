@@ -10,6 +10,7 @@ import { HiMiniUserGroup } from 'react-icons/hi2'
 import { useRecoilValue } from 'recoil'
 import currentUserState from '@/store/atoms/currentUser'
 import { FiSettings } from 'react-icons/fi'
+import { FcAdvertising } from 'react-icons/fc'
 
 export default function SideBar() {
  const router = useRouter()
@@ -87,7 +88,7 @@ export default function SideBar() {
                 }
                 {
                     (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/adverts" && styles.active)}>
-                    <MdOutlineAdminPanelSettings className={styles.icon}/>
+                    <FcAdvertising className={styles.icon}/>
                     <Link href="/adverts" className={styles.link}>Adverts</Link>
                 </li>)
                 }

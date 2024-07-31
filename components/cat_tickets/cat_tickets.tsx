@@ -16,13 +16,11 @@ const [data,setData] = useState([])
 const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [service, setService] = useState<any>({})
-const socket = io('http://localhost:5000');
 const router = useRouter()
  
 useEffect(()=> {
     getTickets(),
-    getCounter(),
-    checkStatus()
+    getCounter()
 },[category])
  const getTickets = () => {
     axios.get('http://localhost:5000/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
@@ -51,18 +49,7 @@ useEffect(()=> {
     })
  }
 
- const checkStatus = () => {
-      socket.on('data', (msg) => {
-        if(msg){
-            console.log(msg.route)
-            if(msg.route==="tickets"){
-                router.reload()
-            }
-            //console.log(msg)
-            // router.reload()
-        }
-      });
- }
+ 
   return (
     <div className={styles.cat_tickets}>
         {data.map((item:any,index:number)=> (

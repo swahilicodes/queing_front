@@ -5,15 +5,50 @@ import useFetchData from '@/custom_hooks/fetch';
 import CatTickets from '@/components/cat_tickets/cat_tickets';
 import cx from 'classnames'
 import AdvertScroller from '@/components/adverts/advert';
+import axios from 'axios';
+import io from 'socket.io-client';
+import { useRouter } from 'next/router';
 
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
     const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
     const date = new Date()
+    const [adverts,setAdverts] = useState([])
+    const socket = io('http://localhost:5000',{ transports: ['websocket'] });
+    const router = useRouter()
 
     useEffect(()=> {
-      //console.log(queue)
-    })
+      getAdverts()
+      checkStatus()
+      // socket.on('connect', () => {
+      //   console.log('Connected to Socket.io server');
+      //   });
+    
+      //   return () => {
+      //   socket.disconnect();
+      //   };
+    },[])
+
+    const checkStatus = () => {
+      socket.on('data', (msg) => {
+        if(msg){
+            console.log(msg.route)
+            if(msg.route==="tickets"){
+                router.reload()
+            }
+            //console.log(msg)
+            // router.reload()
+        }
+      });
+ }
+
+    const getAdverts = () => {
+      axios.get('http://localhost:5000/adverts/get_all_adverts').then((data)=> {
+        setAdverts(data.data)
+      }).catch((error)=> {
+        alert(error)
+      })
+    }
 
     const toggleFullScreen = () => {
      const element:any = document.documentElement;
@@ -43,7 +78,26 @@ export default function Home() {
 
   let folen
   if(loading){
-    folen = <p>loading...</p>
+    folen = <div className={styles.cats_loader}>
+      <table>
+        <thead>
+          <tr>
+            <th> <div className={styles.shimmer}></div> </th>
+            <th> <div className={styles.shimmer}></div> </th>
+            <th> <div className={styles.shimmer}></div> </th>
+            <th> <div className={styles.shimmer}></div> </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td> <div className={styles.shimmer}></div> </td>
+            <td> <div className={styles.shimmer}></div> </td>
+            <td> <div className={styles.shimmer}></div> </td>
+            <td> <div className={styles.shimmer}></div> </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   }else if(!loading && queue.length !== 0 ){
     folen = <div className={styles.cats}>
       <table>
@@ -72,7 +126,26 @@ export default function Home() {
       </table>
     </div>
   }else{
-    folen = <p>Nothing Here</p>
+    folen = <div className={styles.cats_loader}>
+      <table>
+        <thead>
+          <tr>
+            <th> <div className={styles.shimmer}></div> </th>
+            <th> <div className={styles.shimmer}></div> </th>
+            <th> <div className={styles.shimmer}></div> </th>
+            <th> <div className={styles.shimmer}></div> </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td> <div className={styles.shimmer}></div> </td>
+            <td> <div className={styles.shimmer}></div> </td>
+            <td> <div className={styles.shimmer}></div> </td>
+            <td> <div className={styles.shimmer}></div> </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   }
   return (
     <div className={styles.index}>
@@ -100,7 +173,11 @@ export default function Home() {
         </div>
       </div>
       <div className={styles.ads}>
-        <div className={styles.ad}> <AdvertScroller/> </div>
+        <div className={styles.ad}>
+          {
+            adverts.length>0 && (<AdvertScroller adverts={adverts}/>)
+          }
+        </div>
         <div className={styles.time}>
           MATANGAZO
           {/* <div className={styles.time_date}>{date.getDate()}/{date.getMonth()}/{date.getFullYear()}</div>

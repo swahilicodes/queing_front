@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
 import useFetchData from '@/custom_hooks/fetch'
+import { RxEnterFullScreen } from 'react-icons/rx'
 
 export default function Admins() {
 const [name,setName] = useState("")
@@ -25,9 +26,15 @@ const [id,setId] = useState("")
 const {data,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/services/get_all_services")
 const {data:counters,loading:cLoading, error: cError} = useFetchData("http://localhost:5000/counters/get_all_counters")
 const [isFull,setFull] = useState(false)
+const [desc,setDesc] = useState('')
 
 useEffect(()=> {
     getAttendants()
+    if(isFull){
+        setInterval(()=> {
+            setFull(false)
+        },10000)
+    }
 },[page,data])
  
  const submit  = (e:React.FormEvent) => {
@@ -85,6 +92,11 @@ useEffect(()=> {
     setEdit(true)
     setName(name)
   };
+
+ const showFull = (desc:string) => {
+    setDesc(desc)
+    setFull(true)
+ }
  const getAttendants  = () => {
     setFetchLoading(true)
     axios.get("http://localhost:5000/adverts/get_adverts",{params: {page,pagesize}}).then((data:any)=> {
@@ -209,6 +221,7 @@ useEffect(()=> {
                                     <td>
                                         <div className={styles.delete} onClick={()=> handleDelete(data.id)}><MdDelete className={styles.icon}/></div> 
                                         <div className={styles.edit} onClick={()=> handleEdit(data.id,data.name)}><FiEdit2 className={styles.icon}/></div> 
+                                        <div className={styles.expand} onClick={()=> showFull(data.description)}><RxEnterFullScreen className={styles.icon}/></div> 
                                     </td>
                                 </tr>
                             ))
@@ -227,6 +240,12 @@ useEffect(()=> {
                 }
             </div>
             }
+        </div>
+         <div className={cx(styles.toast,isFull && styles.active)}>
+            <p>{desc}</p>
+            <div className={styles.clear} onClick={()=> setFull(false)}>
+                <MdOutlineClear className={styles.icon}/>
+            </div>
         </div>
     </div>
   )

@@ -26,7 +26,7 @@ export default function Layout({children}:any) {
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const socket = io('http://localhost:5000');
   const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','queue_add','/','/login','/adverts']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/queue_add','/','/login','/adverts']
   const attendantRoutes = ['/queue_list','/queue_add','/','/login']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
@@ -67,11 +67,12 @@ const validRoutes = () => {
         router.push(path)
       }
     }else{
-      if(defaultPage){
-        router.push(`${defaultPage}`)
-      }else{
-        router.push(`/`)
-      }
+      router.push(path)
+      // if(defaultPage){
+      //   router.push(`${defaultPage}`)
+      // }else{
+      //   router.push(`/`)
+      // }
     }
   }
 }

@@ -3,6 +3,7 @@
     width: 100%;
     position: relative;
     height: 100vh;
+    overflow: hidden;
     .service_top{
         width: 100%;
         position: absolute;
@@ -189,6 +190,16 @@
                                 padding: 3px;
                                 color: white;
                                 cursor: pointer;
+                                margin-right: 10px;
+                                .icon{
+                                    color: white;
+                                }
+                            }
+                            .expand{
+                                background: $secondColor;
+                                padding: 3px;
+                                color: white;
+                                cursor: pointer;
                                 .icon{
                                     color: white;
                                 }
@@ -227,6 +238,35 @@
         align-items: center;
         justify-content: center;
     }
+    .toast{
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        opacity: 0;
+        align-items: center;
+        justify-content: center;
+        background: $mainColor;
+        padding: 15px;
+        animation: top .5s forwards;
+        &.active{
+            animation: bottom .5s forwards;
+            display: flex;   
+        }
+        p{
+            color: white;
+        }
+        .clear{
+            position: inherit;
+            right: 10px;
+            background: $mainBold;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            .icon{
+                color: white;
+            }
+        }
+    }
 }
 @keyframes move {
     0% {
@@ -236,5 +276,25 @@
     100% {
         top: 50%;
         opacity: 1;
+    }
+}
+@keyframes bottom {
+    0% {
+        bottom: -100px;
+        opacity: 0;
+    }
+    100% {
+        bottom: 0;
+        opacity: 1;
+    }
+}
+@keyframes top {
+    0% {
+        bottom: 0;
+        opacity: 1;
+    }
+    100% {
+        bottom: -100px;
+        opacity: 0;
     }
 }
