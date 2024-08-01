@@ -7,14 +7,20 @@ import { GoGitMergeQueue } from 'react-icons/go'
 import { MdOutlineAdminPanelSettings, MdOutlineCountertops, MdOutlineQueuePlayNext, MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
 import { FaSignInAlt, FaThList } from 'react-icons/fa'
 import { HiMiniUserGroup } from 'react-icons/hi2'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import currentUserState from '@/store/atoms/currentUser'
 import { FiSettings } from 'react-icons/fi'
 import { FcAdvertising } from 'react-icons/fc'
 
 export default function SideBar() {
  const router = useRouter()
- const currentUser:any = useRecoilValue(currentUserState)
+ const [currentUser,setCurrentUser] = useRecoilState<any>(currentUserState)
+
+ const signOut = () => {
+    localStorage.removeItem('token')
+    setCurrentUser({})
+    router.push('/login')
+ }
   return (
     <div className={styles.side_bar}>
         <div className={styles.logo}>
@@ -70,10 +76,20 @@ export default function SideBar() {
                     <Link href="/attendants" className={styles.link}>Attendants</Link>
                 </li>)
                 }
-                <li className={cx(styles.link,router.pathname==="/login" && styles.active)}>
+                {
+                    currentUser.role === undefined && (<li className={cx(styles.link,router.pathname==="/login" && styles.active)}>
                     <FaSignInAlt className={styles.icon}/>
                     <Link href="/login" className={styles.link}>Login</Link>
-                </li>
+                </li>)
+                }
+                {
+                    currentUser.role !== undefined && (
+                        <li onClick={signOut} className={cx(styles.link,router.pathname==="/login" && styles.active)}>
+                            <FaSignInAlt className={styles.icon}/>
+                            <div className={styles.link}>Sign Out</div>
+                        </li>
+                    )
+                }
                 {
                     (currentUser !== undefined && currentUser.role === "admin") && (<li className={cx(styles.link,router.pathname==="/settings" && styles.active)}>
                     <FiSettings className={styles.icon}/>

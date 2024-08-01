@@ -1,21 +1,29 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './login.module.scss'
 import axios from 'axios'
 import { useRouter } from 'next/router'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import errorState from '@/store/atoms/error'
+import currentUserState from '@/store/atoms/currentUser'
 
 export default function Login() {
  const [phone, setPhone] = useState('')
  const [pass, setPass] = useState('')
  const router = useRouter()
  const [error,setError] = useRecoilState(errorState)
+ const currentUser:any = useRecoilValue(currentUserState)
+
+ useEffect(()=> {
+  if(currentUser.name !== undefined){
+    router.push('/')
+  }
+ })
 
  const login = (e:React.FormEvent) => {
     e.preventDefault()
     axios.post("http://localhost:5000/users/login",{phone,password:pass}).then((data:any)=> {
         localStorage.setItem("token",data.data)
-        router.push("/")
+        router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)

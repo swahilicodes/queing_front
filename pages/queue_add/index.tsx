@@ -109,11 +109,11 @@ export default function QueueAdd() {
   return (
     <div className={styles.queue_add}>
         <div className={styles.top_notch}>
-            <div className={styles.item}>
+            {/* <div className={styles.item}>
                 <div className={styles.logo}>
                     <img src="/mnh.png" alt="" />
                 </div>
-            </div>
+            </div> */}
             <div className={styles.title}>
                 <h1>MUHIMBILI NATIONAL HOSPITAL MLOGANZILA</h1>
             </div>

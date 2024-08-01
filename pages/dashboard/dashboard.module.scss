@@ -1,28 +1,61 @@
 @import '../../global.scss';
 .dashboard{
     width: 100%;
-    padding: 0 20px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    .dash{
-        float: left;
-        padding: 20px;
-        background: $divColor;
-        width: 45%;
+    justify-content: flex-start;
+    .dash_top{
+        background: $mainBold;
+        height: 70px;
+        width: 100%;
         display: flex;
         align-items: center;
-        justify-content: space-around;
-        margin: 20px 0;
-        .left{
-            p{
-                margin: 10px 0;
-            }
+        justify-content: space-between;
+        padding: 0 20px;
+        .dash_left{
+            color: white;
+            font-size: 20px;
         }
-        .right{
-            .icon{
-                color: $mainColor;
+        }
+    .wraper{
+        width: 100%;
+        padding: 0 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        @include mobile{
+            flex-wrap: nowrap;
+            flex-direction: column;
+        }
+        .dash{
+            float: left;
+            padding: 20px;
+            background: $divColor;
+            width: 30%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            @include mobile{
+                width: 90%;
+            }
+            .left{
+                p{
+                    margin: 10px 0;
+                    color: $mainBold;
+                    font-weight: 600;
+                    font-size: 20px;
+                }
+                h4{
+                    color: $mainColor;
+                }
+            }
+            .right{
+                .icon{
+                    color: $mainColor;
+                }
             }
         }
     }
