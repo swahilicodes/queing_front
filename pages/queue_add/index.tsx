@@ -98,7 +98,7 @@ export default function QueueAdd() {
         '<html>',
         '   <head>',
         '   </head>',
-        '   <body onload="window.print()" onafterprint="window.close()">',
+        '   <body onload="window.print()" onafterprint="window.close()" style="width: 100%; height: 50%; display: flex; align-items: center; justify-content: center; padding: 15px;">',
         '       <img src="' + src + '"/>',
         '   </body>',
         '</html>'
@@ -134,7 +134,7 @@ export default function QueueAdd() {
         {
             clicked && (
                 <div className={styles.overlay}>
-                    <div className={styles.content}>
+                    <div className={cx(styles.content,clicked && styles.active)}>
                         <div className={styles.top}>
                             <h1>Ingiza Namba Ya Simu / Enter Phone Number</h1>
                         </div>

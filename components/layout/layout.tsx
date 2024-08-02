@@ -28,6 +28,7 @@ export default function Layout({children}:any) {
   const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts']
   const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/queue_add','/','/login','/adverts']
   const attendantRoutes = ['/queue_list','/queue_add','/','/login']
+  const doctorRoutes = ['/queue_list','/queue_add','/','/login','/patients']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
 
@@ -62,6 +63,8 @@ const validRoutes = () => {
       if(user==="admin" && !adminRoutes.includes(path)){
         router.push('/')
       }else if(user ==="attendant" && !attendantRoutes.includes(path)){
+        router.push('/')
+      }else if(user ==="doctor" && !doctorRoutes.includes(path)){
         router.push('/')
       }else{
         router.push(path)

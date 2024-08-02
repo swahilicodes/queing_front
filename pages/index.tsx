@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
-    const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getAllTickets")
     const date = new Date()
     const [adverts,setAdverts] = useState([])
     const socket = io('http://localhost:5000',{ transports: ['websocket'] });
@@ -20,6 +20,11 @@ export default function Home() {
     useEffect(()=> {
       getAdverts()
       checkStatus()
+      if(loading){
+        console.log('loading...')
+      }else{
+        console.log('loading data',queue)
+      }
       // socket.on('connect', () => {
       //   console.log('Connected to Socket.io server');
       //   });

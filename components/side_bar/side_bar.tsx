@@ -5,12 +5,14 @@ import cx from 'classnames'
 import { useRouter } from 'next/router'
 import { GoGitMergeQueue } from 'react-icons/go'
 import { MdOutlineAdminPanelSettings, MdOutlineCountertops, MdOutlineQueuePlayNext, MdOutlineRemoveFromQueue, MdOutlineRoomService } from 'react-icons/md'
-import { FaSignInAlt, FaThList } from 'react-icons/fa'
+import { FaHandHoldingMedical, FaSignInAlt, FaThList } from 'react-icons/fa'
 import { HiMiniUserGroup } from 'react-icons/hi2'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import currentUserState from '@/store/atoms/currentUser'
 import { FiSettings } from 'react-icons/fi'
 import { FcAdvertising } from 'react-icons/fc'
+import { IoArrowRedoOutline, IoArrowUndoOutline } from 'react-icons/io5'
+import { FaUserDoctor } from 'react-icons/fa6'
 
 export default function SideBar() {
  const router = useRouter()
@@ -78,14 +80,14 @@ export default function SideBar() {
                 }
                 {
                     currentUser.role === undefined && (<li className={cx(styles.link,router.pathname==="/login" && styles.active)}>
-                    <FaSignInAlt className={styles.icon}/>
+                    <IoArrowRedoOutline className={styles.icon}/>
                     <Link href="/login" className={styles.link}>Login</Link>
                 </li>)
                 }
                 {
                     currentUser.role !== undefined && (
                         <li onClick={signOut} className={cx(styles.link,router.pathname==="/login" && styles.active)}>
-                            <FaSignInAlt className={styles.icon}/>
+                            <IoArrowUndoOutline className={styles.icon}/>
                             <div className={styles.link}>Sign Out</div>
                         </li>
                     )
@@ -106,6 +108,18 @@ export default function SideBar() {
                     (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/adverts" && styles.active)}>
                     <FcAdvertising className={styles.icon}/>
                     <Link href="/adverts" className={styles.link}>Adverts</Link>
+                </li>)
+                }
+                {
+                    (currentUser !== undefined && currentUser.role === 'doctor') && (<li className={cx(styles.link,router.pathname==="/patients" && styles.active)}>
+                    <FaHandHoldingMedical className={styles.icon}/>
+                    <Link href="/patients" className={styles.link}>Patients</Link>
+                </li>)
+                }
+                {
+                    (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/doctors" && styles.active)}>
+                    <FaUserDoctor className={styles.icon}/>
+                    <Link href="/doctors" className={styles.link}>Doctors</Link>
                 </li>)
                 }
             </ul>
