@@ -17,6 +17,8 @@ import { GoPerson, GoPersonAdd, GoZoomIn, GoZoomOut } from 'react-icons/go'
 import { FaMinus } from 'react-icons/fa'
 import errorState from '@/store/atoms/error'
 import { BiSolidError } from 'react-icons/bi'
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 export default function Layout({children}:any) {
   const [full, setFull] = useRecoilState(isFull)
@@ -34,6 +36,18 @@ export default function Layout({children}:any) {
 
   useEffect(() => {
     checkAuth()
+    const handleStart = () => NProgress.start();
+    const handleStop = () => NProgress.done();
+
+    router.events.on('routeChangeStart', handleStart);
+    router.events.on('routeChangeComplete', handleStop);
+    router.events.on('routeChangeError', handleStop);
+
+    return () => {
+      router.events.off('routeChangeStart', handleStart);
+      router.events.off('routeChangeComplete', handleStop);
+      router.events.off('routeChangeError', handleStop);
+    };
 }, [error]);
 
 const checkAuth = () => {

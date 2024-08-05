@@ -43,10 +43,10 @@ export default function QueueList() {
       mr_no: "M58-48-14",
       age: "57.03.10",
       sex: "female",
-      reg_date: `${new Date()}`,
-      reg_time: `${new Date()}`,
-      consult_time: `${new Date()}`,
-      consult_date: `${new Date()}`,
+      reg_date: `18/07/2024`,
+      reg_time: `${new Date().getTime()}`,
+      consult_time: `${new Date().getTime()}`,
+      consult_date: `18/07/2024`,
       doctor: "Marry Mariwa",
       consult_doctor: "Marry Mariwa",
     }
@@ -54,7 +54,10 @@ export default function QueueList() {
 
   useEffect(() => {
     getTickets()
-    fetchnfilter()
+    // const intervalId = setInterval(() => {
+    //   getTickets()
+    // }, 5000);
+    // return () => clearInterval(intervalId);
     // socket.on('data', (msg) => {
     //   if(msg){
     //       if(msg.route==="tickets"){
@@ -64,21 +67,68 @@ export default function QueueList() {
     // });
   }, [status]);
 
-  const fetchnfilter = () => {
+  const fetchnfilter = (patientes:any) => {
     const now:any = new Date();
     const oneDay:any = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-    patList.forEach((patient) => {
-      const regDate:any = new Date(patient.reg_date);
-      if (now - regDate < oneDay) {
-        if (limitedCats.includes(patient.clinic)) {
-          console.log('limited');
-        }else{
-          addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
-          console.log('not limited')
-        }
-      }
-    });
+    if(patientes.length===0){
+      console.log('patients empty',patientes)
+      patList.forEach((patient) => {
+        const [day, month, year] = patient.reg_date.split('/');
+        const date1 = new Date(`${year}-${month}-${day}`);
+        addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,date1.toDateString(),patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
+        // if(patientes.length>0){
+        //   patientes.forEach((item:any)=> {
+        //     if(item.mr_no===patient.mr_no){
+        //       console.log('exists')
+        //     }else{
+        //       addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
+        //     }
+        //   })
+        // }else{
+        //   addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
+        // }
+      })
+    }else{
+      console.log('not empty')
+    }
+    // patList.forEach((patient) => {
+    //   const regDate:any = new Date(patient.reg_date);
+    //   if (now - regDate < oneDay) {
+    //     if (limitedCats.includes(patient.clinic)) {
+    //       console.log('limited');
+    //     }else{
+    //       console.log('not limited')
+    //       if(!loading){
+    //         console.log('not loading...',patients)
+    //         if(patients.length === 0){
+    //           addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
+    //         }else{
+    //           patients.map((data:any)=> {
+    //             if(data.mr_no===patient.mr_no){
+    //               console.log('user exists')
+    //             }else{
+    //               console.log('user does not exist')
+    //               addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
+    //             }
+    //           })
+    //         }
+    //       }else{
+    //         console.log('loading...')
+    //       }
+    //       // console.log('patients are ',patients)
+    //       // patients.forEach((pat:any) => {
+    //       //   console.log(pat)
+    //       //   if(pat.mr_no===patient.mr_no){
+    //       //     console.log('patient exists')
+    //       //   }else{
+    //       //     console.log('patient does not exist')
+    //       //   }
+    //       // })
+    //       //addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
+    //       //console.log('not limited')
+    //     }
+    //   }
+    // });
   }
 
   const reloda = () => {
@@ -94,7 +144,9 @@ export default function QueueList() {
     setLoading(true)
     axios.get("http://localhost:5000/patients/get_patients").then((data)=> {
       setPatients(data.data)
-      // console.log(data.data.data)
+      setTimeout(()=> {
+        fetchnfilter(data.data)
+      },2000)
       setLoading(false)
     }).catch((error)=> {
       setLoading(false)
@@ -129,7 +181,7 @@ export default function QueueList() {
   }
   const addPatient = (name:string,clinic:string,mr_no:string,age:string,sex:string,reg_date: string,reg_time:string,consult_date:string,consult_time:string,doctor:string,consult_doctor:string) => {
     setEdLoading(true)
-    axios.post(`http://localhost:5000/patients/register_patient`,{name, clinic, age, sex , reg_date, reg_time,consult_date, consult_time, doctor, consult_doctor}).then((data:any)=> {
+    axios.post(`http://localhost:5000/patients/register_patient`,{name:name, clinic:clinic, mr_no:mr_no,age:age, sex:sex, reg_date:reg_date, reg_time:reg_time,consult_date:consult_date, consult_time:consult_time, doctor:doctor, consult_doctor:consult_doctor}).then((data:any)=> {
       socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)
@@ -240,9 +292,9 @@ export default function QueueList() {
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>ticket</th>
+                                    <th>mr no</th>
                                     <th>clinic</th>
-                                    <th>phone</th>
+                                    <th>age</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -250,9 +302,9 @@ export default function QueueList() {
                             patients.map((item:any,index:number)=> (
                                     <tr key={index} className={cx(index%2===0 && styles.even)}>
                                         <td>{item.id}</td>
-                                        <td>{item.ticket_no}</td>
-                                        <td>{item.category}</td>
-                                        <td>{item.phone}</td>
+                                        <td>{item.mr_no}</td>
+                                        <td>{item.clinic}</td>
+                                        <td>{item.age}</td>
                                         {/* <td className={styles.action}>
                                             {
                                               index===0 && (<div className={cx(styles.icon_wrap,namba===item.ticket_no && styles.active)} onClick={()=>handleSpeak(item.ticket_no)}><PiSpeakerHighDuotone className={styles.action_icon}/></div>)
