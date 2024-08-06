@@ -16,6 +16,7 @@ import { IoArrowRedoOutline } from 'react-icons/io5'
 import Ticket_Category_Length from '@/components/ticket_category_length/ticket_category_length'
 import Cubes from '@/components/loaders/cubes/cubes'
 import { SlRefresh } from 'react-icons/sl'
+import Patient_Category_Length from '@/components/patient_category_length/ticket_category_length'
 
 export default function QueueList() {
   //const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
@@ -34,19 +35,33 @@ export default function QueueList() {
   const full = useRecoilValue(isFull)
   const [edLoading,setEdLoading] = useState(false)
   const [refresh, setRefresh] = useState(false)
-  const limitedCats = ["Cardiology","Radiology"] 
+  const limitedCats = ["Cardiology","RARDIOLOGY"] 
   const patList = [
     {
       id: 0,
       name: "mariam",
-      clinic: "CARDIOLOGY",
+      clinic: "Mazoezi",
       mr_no: "M58-48-14",
       age: "57.03.10",
       sex: "female",
-      reg_date: `18/07/2024`,
-      reg_time: `${new Date().getTime()}`,
-      consult_time: `${new Date().getTime()}`,
-      consult_date: `18/07/2024`,
+      reg_date: "06/08/2024",
+      reg_time: "07:51:40",
+      consult_time: "15:05:40",
+      consult_date: "18/07/2024",
+      doctor: "Marry Mariwa",
+      consult_doctor: "Marry Mariwa",
+    },
+    {
+      id: 1,
+      name: "hawa",
+      clinic: "Mazoezi",
+      mr_no: "M57-48-14",
+      age: "57.03.10",
+      sex: "male",
+      reg_date: "06/08/2024",
+      reg_time: "12:51:40",
+      consult_time: "15:05:40",
+      consult_date: "18/07/2024",
       doctor: "Marry Mariwa",
       consult_doctor: "Marry Mariwa",
     }
@@ -54,81 +69,58 @@ export default function QueueList() {
 
   useEffect(() => {
     getTickets()
-    // const intervalId = setInterval(() => {
-    //   getTickets()
-    // }, 5000);
-    // return () => clearInterval(intervalId);
-    // socket.on('data', (msg) => {
-    //   if(msg){
-    //       if(msg.route==="tickets"){
-    //           router.reload()
-    //       }
-    //   }
-    // });
   }, [status]);
+
+  const dateObject = (date:any,time:any) => {
+    const dateObj = new Date(
+      date.split('/')[2],     // Year
+      date.split('/')[1] - 1, // Month (zero-based index)
+      date.split('/')[0],     // Day
+      time.split(':')[0],         // Hours
+      time.split(':')[1],          // Minutes
+      time.split(':')[2]          // seconds
+    );
+    return dateObj
+  }
 
   const fetchnfilter = (patientes:any) => {
     const now:any = new Date();
     const oneDay:any = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     if(patientes.length===0){
-      console.log('patients empty',patientes)
-      patList.forEach((patient) => {
-        const [day, month, year] = patient.reg_date.split('/');
-        const date1 = new Date(`${year}-${month}-${day}`);
-        addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,date1.toDateString(),patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
-        // if(patientes.length>0){
-        //   patientes.forEach((item:any)=> {
-        //     if(item.mr_no===patient.mr_no){
-        //       console.log('exists')
-        //     }else{
-        //       addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
-        //     }
-        //   })
-        // }else{
-        //   addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
-        // }
-      })
+      for (var i=0; i<patList.length; i++){
+          const providedDate:any = dateObject(patList[i].reg_date,patList[i].reg_time);
+          const currentDate:any = new Date();
+          const differenceInMilliseconds = currentDate - providedDate;
+          const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+          if(differenceInHours<24){
+            if(limitedCats.includes(patList[i].clinic)){
+              addPatient(patList[i].name,patList[i].clinic.toLowerCase(),patList[i].mr_no,patList[i].age,patList[i].sex,"vitaling",dateObject(patList[i].reg_date,patList[i].reg_time),dateObject(patList[i].consult_date,patList[i].consult_time),patList[i].doctor,patList[i].consult_doctor)
+            }else{
+              addPatient(patList[i].name,patList[i].clinic.toLowerCase(),patList[i].mr_no,patList[i].age,patList[i].sex,"waiting",dateObject(patList[i].reg_date,patList[i].reg_time),dateObject(patList[i].consult_date,patList[i].consult_time),patList[i].doctor,patList[i].consult_doctor)
+            }
+          }else{
+            console.log('not less than 24')
+          }
+      }
     }else{
-      console.log('not empty')
+      for (var i=0; i<patList.length; i++){
+        const providedDate:any = dateObject(patList[i].reg_date,patList[i].reg_time);
+        const currentDate:any = new Date();
+        const differenceInMilliseconds = currentDate - providedDate;
+        const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+        if(differenceInHours<24){
+          if(limitedCats.includes(patList[i].clinic)){
+            console.log('limited category')
+            addPatient(patList[i].name,patList[i].clinic.toLowerCase(),patList[i].mr_no,patList[i].age,patList[i].sex,"vitaling",dateObject(patList[i].reg_date,patList[i].reg_time),dateObject(patList[i].consult_date,patList[i].consult_time),patList[i].doctor,patList[i].consult_doctor)
+          }else{
+            console.log('unlimited category')
+            addPatient(patList[i].name,patList[i].clinic.toLowerCase(),patList[i].mr_no,patList[i].age,patList[i].sex,"waiting",dateObject(patList[i].reg_date,patList[i].reg_time),dateObject(patList[i].consult_date,patList[i].consult_time),patList[i].doctor,patList[i].consult_doctor)
+          }
+        }else{
+          console.log('not less than 24')
+        }
     }
-    // patList.forEach((patient) => {
-    //   const regDate:any = new Date(patient.reg_date);
-    //   if (now - regDate < oneDay) {
-    //     if (limitedCats.includes(patient.clinic)) {
-    //       console.log('limited');
-    //     }else{
-    //       console.log('not limited')
-    //       if(!loading){
-    //         console.log('not loading...',patients)
-    //         if(patients.length === 0){
-    //           addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
-    //         }else{
-    //           patients.map((data:any)=> {
-    //             if(data.mr_no===patient.mr_no){
-    //               console.log('user exists')
-    //             }else{
-    //               console.log('user does not exist')
-    //               addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
-    //             }
-    //           })
-    //         }
-    //       }else{
-    //         console.log('loading...')
-    //       }
-    //       // console.log('patients are ',patients)
-    //       // patients.forEach((pat:any) => {
-    //       //   console.log(pat)
-    //       //   if(pat.mr_no===patient.mr_no){
-    //       //     console.log('patient exists')
-    //       //   }else{
-    //       //     console.log('patient does not exist')
-    //       //   }
-    //       // })
-    //       //addPatient(patient.name,patient.clinic,patient.mr_no,patient.age,patient.sex,patient.reg_date,patient.reg_time,patient.consult_time,patient.consult_date,patient.doctor,patient.consult_doctor)
-    //       //console.log('not limited')
-    //     }
-    //   }
-    // });
+    }
   }
 
   const reloda = () => {
@@ -140,14 +132,14 @@ export default function QueueList() {
   }
 
   const getTickets = () => {
-    const service:any = localStorage.getItem("user_service")
+    const service:any = localStorage.getItem("user_service")?.toLocaleLowerCase()
     setLoading(true)
-    axios.get("http://localhost:5000/patients/get_patients").then((data)=> {
+    axios.get("http://localhost:5000/patients/get_patients",{params:{clinic:service,status:status}}).then((data)=> {
       setPatients(data.data)
       setTimeout(()=> {
         fetchnfilter(data.data)
+        setLoading(false)
       },2000)
-      setLoading(false)
     }).catch((error)=> {
       setLoading(false)
       if (error.response && error.response.status === 400) {
@@ -162,8 +154,8 @@ export default function QueueList() {
 
   const editTicket = (id:string,status:string) => {
     setEdLoading(true)
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`,{status}).then((data:any)=> {
-      socket.emit("data",{data:data.data,route:"tickets"})
+    axios.put(`http://localhost:5000/patients/edit_patient/${id}`,{status}).then((data:any)=> {
+      socket.emit("data",{data:data.data,route:"patients"})
       setInterval(()=> {
         setEdLoading(false)
         router.reload()
@@ -179,9 +171,9 @@ export default function QueueList() {
     }
     })
   }
-  const addPatient = (name:string,clinic:string,mr_no:string,age:string,sex:string,reg_date: string,reg_time:string,consult_date:string,consult_time:string,doctor:string,consult_doctor:string) => {
+  const addPatient = (name:string,clinic:string,mr_no:string,age:string,sex:string,status:string,reg_date: Date,consult_date:Date,doctor:string,consult_doctor:string) => {
     setEdLoading(true)
-    axios.post(`http://localhost:5000/patients/register_patient`,{name:name, clinic:clinic, mr_no:mr_no,age:age, sex:sex, reg_date:reg_date, reg_time:reg_time,consult_date:consult_date, consult_time:consult_time, doctor:doctor, consult_doctor:consult_doctor}).then((data:any)=> {
+    axios.post(`http://localhost:5000/patients/register_patient`,{name:name, clinic:clinic, mr_no:mr_no,age:age, sex:sex, status: status,reg_date:reg_date,consult_date:consult_date, doctor:doctor, consult_doctor:consult_doctor}).then((data:any)=> {
       socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)
@@ -235,7 +227,7 @@ export default function QueueList() {
   };
   return (
     <div className={styles.queue_list}>
-      {
+      {/* {
         edLoading && (
           <div className={styles.overlay}>
             <div className={styles.conts}>
@@ -243,7 +235,7 @@ export default function QueueList() {
             </div>
           </div>
         )
-      }
+      } */}
       <div className={styles.top}>
         <div className={styles.side}>{currentUser.name}/{currentUser.counter}</div>
         {/* <div className={styles.side}>({currentUser.counter})</div> */}
@@ -275,9 +267,9 @@ export default function QueueList() {
                           <div className={styles.saving_wrap}>
                           <div className={styles.save_full}>
                             <h4>Saving Now</h4>
-                            <h1>{patients[0].ticket_no}</h1>
+                            <h1>{patients[0].mr_no}</h1>
                           </div>
-                          <div className={styles.call} onClick={()=>handleSpeak(patients[0].ticket_no)}>
+                          <div className={styles.call} onClick={()=>handleSpeak(patients[0].mr_no)}>
                             <GiSpeaker size={150} className={cx(styles.click_icon,talking && styles.active)}/>
                           </div>
                           <div className={styles.two_other}>
@@ -331,16 +323,16 @@ export default function QueueList() {
           patients.length > 0 && (<div className={styles.bottom_desc}>
             <div className={styles.top}>
               <div className={styles.item}>
-                <p>On Queue: <span> <Ticket_Category_Length category={currentUser.service} status='waiting'/> </span> </p>
+                <p>On Queue: <span> <Patient_Category_Length category={currentUser.service} status='waiting'/> </span> </p>
               </div>
               <div className={styles.item}>
-                <p>Attended: <span><Ticket_Category_Length category={currentUser.service} status='done'/></span> </p>
+                <p>Attended: <span><Patient_Category_Length category={currentUser.service} status='done'/></span> </p>
               </div>
               <div className={styles.item}>
-                <p>Pending: <span><Ticket_Category_Length category={currentUser.service} status='pending'/></span> </p>
+                <p>Pending: <span><Patient_Category_Length category={currentUser.service} status='pending'/></span> </p>
               </div>
               <div className={styles.item}>
-                <p>Cancelled: <span><Ticket_Category_Length category={currentUser.service} status='cancelled'/></span> </p>
+                <p>Cancelled: <span><Patient_Category_Length category={currentUser.service} status='cancelled'/></span> </p>
               </div>
               <div className={styles.item_out}>
                 <IoArrowRedoOutline className={styles.icon}/>
