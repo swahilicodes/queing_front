@@ -13,6 +13,7 @@ import { FiSettings } from 'react-icons/fi'
 import { FcAdvertising } from 'react-icons/fc'
 import { IoArrowRedoOutline, IoArrowUndoOutline } from 'react-icons/io5'
 import { FaUserDoctor } from 'react-icons/fa6'
+import { RiNurseFill } from 'react-icons/ri'
 
 export default function SideBar() {
  const router = useRouter()
@@ -117,9 +118,21 @@ export default function SideBar() {
                 </li>)
                 }
                 {
+                    (currentUser !== undefined && currentUser.role === 'doctor') && (<li className={cx(styles.link,router.pathname==="/vitals" && styles.active)}>
+                    <FaHandHoldingMedical className={styles.icon}/>
+                    <Link href="/vitals" className={styles.link}>Vitals</Link>
+                </li>)
+                }
+                {
                     (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/doctors" && styles.active)}>
                     <FaUserDoctor className={styles.icon}/>
                     <Link href="/doctors" className={styles.link}>Doctors</Link>
+                </li>)
+                }
+                {
+                    (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/nurses" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/nurses" className={styles.link}>Nurses</Link>
                 </li>)
                 }
             </ul>

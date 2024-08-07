@@ -30,11 +30,11 @@ export default function QueueList() {
   const [loading,setLoading] = useState(false)
   const router = useRouter()
   const socket = io('http://localhost:5000');
-  const [status, setStatus] = useState("waiting")
+  const [status, setStatus] = useState("vitaling")
   const full = useRecoilValue(isFull)
   const [edLoading,setEdLoading] = useState(false)
   const [refresh, setRefresh] = useState(false)
-  const limitedCats = ["Mazoezi","RARDIOLOGY"] 
+  const limitedCats = ["Cardiology","RARDIOLOGY"] 
   const [currentUser,setCurrentUser] = useRecoilState<any>(currentUserState)
   const patList = [
     {
@@ -44,7 +44,7 @@ export default function QueueList() {
       mr_no: "M58-48-14",
       age: "57.03.10",
       sex: "female",
-      reg_date: "07/08/2024",
+      reg_date: "06/08/2024",
       reg_time: "07:51:40",
       consult_time: "15:05:40",
       consult_date: "18/07/2024",
@@ -58,7 +58,7 @@ export default function QueueList() {
       mr_no: "M57-48-14",
       age: "57.03.10",
       sex: "male",
-      reg_date: "07/08/2024",
+      reg_date: "06/08/2024",
       reg_time: "12:51:40",
       consult_time: "15:05:40",
       consult_date: "18/07/2024",
@@ -143,12 +143,14 @@ export default function QueueList() {
   const getTickets = () => {
     const service:any = localStorage.getItem("user_service")?.toLocaleLowerCase()
     setLoading(true)
-    axios.get("http://localhost:5000/patients/get_patients",{params:{clinic:service,status:status}}).then((data)=> {
-      setPatients(data.data)
-      setTimeout(()=> {
-        fetchnfilter(data.data)
-        setLoading(false)
-      },2000)
+    axios.get("http://localhost:5000/patients/getVitalPatients",{params:{clinic:service,status:status}}).then((data)=> {
+      setPatients(data.data.data)
+      console.log(data.data.data)
+      setLoading(false)
+      // setTimeout(()=> {
+      //   fetchnfilter(data.data)
+      //   setLoading(false)
+      // },2000)
     }).catch((error)=> {
       setLoading(false)
       if (error.response && error.response.status === 400) {
@@ -247,8 +249,7 @@ export default function QueueList() {
         <div className={styles.side}>
           <label>Status:</label>
           <select onChange={e => setStatus(e.target.value)} value={status}>
-            <option value="waiting">waiting</option>
-            <option value="done">done</option>
+            <option value="vitaling">waiting</option>
             <option value="cancelled">cancelled</option>
             <option value="pending">pending</option>
           </select>
@@ -281,7 +282,7 @@ export default function QueueList() {
                             <div className={styles.item} onClick={()=> prepare(patients[0].id,"pending")}>Pend</div>
                             <div className={styles.item_red} onClick={()=> prepare(patients[0].id,"cancelled")}>Cancel</div>
                           </div>
-                          <div className={styles.finish} onClick={()=> prepare(patients[0].id,"done")}>Finish</div>
+                          <div className={styles.finish} onClick={()=> prepare(patients[0].id,"waiting")}>Finish</div>
                           <div className={styles.reload} onClick={()=> reloda()}>{refresh?<SlRefresh className={styles.icon}/>:"Refresh"}</div>
                           </div>
                         </div>
