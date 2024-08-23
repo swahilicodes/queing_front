@@ -33,6 +33,45 @@ export default function QueueAdd() {
   const month = date.getMonth()+1
  const qrData = `phone:${qr.phone},clinic:${qr.category}`
  const socket = io('http://localhost:5000');
+ const [disabled, setDisabled] = useState('')
+ const [index,setIndex] = useState(0)
+ const [items, setItems] = useState([
+    { id: 1, name: 'mzee', isActive: false },
+    { id: 2, name: 'mjamzito', isActive: false },
+    { id: 3, name: 'mlemavu', isActive: false },
+  ]);
+ const sags = [
+    {
+        id: 1,
+        name: 'Mzee'
+    },
+    {
+        id: 2,
+        name: 'Mjamzito'
+    },
+    {
+        id: 3,
+        name: 'Mlemavu'
+    },
+ ]
+
+ const changeSag = (id:any,data:string) => {
+    if(index===id){
+        setIndex(0)
+        setDisabled('')
+    }else{
+        setIndex(id)
+        setDisabled(data)
+    }
+ }
+
+  const handleClick = (id:any) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, isActive: true } : { ...item, isActive: false }
+      )
+    );
+  };
 
   const enterNumber = (cat:string,) => {
     setcat(cat)
@@ -49,11 +88,16 @@ export default function QueueAdd() {
     }
   };
 
+  const changeColor = (index:number,stata:string) => {
+    setIndex(index)
+    setDisabled(stata)
+  };
+
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
     console.log('creating ticket',numberString,cat)
-    axios.post("http://localhost:5000/tickets/create_ticket",{category: cat,phone:numberString})
+    axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
     .then((data:any)=> {
         setQrState(data.data)
         setClicked(false)
@@ -149,6 +193,16 @@ export default function QueueAdd() {
                                         <div className={styles.key} key={index} onClick={()=> handleNumberClick(item)}>{item}</div>
                                     ))
                                 }
+                            </div>
+                            <div className={styles.exceptions}>
+                                <h1>Una Uhitaji Maalumu?</h1>
+                                <div className={styles.suggestions}>
+                                    {
+                                        sags.map((item:any,indexa:number)=> (
+                                         <div className={cx(styles.suggestion,item.id===index && styles.active)} onClick={()=> changeSag(item.id,item.name)} key={indexa}>#{item.name}</div>  
+                                        ))
+                                    }
+                                </div>
                             </div>
                             <div className={styles.action}>
                                 <button onClick={submit} type='submit'>Submit</button>

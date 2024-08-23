@@ -98,7 +98,7 @@ useEffect(()=> {
   return (
     <div className={styles.services}>
         <div className={styles.service_top}>
-            <div className={styles.service_left}>Services</div>
+            <div className={styles.service_left}>{router.pathname}</div>
             <div className={styles.service_right} onClick={()=> setAdd(!isAdd)}>
                 <p>Add new</p>
             </div>

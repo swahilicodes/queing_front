@@ -23,9 +23,17 @@
             object-fit: contain;
         }
         .title{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             h1{
-                color: white;
-                font-size: 18px;
+                color: $secondColor;
+                font-size: 25px;
+            }
+            p{
+                color: $mainColor;
+                font-weight: 500;
             }
         }
     }
@@ -44,6 +52,7 @@
                 width: 100%;
                 cursor: pointer;
                 font-size: 17px;
+                color: $mainColor;
                 .icon{
                     width: 20%;
                 }
@@ -51,11 +60,11 @@
                     width: 60%;
                 }
                 &.active{
-                    color: $mainColor;
+                    color: $secondColor;
                     font-weight: 600;
                 }
                 &:hover{
-                    color: $mainColor;
+                    color: $secondColor;
                 }
             }
         }

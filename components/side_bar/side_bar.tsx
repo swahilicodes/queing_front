@@ -27,7 +27,8 @@ export default function SideBar() {
   return (
     <div className={styles.side_bar}>
         <div className={styles.logo}>
-            <img src="/wait1.svg" alt="" />
+            {/* <img src="/wait1.svg" alt="" /> */}
+            <img src="/mnh.png" alt="" />
             <div className={styles.title}>
             <h1>MLOGANZILA</h1>
             <p>Queing System</p>
@@ -135,6 +136,14 @@ export default function SideBar() {
                     <Link href="/nurses" className={styles.link}>Nurses</Link>
                 </li>)
                 }
+                <li className={cx(styles.link,router.pathname==="/out_patients" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/out_patients" className={styles.link}>Out Patients</Link>
+                </li>
+                <li className={cx(styles.link,router.pathname==="/meds" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/meds" className={styles.link}>Medical Records</Link>
+                </li>
             </ul>
         </div>
     </div>

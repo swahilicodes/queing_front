@@ -163,6 +163,10 @@
             }
             .contents{
                 width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
                 .bar{
                     width: 100%;
                     display: flex;
@@ -197,6 +201,78 @@
                         cursor: pointer;
                         font-weight: 600;
                     }
+                }
+                .exceptions{
+                    width: calc(100% - 20px);
+                    margin: 20px 0;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    background: $divColor;
+                    padding: 5px;
+                    h1{
+                        font-size: 20px;
+                        color: $mainBold;
+                        font-weight: 500;
+                    }
+                    .suggestions{
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        justify-content: center;
+                        .suggestion{
+                            background: $divColor;
+                            margin: 5px;
+                            padding: 5px;
+                            border: 1px solid $mainColor;
+                            border-radius: 100px;
+                            cursor: pointer;
+                            transition: all .5s ease-in-out;
+                            &.active{
+                                background: $mainBold;
+                                border: none;
+                                color: white;
+                            }
+                        }
+                    }
+                    .actiona{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        display: none;
+                        .acta{
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            label{
+                                margin-right: 10px;
+                            }
+                            .duara_nje{
+                                width: 60px;
+                                height: 30px;
+                                border-radius: 100px;
+                                background: grey;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                &.active{
+                                    background: $mainColor;
+                                }
+                                .duara_ndani{
+                                    width: 40px;
+                                    height: 20px;
+                                    border-radius: 100px;
+                                    background: white;
+                                    margin: 10px;
+                                    transition: all .2s ease-in-out;
+                                    &.active{
+                                        transform: translateX(20%);
+                                    }
+                                }
+                            }
+                        }
+                    }  
                 }
                 .action{
                     width: 100%;

@@ -40,7 +40,7 @@ export default function Settings() {
   return (
     <div className={styles.settings}>
         <div className={styles.top}>
-            <div className={styles.left}>Settings</div>
+            <div className={styles.left}>{router.pathname}</div>
             <div className={styles.right}><IoSettingsOutline className={styles.icon} size={30}/></div>
         </div>
         {
