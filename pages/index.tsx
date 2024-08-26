@@ -16,6 +16,9 @@ export default function Home() {
     const [adverts,setAdverts] = useState([])
     const socket = io('http://localhost:5000',{ transports: ['websocket'] });
     const router = useRouter()
+    const [time, setTime] = useState(0);
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
 
     useEffect(()=> {
       getAdverts()
@@ -32,6 +35,12 @@ export default function Home() {
       //   return () => {
       //   socket.disconnect();
       //   };
+      const intervalId = setInterval(() => {
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
+  
+      // Clean up the interval on component unmount
+      return () => clearInterval(intervalId);
     },[])
 
     const checkStatus = () => {
@@ -81,81 +90,115 @@ export default function Home() {
       setIsFullScreen(!isFullScreen);
     };
 
-  let folen
-  if(loading){
-    folen = <div className={styles.cats_loader}>
-      <table>
-        <thead>
-          <tr>
-            <th> <div className={styles.shimmer}></div> </th>
-            <th> <div className={styles.shimmer}></div> </th>
-            <th> <div className={styles.shimmer}></div> </th>
-            <th> <div className={styles.shimmer}></div> </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td> <div className={styles.shimmer}></div> </td>
-            <td> <div className={styles.shimmer}></div> </td>
-            <td> <div className={styles.shimmer}></div> </td>
-            <td> <div className={styles.shimmer}></div> </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  }else if(!loading && queue.length !== 0 ){
-    folen = <div className={styles.cats}>
-      <table>
-        <thead>
-        <tr>
-        {
-          Array.from(new Set(queue.map((item:any )=> item.category))).map((item:any,index:number)=> (
-            <th>
-              <div className={styles.th_item}>
-              {item.toUpperCase()}
-              </div>
-            </th>
-          ))
-        }
-        </tr>
-        </thead>
-        <tbody>
-          <tr>
-            {
-              Array.from(new Set(queue.map((item:any,index:number)=> item.category))).map((item:any,index:number)=> (
-                <td className={cx(index%2===0 && styles.even)}> <CatTickets category={item}/> </td>
-              ))
-            }
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  }else{
-    folen = <div className={styles.cats_loader}>
-      <table>
-        <thead>
-          <tr>
-            <th> <div className={styles.shimmer}></div> </th>
-            <th> <div className={styles.shimmer}></div> </th>
-            <th> <div className={styles.shimmer}></div> </th>
-            <th> <div className={styles.shimmer}></div> </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td> <div className={styles.shimmer}></div> </td>
-            <td> <div className={styles.shimmer}></div> </td>
-            <td> <div className={styles.shimmer}></div> </td>
-            <td> <div className={styles.shimmer}></div> </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  }
+  // let folen
+  // if(loading){
+  //   folen = <div className={styles.cats_loader}>
+  //     <table>
+  //       <thead>
+  //         <tr>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //         </tr>
+  //       </thead>
+  //       <tbody>
+  //         <tr>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //         </tr>
+  //       </tbody>
+  //     </table>
+  //   </div>
+  // }else if(!loading && queue.length !== 0 ){
+  //   folen = <div className={styles.cats}>
+  //     <table>
+  //       <thead>
+  //       <tr>
+  //       {
+  //         Array.from(new Set(queue.map((item:any )=> item.category))).map((item:any,index:number)=> (
+  //           <th>
+  //             <div className={styles.th_item}>
+  //             {item.toUpperCase()}
+  //             </div>
+  //           </th>
+  //         ))
+  //       }
+  //       </tr>
+  //       </thead>
+  //       <tbody>
+  //         <tr>
+  //           {
+  //             Array.from(new Set(queue.map((item:any,index:number)=> item.category))).map((item:any,index:number)=> (
+  //               <td className={cx(index%2===0 && styles.even)}> <CatTickets category={item}/> </td>
+  //             ))
+  //           }
+  //         </tr>
+  //       </tbody>
+  //     </table>
+  //   </div>
+  // }else{
+  //   folen = <div className={styles.cats_loader}>
+  //     <table>
+  //       <thead>
+  //         <tr>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //           <th> <div className={styles.shimmer}></div> </th>
+  //         </tr>
+  //       </thead>
+  //       <tbody>
+  //         <tr>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //           <td> <div className={styles.shimmer}></div> </td>
+  //         </tr>
+  //       </tbody>
+  //     </table>
+  //   </div>
+  // }
   return (
     <div className={styles.index}>
-      {folen}
-      <div className={styles.color_expla}>
+      <div className={styles.new_look}>
+        <div className={styles.new_left}>
+          <div className={styles.round}>
+            <h5>Current Serving</h5>
+            <h2>Token Number</h2>
+            <div className={styles.token_no}>
+              D002
+            </div>
+            <div className={styles.waiting_time}>
+              <p>Waiting Time</p>
+              <span>{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
+            </div>
+          </div>
+        </div>
+        <div className={styles.new_right}>
+          {
+            queue.length>0 
+            ? <div className={styles.queue_div}>
+              {
+                queue.map((item:any,index:number)=> (
+                  <div className={cx(styles.div)}>
+                    <div className={cx(styles.indi,index===0 && styles.serving,index===1 && styles.next)}> <p>{index+1}</p> </div>
+                    <div className={styles.ticket_info}>
+                    <p>{item.ticket_no}</p>
+                    <span>COUNTER <span>001</span> </span>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+            : <div className={styles.queue_div}></div>
+          }
+        </div>
+      </div>
+      {/* {folen} */}
+      {/* <div className={styles.color_expla}>
         <div className={styles.item}>
           <div className={cx(styles.color_left,styles.main)}></div>
           <div className={styles.color_right}>Namba</div>
@@ -176,7 +219,7 @@ export default function Home() {
           <div className={cx(styles.color_left,styles.yellow)}></div>
           <div className={styles.color_right}>Kaa Tayari</div>
         </div>
-      </div>
+      </div> */}
       <div className={styles.ads}>
         <div className={styles.ad}>
           {

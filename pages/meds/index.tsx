@@ -10,7 +10,9 @@ import cx from 'classnames'
 import { SlRefresh } from 'react-icons/sl'
 import { io } from 'socket.io-client'
 import Ticket_Category_Length from '@/components/ticket_category_length/ticket_category_length'
-import { IoArrowRedoOutline } from 'react-icons/io5'
+import { IoArrowRedoOutline, IoSearch } from 'react-icons/io5'
+import { MdOutlineClear } from 'react-icons/md'
+import Cubes from '@/components/loaders/cubes/cubes'
 
 export default function MedicalRecords() {
   const [tickets, setTickets] = useState<any>([])
@@ -29,14 +31,17 @@ export default function MedicalRecords() {
   const [edLoading,setEdLoading] = useState(false)
   const [specialIndex, setSpecialIndex] = useState(0)
   const [disable, setDisable] = useState("normal")
+  const [search, setSearch] = useState(false)
+  const [ticket, setTicket] = useState('')
+  const [language, setLanguage] = useState<string>('sw-KE');
 
   useEffect(()=> {
     getTicks()
-  },[status,disable])
+  },[status,disable,ticket])
 
   const getTicks  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/tickets/getMedsTickets",{params: {page,pagesize,status,disable}}).then((data:any)=> {
+    axios.get("http://localhost:5000/tickets/getMedsTickets",{params: {page,pagesize,status,disable,phone:ticket}}).then((data:any)=> {
         setTickets(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -56,6 +61,7 @@ export default function MedicalRecords() {
     setSpecialIndex(index)
     setDisable(disability)
  }
+
  const handleSpeak = (namba:any) => {
     setTalking(true)
     setNumber(namba)
@@ -70,12 +76,13 @@ export default function MedicalRecords() {
       
       // Find the Swahili voice
       const voices = synthesis.getVoices();
-      const swahiliFemaleVoice = voices.find((voice:any) => voice.lang === 'sw' && voice.gender === 'female');
+      //const swahiliFemaleVoice = voices.find((voice:any) => voice.lang === 'zh-TW' && voice.gender === 'female');
+      const swahiliFemaleVoice = voices.find((voice:any) => voice.lang === 'sw-TZ');
 
       if (swahiliFemaleVoice) {
         utterance.voice = swahiliFemaleVoice;
       } else {
-        console.warn('Swahili female voice not found.');
+        console.warn('Swahili female voice not found.',voices.map((item:any)=> item.lang));
       }
 
       synthesis.speak(utterance)
@@ -117,12 +124,60 @@ export default function MedicalRecords() {
     }
     })
   }
+  const penalize = (id:string) => {
+    setEdLoading(true)
+    axios.put(`http://localhost:5000/tickets/penalize/${id}`).then((data:any)=> {
+      socket.emit("data",{data:data.data,route:"tickets"})
+      setInterval(()=> {
+        setEdLoading(false)
+        router.reload()
+      },3000)
+    }).catch((error)=> {
+      setEdLoading(false)
+      if (error.response && error.response.status === 400) {
+        console.log(`there is an error ${error.message}`)
+        alert(error.response.data.error);
+    } else {
+        console.log(`there is an error message ${error.message}`)
+        alert(error.message);
+    }
+    })
+  }
 
   return (
     <div className={styles.meds}>
+      {
+        edLoading && (
+          <div className={styles.overlay}>
+            <div className={styles.conts}>
+              <Cubes/>
+            </div>
+          </div>
+        )
+      }
+      <div className={cx(styles.search_modal,search && styles.active)}>
+        <div className={styles.bar}>
+          <input 
+          type="text" 
+          value={ticket}
+          onChange={e => setTicket(e.target.value)}
+          placeholder='phone number..'
+          />
+          <div className={styles.search_button}>
+          <IoSearch size={20} className={styles.icon___}/>
+          </div>
+        </div>
+      </div>
         <div className={styles.meds_top}>
             <div className={styles.left}>{router.pathname}</div>
             <div className={styles.right}>
+            <div className={cx(styles.search,search && styles.active)} onClick={()=> setSearch(!search)}>
+            {
+              search 
+              ? <MdOutlineClear size={20} className={styles.icon___}/>
+              : <IoSearch size={20} className={styles.icon___}/>
+            }
+            </div>
             <div className={styles.special}>
                 <div className={cx(styles.one,specialIndex===1 && styles.active)} onClick={()=> setDisability(1,"normal")}>Normal</div>
                 <div className={cx(styles.one,specialIndex===2 && styles.active)} onClick={()=> setDisability(2,"disabled")}>Special</div>
@@ -158,12 +213,13 @@ export default function MedicalRecords() {
                             <h4>Serving Now</h4>
                             <h1>{tickets[0].ticket_no}</h1>
                           </div>
+                          {/* <div className={styles.call} onClick={()=>handleSpeak(tickets[0].ticket_no)}> */}
                           <div className={styles.call} onClick={()=>handleSpeak(tickets[0].ticket_no)}>
                             <GiSpeaker size={150} className={cx(styles.click_icon,talking && styles.active)}/>
                           </div>
                           <div className={styles.two_other}>
                             <div className={styles.item} onClick={()=> prepare(tickets[0].id,"pending")}>Pend</div>
-                            <div className={styles.item_red} onClick={()=> prepare(tickets[0].id,"cancelled")}>Cancel</div>
+                            <div className={styles.item_red} onClick={()=> penalize(tickets[0].id)}>Penalize</div>
                           </div>
                           <div className={styles.finish} onClick={()=> prepare(tickets[0].id,"done")}>Finish</div>
                           <div className={styles.reload} onClick={()=> reloda()}>{refresh?<SlRefresh className={styles.icon}/>:"Refresh"}</div>
@@ -186,49 +242,37 @@ export default function MedicalRecords() {
                                         <td>{item.ticket_no}</td>
                                         <td>{item.disability}</td>
                                         <td>{item.phone}</td>
-                                        {/* <td className={styles.action}>
-                                            {
-                                              index===0 && (<div className={cx(styles.icon_wrap,namba===item.ticket_no && styles.active)} onClick={()=>handleSpeak(item.ticket_no)}><PiSpeakerHighDuotone className={styles.action_icon}/></div>)
-                                            }
-                                            <div className={cx(styles.icon_wrap,namba===item.ticket_no  && styles.active)} onClick={()=> editTicket(item.id)}><MdOutlineEdit className={styles.action_icon}/></div>
-                                        </td> */}
                                     </tr>
                                 ))
                             }
                             </tbody>
                         </table>
                         </div>
-                        <div className={styles.list_botoms}>
-                          <div className={styles.list_botom}>On Queue: 1</div>
-                          <div className={styles.list_botom}>Attended: 56</div>
-                          <div className={styles.list_botom}>Pending: 0</div>
-                          <div className={styles.list_botom}>Remaining: 50</div>
-                        </div>
                     </div>
                 }
             </div>
         }
-        {/* {
+        {
           tickets.length > 0 && (<div className={styles.bottom_desc}>
             <div className={styles.top}>
               <div className={styles.item}>
-                <p>On Queue: <span> <Ticket_Category_Length category={currentUser.service} status='waiting'/> </span> </p>
+                <p>On Queue: <span> <Ticket_Category_Length category="meds" status='waiting'/> </span> </p>
               </div>
               <div className={styles.item}>
-                <p>Attended: <span><Ticket_Category_Length category={currentUser.service} status='done'/></span> </p>
+                <p>Attended: <span><Ticket_Category_Length category="meds" status='done'/></span> </p>
               </div>
               <div className={styles.item}>
-                <p>Pending: <span><Ticket_Category_Length category={currentUser.service} status='pending'/></span> </p>
+                <p>Pending: <span><Ticket_Category_Length category="meds" status='pending'/></span> </p>
               </div>
               <div className={styles.item}>
-                <p>Cancelled: <span><Ticket_Category_Length category={currentUser.service} status='cancelled'/></span> </p>
+                <p>Cancelled: <span><Ticket_Category_Length category="meds" status='cancelled'/></span> </p>
               </div>
               <div className={styles.item_out}>
                 <IoArrowRedoOutline className={styles.icon}/>
               </div>
             </div>
           </div>)
-        } */}
+        }
     </div>
   )
 }

@@ -14,8 +14,8 @@ interface MyComponentProps {
       }, [category,status]);
     
       const getTickets = () => {
-        axios.get("http://localhost:5000/tickets/getCatTickets",{params: {page,pagesize,category:category??"Radiology",status}}).then((data)=> {
-          setTickets(data.data.totalItems)
+        axios.get("http://localhost:5000/tickets/getTicketTotal",{params: {status,stage:category}}).then((data)=> {
+          setTickets(data.data)
         }).catch((error)=> {
           if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -27,7 +27,7 @@ interface MyComponentProps {
         })
       }
   return (
-    <div>{tickets>0?tickets:0}</div>
+    <div>{tickets.length>0?tickets.length:0}</div>
   )
 }
 export default Ticket_Category_Length;
