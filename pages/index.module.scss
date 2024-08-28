@@ -8,19 +8,62 @@
     background: $divColor;
     position: relative;
     overflow: hidden;
+    .top_bar{
+        width: 100%;
+        background: $mainBold;
+        height: 70px;
+        position: absolute;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        h1{
+            color: white;
+        }
+        .date{
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            border: 2px solid $mainColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 5px;
+            display: none;
+        }
+    }
     .new_look{
         width: 100%;
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         padding: 15px;
+        margin-top: 70px;
+        height: 80%;
         .new_left{
             width: 60%;
+            height: 100%;
+            //background: linear-gradient(to left, $mainColor, $divColor);
+            //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 2px solid $mainColor;
-            border-radius: 10px;
+            // border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            .current_serving{
+                width: 40%;
+                background: $mainColor;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                p{
+                    color: white;
+                }
+            }
             .round{
                 width: 100%;
                 display: flex;
@@ -31,12 +74,16 @@
                 h5{
                     font-size: 20px;
                     color: grey;
+                    font-weight: 400;
+                    display: none;
                 }
                 h2{
                     color: $mainColor;
+                    font-size: 30px;
                     margin-bottom: 15px;
                 }
                 .token_no{
+                    width: 40%;
                     border: 2px solid $secondColor;
                     padding: 15px;
                     border-radius: 10px;
@@ -44,12 +91,48 @@
                     color: $secondColor;
                     margin: 15px;
                     font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
                 .waiting_time{
                     display: flex;
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
+                    p{
+                        color: grey;
+                    }
+                    span{
+                        color: $mainColor;
+                        font-weight: 600;
+                        font-size: 25px;
+                    }
+                }
+                .counter{
+                    width: 40%;
+                    background: $mainColor;
+                    padding: 15px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-around;
+                    border-radius: 10px;
+                    p{
+                        color: white;
+                        font-weight: 600;
+                        font-size: 30px;
+                    }
+                    .con{
+                        color: $secondColor;
+                    }
+                    span{
+                        color: white;
+                        font-weight: 400;
+                        font-size: 30px;
+                        span{
+                            color: $secondColor;
+                        }
+                    }
                 }
             }
         }
@@ -65,22 +148,30 @@
                     width: 100%;
                     background: $mainColor;
                     height: 70px;
-                    //border-radius: 10px;
+                    border-radius: 10px;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    margin-bottom: 10px;
+                    margin-bottom: 5px;
                     color: white;
                     position: relative;
+                    border-bottom: 2px solid $mainBold;
+                    &.serving{
+                        border-bottom: 2px solid red;   
+                    }
+                    &.next{
+                        border-bottom: 2px solid green;   
+                    }
                     .indi{
                         position: absolute;
                         height: 90%;
                         left: 5px;
                         width: 10%;
-                        background: red;
+                        background: $mainBold;
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        border-radius: 10px;
                         p{
                             font-weight: 600;
                             font-size: 30px;
@@ -99,6 +190,9 @@
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
+                        .con{
+                            color: $secondColor;
+                        }
                         p{
                             font-weight: 600;
                             font-size: 30px;

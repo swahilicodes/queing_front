@@ -8,6 +8,7 @@ import { FiEdit2 } from 'react-icons/fi'
 
 export default function Services() {
 const [name,setName] = useState("")
+const [namba,setNamba] = useState("")
 const [isAdd, setAdd] = useState(false)
 const [isDelete, setDelete] = useState(false)
 const [isEdit, setEdit] = useState(false)
@@ -25,7 +26,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/counters/create_counter",{name}).then((data:any)=> {
+    axios.post("http://localhost:5000/counters/create_counter",{name,namba}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -53,7 +54,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{name}).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{name,namba}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error:any)=> {
@@ -73,10 +74,11 @@ useEffect(()=> {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (namba:string,name:string) => {
-    setId(namba);
+ const handleEdit = (id:string, namba:string,name:string) => {
+    setId(id);
     setEdit(true)
     setName(name)
+    setNamba(namba)
   };
  const getServices  = () => {
     setFetchLoading(true)
@@ -112,6 +114,12 @@ useEffect(()=> {
                     onChange={e => setName(e.target.value)}
                     placeholder='name*'
                     />
+                    <input 
+                    type="text" 
+                    value={namba}
+                    onChange={e => setNamba(e.target.value)}
+                    placeholder='number*'
+                    />
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
                     <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>
@@ -127,6 +135,12 @@ useEffect(()=> {
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder='name*'
+                    />
+                    <input 
+                    type="text" 
+                    value={namba}
+                    onChange={e => setNamba(e.target.value)}
+                    placeholder='number*'
                     />
                     <div className={styles.action}>
                     <button onClick={editService}>submit</button>
@@ -170,6 +184,7 @@ useEffect(()=> {
                                 <tr>
                                     <th>Id</th>
                                     <th>Name</th>
+                                    <th>Number</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -179,9 +194,10 @@ useEffect(()=> {
                                     <tr key={index} className={cx(index%2===0 && styles.active)}>
                                         <td>{data.id}</td>
                                         <td>{data.name}</td>
+                                        <td>{data.namba}</td>
                                         <td>
                                             <div className={styles.delete} onClick={()=> handleDelete(data.id)}><MdDelete className={styles.icon}/></div> 
-                                            <div className={styles.edit} onClick={()=> handleEdit(data.id,data.name)}><FiEdit2 className={styles.icon}/></div> 
+                                            <div className={styles.edit} onClick={()=> handleEdit(data.id,data.namba,data.name)}><FiEdit2 className={styles.icon}/></div> 
                                         </td>
                                     </tr>
                                 ))

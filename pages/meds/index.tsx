@@ -169,7 +169,7 @@ export default function MedicalRecords() {
         </div>
       </div>
         <div className={styles.meds_top}>
-            <div className={styles.left}>{router.pathname}</div>
+            <div className={styles.left}>{currentUser.name}| {currentUser.counter}</div>
             <div className={styles.right}>
             <div className={cx(styles.search,search && styles.active)} onClick={()=> setSearch(!search)}>
             {
