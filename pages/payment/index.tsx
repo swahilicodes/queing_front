@@ -14,7 +14,7 @@ import { GiSpeaker } from 'react-icons/gi';
 import { SlRefresh } from 'react-icons/sl';
 import Medicine_Category_Length from '@/components/meds_cat_length';
 
-function OutPatients() {
+function Accounts() {
 const [patients, setPatients] = useState<any>([]);
 const [clients, setClients] =  useState<any>([]);
 const [tickets, setTickets] = useState<any>([])
@@ -31,81 +31,26 @@ const currentUser:any = useRecoilValue(currentUserState)
 const socket = io('http://localhost:5000');
 const [refresh, setRefresh] = useState(false)
 const [edLoading,setEdLoading] = useState(false)
-const [specialIndex, setSpecialIndex] = useState(0)
-const [disable, setDisable] = useState("normal")
 const [search, setSearch] = useState(false)
 const [ticket, setTicket] = useState('')
 const [language, setLanguage] = useState<string>('sw-KE');
 const full = useRecoilValue(isFull)
+const [finish, setFinish] = useState(false)
+const [pay,setPay] = useState("")
+const [finishId, setFinishId] = useState('')
+const [finiLoading, setFiniLoading] = useState(false)
 
   useEffect(() => {
     getPatients()
-    checkPatients();
-    const intervalId = setInterval(() => {
-      const newPatients = generatePatients();
-      setPatients(newPatients);
-      router.reload()
-    }, 120000); // 10 seconds
-    // }, 10000); // 10 seconds
-
-    return () => clearInterval(intervalId);
   }, [patients,status,mr_no]);
-
-  const checkPatients = () => {
-    patients.map((patient:any) => {
-      const regDateTime:Date = new Date(`${patient.regDate}T${patient.regTime}`);
-      const now:Date = new Date();
-      const timeDiff = now.getTime() - regDateTime.getTime();
-      const hoursDiff = (now.getTime() - regDateTime.getTime()) / (1000 * 60 * 60);
-
-      if (hoursDiff < 24) {
-        if(clients.length>0){
-          clients.map((item:any)=> {
-            if(item.mr_no===patient.mrNumber){
-              console.log('patient exists')
-            }else{
-              axios.post('http://localhost:5000/patients/register_patient',{name:patient.name,stage:"meds",clinic:"hello there",mr_no:patient.mrNumber,age:patient.age,sex:patient.sex,status:"waiting",reg_date: regDateTime,doctor:patient.doctor,consult_doctor:patient.consultationDoctor}).then((data)=> {
-                setClients(data.data)
-              }).catch((err)=> {
-                console.log(err)
-              })
-            }
-          })
-        }else{
-          console.log("writting patients")
-          axios.post('http://localhost:5000/patients/register_patient',{name:patient.name,stage:"meds",clinic:"hello there",mr_no:patient.mrNumber,age:patient.age,sex:patient.sex,status:"waiting",reg_date: regDateTime,doctor:patient.doctor,consult_doctor:patient.consultationDoctor}).then((data)=> {
-            //setClients(data.data)
-            console.log(data.data)
-          }).catch((err)=> {
-            console.log(err)
-          })
-        }
-      }else{
-        console.log(`greater than 24`)
-      }
-    });
-  };
 
   const getPatients = () => {
     setFetchLoading(true)
-    axios.get('http://localhost:5000/patients/get_patients',{params: {status,mr_no}}).then((data)=> {
+    axios.get('http://localhost:5000/patients/get_account_patients',{params: {status,mr_no,stage:"payment"}}).then((data)=> {
       setClients(data.data)
       setFetchLoading(false)
-      deleteDuplicates()
-      // setInterval(()=> {
-      //   deleteDuplicates()
-      // },1000)
     }).catch((err)=> {
       setFetchLoading(false)
-      console.log(err)
-    })
-  }
-  const deleteDuplicates = () => {
-    axios.put('http://localhost:5000/patients/duplicate_patients').then((data)=> {
-      //setClients(data.data)
-      // setFetchLoading(false)
-    }).catch((err)=> {
-      // setFetchLoading(false)
       console.log(err)
     })
   }
@@ -152,8 +97,13 @@ const full = useRecoilValue(isFull)
   const prepare = (id:string,status:string) => {
     editTicket(id,status)
   }
-  const prepare01 = (id:string) => {
-    finishPatient(id)
+  // const prepareFinish = (id:string) => {
+  //   setFinishId(id)
+  //   setFinish(true)
+  // }
+
+  const pushNext = () => {
+    setFinish(true)
   }
 
   const editTicket = (id:string,status:string) => {
@@ -176,8 +126,9 @@ const full = useRecoilValue(isFull)
     })
   }
   const finishPatient = (id:string) => {
+    console.log("stage is ",id)
     setEdLoading(true)
-    axios.put(`http://localhost:5000/patients/finish_patient/${id}`,{status}).then((data:any)=> {
+    axios.put(`http://localhost:5000/patients/edit_status/${id}`,{stage:"clinic"}).then((data:any)=> {
       socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)
@@ -194,54 +145,6 @@ const full = useRecoilValue(isFull)
     }
     })
   }
-    const generatePatient = () => {
-        const categories = ['one', 'two', 'three', 'four'];
-        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-        const randomName = `Patient-${Math.floor(Math.random() * 1000)}`;
-        const randomMRNumber = Math.floor(Math.random() * 100000);
-        const randomAge = Math.floor(Math.random() * 100);
-        const randomSex = Math.random() > 0.5 ? 'Male' : 'Female';
-        const now = new Date();
-        const regDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
-        const regTime = now.toTimeString().split(' ')[0]; // HH:MM:SS
-        const consDate = regDate; // Assuming consultation date is the same as registration date
-        const consTime = regTime; // Assuming consultation time is the same as registration time
-        const randomDoctor = `Doctor-${Math.floor(Math.random() * 100)}`;
-        const randomConsultationDoctor = `ConsultationDoctor-${Math.floor(Math.random() * 100)}`;
-        const patientType = 'Outpatient';
-        const patientCategory = 'General';
-        const exemptionCategory = 'None';
-        const initialDiagnosis = 'N/A';
-        const creditCompanyName = 'N/A';
-      
-        return {
-          name: randomName,
-          category: randomCategory,
-          mrNumber: randomMRNumber,
-          age: randomAge,
-          sex: randomSex,
-          regDate,
-          regTime,
-          consDate,
-          consTime,
-          doctor: randomDoctor,
-          consultationDoctor: randomConsultationDoctor,
-          patientType,
-          patientCategory,
-          exemptionCategory,
-          initialDiagnosis,
-          creditCompanyName,
-        };
-      };
-      
-      // Function to generate an array of patients
-      const generatePatients = (count = 10) => {
-        const patients = [];
-        for (let i = 0; i < count; i++) {
-          patients.push(generatePatient());
-        }
-        return patients;
-      };
   return (
     <div className={styles.meds}>
       {
@@ -249,6 +152,31 @@ const full = useRecoilValue(isFull)
           <div className={styles.overlay}>
             <div className={styles.conts}>
               <Cubes/>
+            </div>
+          </div>
+        )
+      }
+      {
+        finish && (
+          <div className={styles.overlay}>
+            <div className={styles.contenta}>
+              <label>Select Service</label>
+              <select onChange={e => setPay(e.target.value)}>
+                <option value="" selected disabled hidden>choose service</option>
+                <option value="insurance">Insurance</option>
+                <option value="cash">Cash</option>
+              </select>
+              <div className={styles.cont_body}>
+                <div className={cx(styles.body_item,pay==="insurance" && styles.active)} onClick={()=> setPay("insurance")}>#Insurance</div>
+                <div className={cx(styles.body_item,pay==="cash" && styles.active)} onClick={()=> setPay("cash")}>#Cash</div>
+              </div>
+              <div className={styles.actions}>
+                <div className={styles.action} onClick={()=> finishPatient(finishId)}>Submit</div>
+                <div className={styles.action} onClick={()=> setFinish(false)} style={{background:"red"}}>Cancel</div>
+              </div>
+              <div className={cx(styles.loading_bar,finiLoading && styles.active)}>
+                <div className={styles.loading_inside}></div>
+              </div>
             </div>
           </div>
         )
@@ -319,7 +247,8 @@ const full = useRecoilValue(isFull)
                             <div className={styles.item} onClick={()=> prepare(clients[0].id,"pending")}>Pend</div>
                             <div className={styles.item_red} onClick={()=> prepare(clients[0].id,"cancelled")}>Cancel</div>
                           </div>
-                          <div className={styles.finish} onClick={()=> prepare01(clients[0].id)}>Finish</div>
+                          <div className={styles.finish} onClick={()=> finishPatient(clients[0].id)}>Finish</div>
+                          {/* <div className={styles.finish} onClick={()=> prepare01(clients[0].id)}>Finish</div> */}
                           <div className={styles.reload} onClick={()=> reloda()}>{refresh?<SlRefresh className={styles.icon}/>:"Refresh"}</div>
                           </div>
                         </div>
@@ -358,16 +287,16 @@ const full = useRecoilValue(isFull)
           clients.length > 0 && (<div className={styles.bottom_desc}>
             <div className={styles.top}>
               <div className={styles.item}>
-                <p>On Queue: <span> <Medicine_Category_Length stage="meds" status='waiting'/> </span> </p>
+                <p>On Queue: <span> <Medicine_Category_Length stage="payment" status='waiting'/> </span> </p>
               </div>
               <div className={styles.item}>
-                <p>Attended: <span><Medicine_Category_Length stage="meds" status='done'/></span> </p>
+                <p>Attended: <span><Medicine_Category_Length stage="payment" status='done'/></span> </p>
               </div>
               <div className={styles.item}>
-                <p>Pending: <span><Medicine_Category_Length stage="meds" status='pending'/></span> </p>
+                <p>Pending: <span><Medicine_Category_Length stage="payment" status='pending'/></span> </p>
               </div>
               <div className={styles.item}>
-                <p>Cancelled: <span><Medicine_Category_Length stage="meds" status='cancelled'/></span> </p>
+                <p>Cancelled: <span><Medicine_Category_Length stage="payment" status='cancelled'/></span> </p>
               </div>
               <div className={styles.item_out}>
                 <IoArrowRedoOutline className={styles.icon}/>
@@ -379,4 +308,4 @@ const full = useRecoilValue(isFull)
   )
 }
 
-export default OutPatients
+export default Accounts

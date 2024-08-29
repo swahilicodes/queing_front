@@ -144,6 +144,18 @@ export default function SideBar() {
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/meds" className={styles.link}>Medical Records</Link>
                 </li>
+                <li className={cx(styles.link,router.pathname==="/accounts" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/accounts" className={styles.link}>Accounts</Link>
+                </li>
+                <li className={cx(styles.link,router.pathname==="/accounts_display" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/accounts_display" className={styles.link}>Accounts Display</Link>
+                </li>
+                <li className={cx(styles.link,router.pathname==="/payment" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/payment" className={styles.link}>Payment</Link>
+                </li>
             </ul>
         </div>
     </div>
