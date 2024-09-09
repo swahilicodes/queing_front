@@ -24,6 +24,14 @@ const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
 const {data,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/services/get_all_services")
 const {data:counters,loading:cLoading, error: cError} = useFetchData("http://localhost:5000/counters/get_all_counters")
+const [editData, setEditData] = useState<any>({})
+const [fields, setFields] = useState({
+    name: "",
+    role: "",
+    service: "",
+    counter: "",
+    phone: ""
+})
 
 useEffect(()=> {
     getAttendants()
@@ -31,9 +39,9 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/attendants/create_attendant",{name,phone,service,counter,role:"attendant"}).then((data:any)=> {
+    axios.post("http://localhost:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter}).then((data:any)=> {
         setAdd(false)
-        //router.reload()
+        router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -45,7 +53,7 @@ useEffect(()=> {
     })
  }
  const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/attendants/delete_attendant/${id}`).then((data:any)=> {
+    axios.put(`http://localhost:5000/doctors/delete_doctor/${id}`).then((data:any)=> {
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
@@ -59,7 +67,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then((data:any)=> {
+    axios.put(`http://localhost:5000/doctors/edit_doctor/${id}`,{fields}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error:any)=> {
@@ -79,14 +87,20 @@ useEffect(()=> {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (namba:string,name:string) => {
+ const handleEdit = (namba:string,doctor:any) => {
     setId(namba);
     setEdit(true)
-    setName(name)
+    setFields({
+        ...fields,
+        name: doctor.name,
+        phone: doctor.phone,
+        service: doctor.service,
+        counter: doctor.room
+    })
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/attendants/get_attendants",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/doctors/get_doctors",{params: {page,pagesize}}).then((data:any)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -101,6 +115,14 @@ useEffect(()=> {
         }
     })
  }
+
+ function toCamelCase(str:string) {
+    return str
+        .replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, (match, index) => 
+            index === 0 ? match.toLowerCase() : match.toUpperCase()
+        )
+        .replace(/\s+/g, ''); // Remove spaces
+}
   return (
     <div className={styles.services}>
         <div className={styles.service_top}>
@@ -117,8 +139,8 @@ useEffect(()=> {
                     <label htmlFor="name">Enter name:</label>
                     <input 
                     type="text" 
-                    value={name}
-                    onChange={e => setName(e.target.value)}
+                    value={fields.name}
+                    onChange={e => setFields({...fields,name:e.target.value})}
                     placeholder='name*'
                     id="name" 
                     name="name"
@@ -128,8 +150,8 @@ useEffect(()=> {
                     <label htmlFor="phone">Enter phone:</label>
                     <input 
                     type="text" 
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
+                    value={fields.phone}
+                    onChange={e => setFields({...fields,phone:e.target.value})}
                     placeholder='phone*'
                     id="phone" 
                     name="phone"
@@ -137,28 +159,33 @@ useEffect(()=> {
                     </div>
                     <div className={styles.add_item}>
                     <label htmlFor="service">Select service:</label>
-                    <select value={service}
-                    onChange={e => setService(e.target.value)}>
+                    <select value={fields.service}
+                    onChange={e => setFields({...fields,service:e.target.value})}>
                         <option selected disabled defaultValue="Select Service">Select Service</option>
                         {
-                            data.map((item:any,index:number)=> (
-                                <option value={item.name} key={index}>{item.name}</option>
+                            Array.from(new Set(counters.map((item:any) => item.name))).map(name => counters.find((item:any) => item.name === name)).map((data01:any,index)=> (
+                                <option value={data01.name} key={index}>{data01.name}</option>
                             ))
                         }
                     </select>
                     </div>
-                    <div className={styles.add_item}>
-                    <label htmlFor="counter">Select counter:</label>
-                    <select value={counter}
-                    onChange={e => setCounter(e.target.value)}>
-                        <option selected disabled>Select Counter</option>
-                        {
-                            counters.map((item:any,index:number)=> (
-                                <option value={item.name} key={index}>{item.name}</option>
-                            ))
-                        }
-                    </select>
-                    </div>
+                    {
+                        fields.service !== "" && (<div className={styles.add_item}>
+                            <label htmlFor="counter">Select counter:</label>
+                            <select value={fields.counter}
+                            onChange={e => setFields({...fields,counter: e.target.value})}>
+                                <option selected disabled>Select Counter</option>
+                                {
+                                    fields.service !== "clinic" && (<option selected value={counters[0].namba}>Select Counter</option>)
+                                }
+                                {
+                                    counters.filter((data:any)=> data.name === fields.service).map((item:any,index:number)=> (
+                                        <option value={item.namba} key={index}>{item.namba}</option>
+                                    ))
+                                }
+                            </select>
+                            </div>)
+                    }
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
                     <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>
@@ -169,27 +196,60 @@ useEffect(()=> {
         }
         {
             isEdit && ( <div className={styles.add_service}>
-                <form>
+                <form onSubmit={submit}>
+                    <div className={styles.add_items}>
+                    <div className={styles.add_item}>
+                    <label htmlFor="name">Enter name:</label>
                     <input 
                     type="text" 
-                    value={name}
-                    onChange={e => setName(e.target.value)}
+                    value={fields.name}
+                    onChange={e => setFields({...fields,name: e.target.value})}
                     placeholder='name*'
+                    id="name" 
+                    name="name"
                     />
+                    </div>
+                    <div className={styles.add_item}>
+                    <label htmlFor="phone">Enter phone:</label>
+                    <input 
+                    type="text" 
+                    value={fields.phone}
+                    onChange={e => setFields({...fields,phone: e.target.value})}
+                    placeholder='phone*'
+                    id="phone" 
+                    name="phone"
+                    />
+                    </div>
+                    <div className={styles.add_item}>
+                    <label htmlFor="service">Select service:</label>
+                    <select value={fields.service}
+                    onChange={e => setFields({...fields,service:e.target.value})}>
+                        <option selected disabled defaultValue="Select Service">Select Service</option>
+                        {
+                            Array.from(new Set(counters.map((item:any) => item.name))).map(name => counters.find((item:any) => item.name === name)).map((data01:any,index)=> (
+                                <option value={data01.name} key={index}>{data01.name}</option>
+                            ))
+                        }
+                    </select>
+                    </div>
+                    {
+                        fields.service !== "" && (<div className={styles.add_item}>
+                            <label htmlFor="counter">Select counter:</label>
+                            <select value={fields.counter}
+                            onChange={e => setFields({...fields,counter: e.target.value })}>
+                                <option selected disabled>Select Counter</option>
+                                {
+                                    counters.filter((data:any)=> data.name === fields.service).map((item:any,index:number)=> (
+                                        <option value={item.namba} key={index}>{item.namba}</option>
+                                    ))
+                                }
+                            </select>
+                            </div>)
+                    }
                     <div className={styles.action}>
                     <button onClick={editService}>submit</button>
                     <div className={styles.clear} onClick={()=> setEdit(false)}><MdOutlineClear className={styles.icon}/></div>
                     </div>
-                </form>
-            </div> )
-        }
-        {
-            isDelete && ( <div className={styles.add_service}>
-                <form>
-                    <h4>Are You Sure?</h4>
-                    <div className={styles.action}>
-                    <button onClick={()=> deleteService(id)}>Yes</button>
-                    <div className={styles.clear} onClick={()=> setDelete(false)}><MdOutlineClear className={styles.icon}/></div>
                     </div>
                 </form>
             </div> )
@@ -216,24 +276,26 @@ useEffect(()=> {
                     <table>
                         <thead>
                             <tr>
-                                <th>Id</th>
                                 <th>Name</th>
-                                <th>Role</th>
                                 <th>Phone</th>
+                                <th>Service</th>
+                                <th>Counter</th>
+                                <th>role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                         {
-                            services.map((data:any,index:number)=> (
+                            services.map((item:any,index:number)=> (
                                 <tr key={index} className={cx(index%2===0 && styles.active)}>
-                                    <td>{data.id}</td>
-                                    <td>{data.name}</td>
-                                    <td>{data.role}</td>
-                                    <td>{data.phone}</td>
+                                    <td>{item.name}</td>
+                                    <td>{item.phone}</td>
+                                    <td>{toCamelCase(item.service)}</td>
+                                    <td>{item.room}</td>
+                                    <td>{item.role}</td>
                                     <td>
-                                        <div className={styles.delete} onClick={()=> handleDelete(data.id)}><MdDelete className={styles.icon}/></div> 
-                                        <div className={styles.edit} onClick={()=> handleEdit(data.id,data.name)}><FiEdit2 className={styles.icon}/></div> 
+                                        <div className={styles.delete} onClick={()=> handleDelete(item.id)}><MdDelete className={styles.icon}/></div> 
+                                        <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div> 
                                     </td>
                                 </tr>
                             ))
@@ -248,7 +310,7 @@ useEffect(()=> {
                         ))}
             </div>
                 </div> 
-                    : <div className={styles.message}>No Attendants </div>
+                    : <div className={styles.message}>No Doctors </div>
                 }
             </div>
             }

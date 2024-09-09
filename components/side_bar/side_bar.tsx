@@ -75,12 +75,6 @@ export default function SideBar() {
                 </li>)
                 }
                 {
-                    (currentUser.role === "admin" || currentUser.role==="attendant") && (<li className={cx(styles.link,router.pathname==="/attendants" && styles.active)}>
-                    <HiMiniUserGroup className={styles.icon}/>
-                    <Link href="/attendants" className={styles.link}>Attendants</Link>
-                </li>)
-                }
-                {
                     currentUser.role === undefined && (<li className={cx(styles.link,router.pathname==="/login" && styles.active)}>
                     <IoArrowRedoOutline className={styles.icon}/>
                     <Link href="/login" className={styles.link}>Login</Link>
@@ -113,21 +107,9 @@ export default function SideBar() {
                 </li>)
                 }
                 {
-                    (currentUser !== undefined && currentUser.role === 'doctor') && (<li className={cx(styles.link,router.pathname==="/patients" && styles.active)}>
-                    <FaHandHoldingMedical className={styles.icon}/>
-                    <Link href="/patients" className={styles.link}>Patients</Link>
-                </li>)
-                }
-                {
-                    (currentUser !== undefined && currentUser.role === 'doctor') && (<li className={cx(styles.link,router.pathname==="/vitals" && styles.active)}>
-                    <FaHandHoldingMedical className={styles.icon}/>
-                    <Link href="/vitals" className={styles.link}>Vitals</Link>
-                </li>)
-                }
-                {
-                    (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/doctors" && styles.active)}>
+                    (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/attendants" && styles.active)}>
                     <FaUserDoctor className={styles.icon}/>
-                    <Link href="/doctors" className={styles.link}>Doctors</Link>
+                    <Link href="/attendants" className={styles.link}>Attendants</Link>
                 </li>)
                 }
                 {
@@ -155,6 +137,10 @@ export default function SideBar() {
                 <li className={cx(styles.link,router.pathname==="/payment" && styles.active)}>
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/payment" className={styles.link}>Payment</Link>
+                </li>
+                <li className={cx(styles.link,router.pathname==="/clinic" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/clinic" className={styles.link}>Clinic</Link>
                 </li>
             </ul>
         </div>

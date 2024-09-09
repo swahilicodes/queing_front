@@ -128,7 +128,7 @@ const [finiLoading, setFiniLoading] = useState(false)
   const finishPatient = (id:string) => {
     console.log("stage is ",id)
     setEdLoading(true)
-    axios.put(`http://localhost:5000/patients/edit_status/${id}`,{stage:"clinic"}).then((data:any)=> {
+    axios.put(`http://localhost:5000/patients/edit_status01/${id}`,{stage:"clinic"}).then((data:any)=> {
       socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)

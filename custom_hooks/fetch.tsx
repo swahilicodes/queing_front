@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useRecoilState } from 'recoil';
 
 const useFetchData = (url:string) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("")
   const page = 1;

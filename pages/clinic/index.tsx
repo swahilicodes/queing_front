@@ -1,68 +1,61 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import styles from './meds.module.scss'
-import { useRouter } from 'next/router'
-import { useRecoilValue } from 'recoil'
-import isFull from '@/store/atoms/isFull'
-import { GiSpeaker } from 'react-icons/gi'
-import currentUserState from '@/store/atoms/currentUser'
+import styles from './out.module.scss'
+import axios from 'axios';
+import Cubes from '@/components/loaders/cubes/cubes';
+import { io } from 'socket.io-client';
+import { useRouter } from 'next/router';
+import { useRecoilValue } from 'recoil';
+import currentUserState from '@/store/atoms/currentUser';
 import cx from 'classnames'
-import { SlRefresh } from 'react-icons/sl'
-import { io } from 'socket.io-client'
-import Ticket_Category_Length from '@/components/ticket_category_length/ticket_category_length'
-import { IoArrowRedoOutline, IoSearch } from 'react-icons/io5'
-import { MdOutlineClear } from 'react-icons/md'
-import Cubes from '@/components/loaders/cubes/cubes'
+import { IoArrowRedoOutline, IoSearch } from 'react-icons/io5';
+import { MdOutlineClear } from 'react-icons/md';
+import isFull from '@/store/atoms/isFull';
+import { GiSpeaker } from 'react-icons/gi';
+import { SlRefresh } from 'react-icons/sl';
+import Medicine_Category_Length from '@/components/meds_cat_length';
 
-export default function MedicalRecords() {
-  const [tickets, setTickets] = useState<any>([])
-  const [page,setPage] = useState(1)
-  const [pagesize,setPageSize] = useState(10)
-  const [totalItems, setTotalItems] = useState(0);
-  const [fetchLoading, setFetchLoading] = useState(false)
-  const router = useRouter()
-  const [status, setStatus] = useState("waiting")
-  const full = useRecoilValue(isFull)
-  const [namba, setNumber] = useState(0)
-  const [talking, setTalking] = useState(false)
-  const currentUser:any = useRecoilValue(currentUserState)
-  const socket = io('http://localhost:5000');
-  const [refresh, setRefresh] = useState(false)
-  const [edLoading,setEdLoading] = useState(false)
-  const [specialIndex, setSpecialIndex] = useState(0)
-  const [disable, setDisable] = useState("normal")
-  const [search, setSearch] = useState(false)
-  const [ticket, setTicket] = useState('')
-  const [language, setLanguage] = useState<string>('sw-KE');
+function Accounts() {
+const [patients, setPatients] = useState<any>([]);
+const [clients, setClients] =  useState<any>([]);
+const [tickets, setTickets] = useState<any>([])
+const [page,setPage] = useState(1)
+const [pagesize,setPageSize] = useState(10)
+const [totalItems, setTotalItems] = useState(0);
+const [fetchLoading, setFetchLoading] = useState(false)
+const router = useRouter()
+const [status, setStatus] = useState("waiting")
+const [mr_no, setMrNumber] = useState("")
+const [namba, setNumber] = useState(0)
+const [talking, setTalking] = useState(false)
+const currentUser:any = useRecoilValue(currentUserState)
+const socket = io('http://localhost:5000');
+const [refresh, setRefresh] = useState(false)
+const [edLoading,setEdLoading] = useState(false)
+const [search, setSearch] = useState(false)
+const [ticket, setTicket] = useState('')
+const [language, setLanguage] = useState<string>('sw-KE');
+const full = useRecoilValue(isFull)
+const [finish, setFinish] = useState(false)
+const [pay,setPay] = useState("")
+const [finishId, setFinishId] = useState('')
+const [finiLoading, setFiniLoading] = useState(false)
 
-  useEffect(()=> {
-    getTicks()
-  },[status,disable,ticket])
+  useEffect(() => {
+    getPatients()
+  }, [patients,status,mr_no]);
 
-  const getTicks  = () => {
+  const getPatients = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/tickets/getMedsTickets",{params: {page,pagesize,status,disable,phone:ticket}}).then((data:any)=> {
-        setTickets(data.data.data)
-        setFetchLoading(false)
-        setTotalItems(data.data.totalItems)
-    }).catch((error:any)=> {
-        setFetchLoading(false)
-        if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
-        } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
-        }
+    axios.get('http://localhost:5000/patients/get_account_patients',{params: {status,mr_no,stage:"clinic"}}).then((data)=> {
+      setClients(data.data)
+      setFetchLoading(false)
+    }).catch((err)=> {
+      setFetchLoading(false)
+      console.log(err)
     })
- }
+  }
 
- const setDisability = (index:number,disability:string) => {
-    setSpecialIndex(index)
-    setDisable(disability)
- }
-
- const handleSpeak = (namba:any) => {
+  const handleSpeak = (namba:any) => {
     setTalking(true)
     setNumber(namba)
     const text = `mteja mwenye namba ${namba} nenda kwenye derisha namba ${currentUser.counter}`
@@ -104,10 +97,18 @@ export default function MedicalRecords() {
   const prepare = (id:string,status:string) => {
     editTicket(id,status)
   }
+  // const prepareFinish = (id:string) => {
+  //   setFinishId(id)
+  //   setFinish(true)
+  // }
+
+  const pushNext = () => {
+    setFinish(true)
+  }
 
   const editTicket = (id:string,status:string) => {
     setEdLoading(true)
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`,{status,disable}).then((data:any)=> {
+    axios.put(`http://localhost:5000/patients/edit_status/${id}`,{status}).then((data:any)=> {
       socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)
@@ -124,9 +125,10 @@ export default function MedicalRecords() {
     }
     })
   }
-  const penalize = (id:string) => {
+  const finishPatient = (id:string) => {
+    console.log("stage is ",id)
     setEdLoading(true)
-    axios.put(`http://localhost:5000/tickets/penalize/${id}`).then((data:any)=> {
+    axios.put(`http://localhost:5000/patients/edit_status01/${id}`,{stage:"clinic"}).then((data:any)=> {
       socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)
@@ -143,7 +145,6 @@ export default function MedicalRecords() {
     }
     })
   }
-
   return (
     <div className={styles.meds}>
       {
@@ -155,13 +156,38 @@ export default function MedicalRecords() {
           </div>
         )
       }
+      {
+        finish && (
+          <div className={styles.overlay}>
+            <div className={styles.contenta}>
+              <label>Select Service</label>
+              <select onChange={e => setPay(e.target.value)}>
+                <option value="" selected disabled hidden>choose service</option>
+                <option value="insurance">Insurance</option>
+                <option value="cash">Cash</option>
+              </select>
+              <div className={styles.cont_body}>
+                <div className={cx(styles.body_item,pay==="insurance" && styles.active)} onClick={()=> setPay("insurance")}>#Insurance</div>
+                <div className={cx(styles.body_item,pay==="cash" && styles.active)} onClick={()=> setPay("cash")}>#Cash</div>
+              </div>
+              <div className={styles.actions}>
+                <div className={styles.action} onClick={()=> finishPatient(finishId)}>Submit</div>
+                <div className={styles.action} onClick={()=> setFinish(false)} style={{background:"red"}}>Cancel</div>
+              </div>
+              <div className={cx(styles.loading_bar,finiLoading && styles.active)}>
+                <div className={styles.loading_inside}></div>
+              </div>
+            </div>
+          </div>
+        )
+      }
       <div className={cx(styles.search_modal,search && styles.active)}>
         <div className={styles.bar}>
           <input 
           type="text" 
-          value={ticket}
-          onChange={e => setTicket(e.target.value)}
-          placeholder='phone number..'
+          value={mr_no}
+          onChange={e => setMrNumber(e.target.value)}
+          placeholder='Mr number..'
           />
           <div className={styles.search_button}>
           <IoSearch size={20} className={styles.icon___}/>
@@ -178,10 +204,10 @@ export default function MedicalRecords() {
               : <IoSearch size={20} className={styles.icon___}/>
             }
             </div>
-            <div className={styles.special}>
+            {/* <div className={styles.special}>
                 <div className={cx(styles.one,specialIndex===1 && styles.active)} onClick={()=> setDisability(1,"normal")}>Normal</div>
                 <div className={cx(styles.one,specialIndex===2 && styles.active)} onClick={()=> setDisability(2,"disabled")}>Special</div>
-            </div>
+            </div> */}
             <div className={styles.side}>
             <label>Status:</label>
             <select onChange={e => setStatus(e.target.value)} value={status}>
@@ -198,7 +224,7 @@ export default function MedicalRecords() {
             ? <div className={styles.loader}>loading...</div>
             : <div className={styles.wrap}>
                 {
-                    tickets.length<1
+                    clients.length<1
                     ? <div className={styles.message}>
                       <div className={styles.image}>
                         <img src="/nodata.svg" alt="" />
@@ -211,17 +237,18 @@ export default function MedicalRecords() {
                           <div className={styles.saving_wrap}>
                           <div className={styles.save_full}>
                             <h4>Serving Now</h4>
-                            <h1>{tickets[0].ticket_no}</h1>
+                            <h1>{clients.length>0 && clients[0].mr_no}</h1>
                           </div>
                           {/* <div className={styles.call} onClick={()=>handleSpeak(tickets[0].ticket_no)}> */}
-                          <div className={styles.call} onClick={()=>handleSpeak(tickets[0].ticket_no)}>
+                          <div className={styles.call} onClick={()=>handleSpeak(clients[0].mr_no)}>
                             <GiSpeaker size={150} className={cx(styles.click_icon,talking && styles.active)}/>
                           </div>
                           <div className={styles.two_other}>
-                            <div className={styles.item} onClick={()=> prepare(tickets[0].id,"pending")}>Pend</div>
-                            <div className={styles.item_red} onClick={()=> penalize(tickets[0].id)}>Penalize</div>
+                            <div className={styles.item} onClick={()=> prepare(clients[0].id,"pending")}>Pend</div>
+                            <div className={styles.item_red} onClick={()=> prepare(clients[0].id,"cancelled")}>Cancel</div>
                           </div>
-                          <div className={styles.finish} onClick={()=> prepare(tickets[0].id,"done")}>Finish</div>
+                          <div className={styles.finish} onClick={()=> prepare(clients[0].id,"done")}>Finish</div>
+                          {/* <div className={styles.finish} onClick={()=> prepare01(clients[0].id)}>Finish</div> */}
                           <div className={styles.reload} onClick={()=> reloda()}>{refresh?<SlRefresh className={styles.icon}/>:"Refresh"}</div>
                           </div>
                         </div>
@@ -230,22 +257,26 @@ export default function MedicalRecords() {
                                 <tr>
                                     <th>#</th>
                                     <th>ticket</th>
-                                    <th>disability</th>
-                                    <th>phone</th>
+                                    <th>name</th>
+                                    <th>age</th>
                                 </tr>
                             </thead>
-                            <tbody>
                             {
-                            tickets.map((item:any,index:number)=> (
-                                    <tr key={index} className={cx(index%2===0 && styles.even)}>
-                                        <td>{item.id}</td>
-                                        <td>{item.ticket_no}</td>
-                                        <td>{item.disability.trim().length === 0?"N/A":item.disability}</td>
-                                        <td>{item.phone}</td>
-                                    </tr>
-                                ))
-                            }
+                              clients.length>0 && (
+                                <tbody>
+                              {
+                              clients.map((item:any,index:number)=> (
+                                      <tr key={index} className={cx(index%2===0 && styles.even)}>
+                                          <td>{item.id}</td>
+                                          <td>{item.mr_no}</td>
+                                          <td>{item.name}</td>
+                                          <td>{item.age}</td>
+                                      </tr>
+                                  ))
+                              } 
                             </tbody>
+                              )
+                            }
                         </table>
                         </div>
                     </div>
@@ -253,16 +284,19 @@ export default function MedicalRecords() {
             </div>
         }
         {
-          tickets.length > 0 && (<div className={styles.bottom_desc}>
+          clients.length > 0 && (<div className={styles.bottom_desc}>
             <div className={styles.top}>
               <div className={styles.item}>
-                <p>On Queue: <span> <Ticket_Category_Length category="meds" status='waiting'/> </span> </p>
+                <p>On Queue: <span> <Medicine_Category_Length stage="clinic" status='waiting'/> </span> </p>
               </div>
               <div className={styles.item}>
-                <p>Pending: <span><Ticket_Category_Length category="meds" status='pending'/></span> </p>
+                <p>Attended: <span><Medicine_Category_Length stage="clinic" status='done'/></span> </p>
               </div>
               <div className={styles.item}>
-                <p>Cancelled: <span><Ticket_Category_Length category="meds" status='cancelled'/></span> </p>
+                <p>Pending: <span><Medicine_Category_Length stage="clinic" status='pending'/></span> </p>
+              </div>
+              <div className={styles.item}>
+                <p>Cancelled: <span><Medicine_Category_Length stage="clinic" status='cancelled'/></span> </p>
               </div>
               <div className={styles.item_out}>
                 <IoArrowRedoOutline className={styles.icon}/>
@@ -273,3 +307,5 @@ export default function MedicalRecords() {
     </div>
   )
 }
+
+export default Accounts

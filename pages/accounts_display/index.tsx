@@ -152,26 +152,26 @@ export default function Home() {
   //     </table>
   //   </div>
   // }else{
-  //   folen = <div className={styles.cats_loader}>
-  //     <table>
-  //       <thead>
-  //         <tr>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //         </tr>
-  //       </thead>
-  //       <tbody>
-  //         <tr>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //         </tr>
-  //       </tbody>
-  //     </table>
-  //   </div>
+    // folen = <div className={styles.cats_loader}>
+    //   <table>
+    //     <thead>
+    //       <tr>
+    //         <th> <div className={styles.shimmer}></div> </th>
+    //         <th> <div className={styles.shimmer}></div> </th>
+    //         <th> <div className={styles.shimmer}></div> </th>
+    //         <th> <div className={styles.shimmer}></div> </th>
+    //       </tr>
+    //     </thead>
+    //     <tbody>
+    //       <tr>
+    //         <td> <div className={styles.shimmer}></div> </td>
+    //         <td> <div className={styles.shimmer}></div> </td>
+    //         <td> <div className={styles.shimmer}></div> </td>
+    //         <td> <div className={styles.shimmer}></div> </td>
+    //       </tr>
+    //     </tbody>
+    //   </table>
+    // </div>
   // }
   return (
     <div className={styles.index}>
@@ -188,16 +188,16 @@ export default function Home() {
             <h5>Current Serving</h5>
             <h2>Token Number</h2>
             <div className={styles.token_no}>
-              {tickets.length>0 && tickets[0].ticket.mr_no}
+              {tickets.length>0 ? tickets[0].ticket.mr_no : "0000"}
             </div>
             <div className={styles.waiting_time}>
               <p>Waiting Time</p>
               <span>{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
             </div>
             <div className={styles.counter}>
-              <p>{tickets.length>0 && tickets[0].ticket.mr_no}</p>
+              <p>{tickets.length>0 ? tickets[0].ticket.mr_no: "0000"}</p>
               <FaArrowTrendUp className={styles.con}/>
-              <span>COUNTER <span>{tickets.length>0 && tickets[0].counter.namba}</span> </span>
+              <span>COUNTER <span>{tickets.length>0 && (tickets[0].counter === undefined ?"000":tickets[0].counter.namba)}</span> </span>
             </div>
           </div>
         </div>
@@ -218,7 +218,15 @@ export default function Home() {
                 ))
               }
             </div>
-            : <div className={styles.queue_div}></div>
+            : <div className={styles.queue_div}>
+            {
+              Array.from({length: 10}).map((item:any,index)=> (
+                <div className={styles.shimmer_top}>
+                  <div className={styles.shimmer}></div>
+                </div>
+              ))
+            }
+          </div>
           }
         </div>
       </div>
