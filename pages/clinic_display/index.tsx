@@ -9,28 +9,29 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import { useRouter } from 'next/router';
 import { FaArrowTrendUp } from 'react-icons/fa6';
-import { useRecoilState } from 'recoil';
-import currentConditionState from '@/store/atoms/current';
 
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
-    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getAllTickets")
+    const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
     const [tickets, setTickets] = useState<any>([])
     const date = new Date()
     const [adverts,setAdverts] = useState([])
     // const socket = io('http://localhost:5000',{ transports: ['websocket'] });
-    const socket = io('http://localhost:5000',{ transports: ['websocket'] });
     const router = useRouter()
     const [time, setTime] = useState(0);
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    const [condition, setCondition] = useRecoilState(currentConditionState)
-    const [tLoading, setLoading] = useState(false)
 
     useEffect(()=> {
       getTickets()
       getAdverts()
-      checkStatus()
+      // checkStatus()
+      if(loading){
+        console.log('loading...')
+      }else{
+        console.log('loading data',queue)
+      }
       // socket.on('connect', () => {
       //   console.log('Connected to Socket.io server');
       //   });
@@ -44,20 +45,20 @@ export default function Home() {
   
       // Clean up the interval on component unmount
       return () => clearInterval(intervalId);
-    },[condition])
+    },[])
 
-    const checkStatus = () => {
-      socket.on('data', (msg) => {
-        if(msg){
-            console.log(msg.route)
-            if(msg.route==="tickets"){
-                router.reload()
-            }
-            //console.log(msg)
-            // router.reload()
-        }
-      });
- }
+//     const checkStatus = () => {
+//       socket.on('data', (msg) => {
+//         if(msg){
+//             console.log(msg.route)
+//             if(msg.route==="tickets"){
+//                 router.reload()
+//             }
+//             //console.log(msg)
+//             // router.reload()
+//         }
+//       });
+//  }
 
     const getAdverts = () => {
       axios.get('http://localhost:5000/adverts/get_all_adverts').then((data)=> {
@@ -67,13 +68,10 @@ export default function Home() {
       })
     }
     const getTickets = () => {
-      setLoading(true)
-      axios.get('http://localhost:5000/tickets/getTickets',{params:{disability: condition}}).then((data)=> {
+      axios.get('http://localhost:5000/patients/getPatientTickets',{params: {stage:"clinic"}}).then((data)=> {
         setTickets(data.data)
-        setLoading(false)
-        console.log("tickets are ",data.data)
+        console.log(data.data)
       }).catch((error)=> {
-        setLoading(false)
         alert(error)
       })
     }
@@ -103,7 +101,6 @@ export default function Home() {
       }
       setIsFullScreen(!isFullScreen);
     };
-
   return (
     <div className={styles.index}>
       <div className={styles.top_bar}>
@@ -119,14 +116,14 @@ export default function Home() {
             <h5>Current Serving</h5>
             <h2>Token Number</h2>
             <div className={styles.token_no}>
-              M{tickets.length>0 ? tickets[0].ticket.ticket_no : "0000"}
+              {tickets.length>0 ? tickets[0].ticket.mr_no : "0000"}
             </div>
             <div className={styles.waiting_time}>
               <p>Waiting Time</p>
               <span>{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
             </div>
             <div className={styles.counter}>
-              <p>M{tickets.length>0 && tickets[0].ticket.ticket_no}</p>
+              <p>{tickets.length>0 ? tickets[0].ticket.mr_no: "0000"}</p>
               <FaArrowTrendUp className={styles.con} size={40}/>
               <span>COUNTER <span>{tickets.length>0 ? tickets[0].counter === undefined ?"0000":tickets[0].counter.namba:"0000"}</span> </span>
             </div>
@@ -141,7 +138,7 @@ export default function Home() {
                   <div className={cx(styles.div,index===0 && styles.serving,index===1 && styles.next)}>
                     <div className={cx(styles.indi,index===0 && styles.serving,index===1 && styles.next)}> <p>{index+1}</p> </div>
                     <div className={styles.ticket_info}>
-                    <p>M{item.ticket.ticket_no}</p>
+                    <p>{item.ticket.mr_no}</p>
                     <FaArrowTrendUp className={styles.con} size={40}/>
                     <span>COUNTER <span>{item.counter.namba}</span> </span>
                     </div>
@@ -150,14 +147,14 @@ export default function Home() {
               }
             </div>
             : <div className={styles.queue_div}>
-              {
+            {
               Array.from({length: 10}).map((item:any,index)=> (
                 <div className={styles.shimmer_top}>
                   <div className={styles.shimmer}></div>
                 </div>
               ))
             }
-            </div>
+          </div>
           }
         </div>
       </div>

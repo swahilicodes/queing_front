@@ -68,7 +68,7 @@ export default function Home() {
       })
     }
     const getTickets = () => {
-      axios.get('http://localhost:5000/patients/getPatientTickets').then((data)=> {
+      axios.get('http://localhost:5000/patients/getPatientTickets',{params: {stage:"accounts"}}).then((data)=> {
         setTickets(data.data)
         console.log(data.data)
       }).catch((error)=> {
@@ -102,77 +102,6 @@ export default function Home() {
       setIsFullScreen(!isFullScreen);
     };
 
-  // let folen
-  // if(loading){
-  //   folen = <div className={styles.cats_loader}>
-  //     <table>
-  //       <thead>
-  //         <tr>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //           <th> <div className={styles.shimmer}></div> </th>
-  //         </tr>
-  //       </thead>
-  //       <tbody>
-  //         <tr>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //           <td> <div className={styles.shimmer}></div> </td>
-  //         </tr>
-  //       </tbody>
-  //     </table>
-  //   </div>
-  // }else if(!loading && queue.length !== 0 ){
-  //   folen = <div className={styles.cats}>
-  //     <table>
-  //       <thead>
-  //       <tr>
-  //       {
-  //         Array.from(new Set(queue.map((item:any )=> item.category))).map((item:any,index:number)=> (
-  //           <th>
-  //             <div className={styles.th_item}>
-  //             {item.toUpperCase()}
-  //             </div>
-  //           </th>
-  //         ))
-  //       }
-  //       </tr>
-  //       </thead>
-  //       <tbody>
-  //         <tr>
-  //           {
-  //             Array.from(new Set(queue.map((item:any,index:number)=> item.category))).map((item:any,index:number)=> (
-  //               <td className={cx(index%2===0 && styles.even)}> <CatTickets category={item}/> </td>
-  //             ))
-  //           }
-  //         </tr>
-  //       </tbody>
-  //     </table>
-  //   </div>
-  // }else{
-    // folen = <div className={styles.cats_loader}>
-    //   <table>
-    //     <thead>
-    //       <tr>
-    //         <th> <div className={styles.shimmer}></div> </th>
-    //         <th> <div className={styles.shimmer}></div> </th>
-    //         <th> <div className={styles.shimmer}></div> </th>
-    //         <th> <div className={styles.shimmer}></div> </th>
-    //       </tr>
-    //     </thead>
-    //     <tbody>
-    //       <tr>
-    //         <td> <div className={styles.shimmer}></div> </td>
-    //         <td> <div className={styles.shimmer}></div> </td>
-    //         <td> <div className={styles.shimmer}></div> </td>
-    //         <td> <div className={styles.shimmer}></div> </td>
-    //       </tr>
-    //     </tbody>
-    //   </table>
-    // </div>
-  // }
   return (
     <div className={styles.index}>
       <div className={styles.top_bar}>
@@ -196,8 +125,8 @@ export default function Home() {
             </div>
             <div className={styles.counter}>
               <p>{tickets.length>0 ? tickets[0].ticket.mr_no: "0000"}</p>
-              <FaArrowTrendUp className={styles.con}/>
-              <span>COUNTER <span>{tickets.length>0 && (tickets[0].counter === undefined ?"000":tickets[0].counter.namba)}</span> </span>
+              <FaArrowTrendUp className={styles.con} size={40}/>
+              <span>COUNTER <span>{tickets.length>0 ? tickets[0].counter === undefined ?"0000":tickets[0].counter.namba:"0000"}</span> </span>
             </div>
           </div>
         </div>
@@ -211,7 +140,7 @@ export default function Home() {
                     <div className={cx(styles.indi,index===0 && styles.serving,index===1 && styles.next)}> <p>{index+1}</p> </div>
                     <div className={styles.ticket_info}>
                     <p>{item.ticket.mr_no}</p>
-                    <FaArrowTrendUp className={styles.con}/>
+                    <FaArrowTrendUp className={styles.con} size={40}/>
                     <span>COUNTER <span>{item.counter.namba}</span> </span>
                     </div>
                   </div>

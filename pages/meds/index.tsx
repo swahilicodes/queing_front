@@ -2,7 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import styles from './meds.module.scss'
 import { useRouter } from 'next/router'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import isFull from '@/store/atoms/isFull'
 import { GiSpeaker } from 'react-icons/gi'
 import currentUserState from '@/store/atoms/currentUser'
@@ -13,6 +13,7 @@ import Ticket_Category_Length from '@/components/ticket_category_length/ticket_c
 import { IoArrowRedoOutline, IoSearch } from 'react-icons/io5'
 import { MdOutlineClear } from 'react-icons/md'
 import Cubes from '@/components/loaders/cubes/cubes'
+import currentConditionState from '@/store/atoms/current'
 
 export default function MedicalRecords() {
   const [tickets, setTickets] = useState<any>([])
@@ -30,7 +31,7 @@ export default function MedicalRecords() {
   const [refresh, setRefresh] = useState(false)
   const [edLoading,setEdLoading] = useState(false)
   const [specialIndex, setSpecialIndex] = useState(0)
-  const [disable, setDisable] = useState("normal")
+  const [disable, setDisable] = useRecoilState(currentConditionState)
   const [search, setSearch] = useState(false)
   const [ticket, setTicket] = useState('')
   const [language, setLanguage] = useState<string>('sw-KE');

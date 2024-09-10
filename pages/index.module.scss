@@ -52,16 +52,17 @@
             align-items: center;
             justify-content: center;
             .current_serving{
-                width: 40%;
+                width: 60%;
                 background: $mainColor;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                border-radius: 10px;
-                height: 40px;
+                border-radius: 4px;
+                padding: 5px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 p{
                     color: white;
+                    font-size: 35px;
                 }
             }
             .round{
@@ -83,11 +84,11 @@
                     margin-bottom: 15px;
                 }
                 .token_no{
-                    width: 40%;
+                    width: 60%;
                     border: 2px solid $secondColor;
                     padding: 15px;
-                    border-radius: 10px;
-                    font-size: 100px;
+                    border-radius: 4px;
+                    font-size: 120px;
                     color: $secondColor;
                     margin: 15px;
                     font-weight: 600;
@@ -110,13 +111,13 @@
                     }
                 }
                 .counter{
-                    width: 40%;
+                    width: 60%;
                     background: $mainColor;
                     padding: 15px;
                     display: flex;
                     align-items: center;
                     justify-content: space-around;
-                    border-radius: 10px;
+                    border-radius: 4px;
                     p{
                         color: white;
                         font-weight: 600;
@@ -137,9 +138,9 @@
             }
         }
         .new_right{
-            width: 30%;
+            width: 36%;
             .queue_div{
-                width: 90%;
+                width: 100%;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -187,6 +188,7 @@
                         position: absolute;
                         right: 0;
                         width: 80%;
+                        padding: 10px;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
@@ -204,6 +206,28 @@
                                 color: $secondColor;
                             }
                         }
+                    }
+                }
+                .shimmer_top{
+                    position: relative;
+                    overflow: hidden;
+                    background: linear-gradient(to right, $mainBold,$mainColor);
+                    width: 100%;
+                    height: 60px;
+                    margin-bottom: 5px;
+                    .shimmer{
+                        position: absolute;
+                        top: 0;
+                        left: -100%;
+                        width: 100%;
+                        height: 100%;
+                        background: linear-gradient(
+                            to right,
+                            rgba(255, 255, 255, 0) 0%,
+                            rgba(255, 255, 255, 0.4) 50%,
+                            rgba(255, 255, 255, 0) 100%
+                        );
+                        animation: shimmer 1.5s infinite;
                     }
                 }
             }

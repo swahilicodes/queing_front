@@ -27,10 +27,11 @@ export default function Layout({children}:any) {
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const socket = io('http://localhost:5000');
-  const restrictedRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/queue_list','/services','/queue_add','/','/login','/adverts']
-  const attendantRoutes = ['/queue_list','/queue_add','/','/login']
-  const doctorRoutes = ['/queue_list','/queue_add','/','/login','/patients']
+  const restrictedRoutes = ['/accounts','/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts','/clinic','/counters','/meds','/payment']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
+  const medRoutes = ['/meds','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
+  const doctorRoutes = ['/clinic','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
+  const accountRoutes = ['/accounts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
 
@@ -76,7 +77,9 @@ const validRoutes = () => {
     if(restrictedRoutes.includes(path)){
       if(user==="admin" && !adminRoutes.includes(path)){
         router.push('/')
-      }else if(user ==="attendant" && !attendantRoutes.includes(path)){
+      }else if(user ==="medical_recorder" && !medRoutes.includes(path)){
+        router.push('/')
+      }else if(user ==="cashier" && !accountRoutes.includes(path)){
         router.push('/')
       }else if(user ==="doctor" && !doctorRoutes.includes(path)){
         router.push('/')
@@ -193,7 +196,6 @@ const clearError = () => {
         }
       </div>
       </div>
-      {/* <div className={styles.full_button} onClick={()=> setFull(!full)}>{full?<TiZoomOut className={styles.icon} size={25}/>:<TiZoomInOutline className={styles.icon} size={25}/>}</div> */}
     </div>
   )
 }
