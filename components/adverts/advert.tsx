@@ -23,7 +23,7 @@ const AdvertScroller = (adverts:any) => {
         ? <div className={styles.adverts}>
           {
             adverts.adverts.map((item:any,index:number)=> (
-              <div className={cx(styles.advert,index===currentAdvertIndex && styles.active)}>{item.description}</div>
+              <div className={cx(styles.advert,index===currentAdvertIndex && styles.active)} key={index}>{item.description}</div>
             ))
           }
         </div>

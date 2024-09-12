@@ -66,7 +66,6 @@ const validRoutes = () => {
   const path = router.pathname
   const user = localStorage.getItem('user_role')
   const defaultPage = localStorage.getItem('page')
-  console.log('current user role ',currentUser.role)
   if(!currentUser){
     if(defaultPage){
       router.push(`${defaultPage}`)

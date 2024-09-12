@@ -30,14 +30,8 @@ export default function Home() {
     useEffect(()=> {
       getTickets()
       getAdverts()
+      newLoop()
       checkStatus()
-      // socket.on('connect', () => {
-      //   console.log('Connected to Socket.io server');
-      //   });
-    
-      //   return () => {
-      //   socket.disconnect();
-      //   };
       const intervalId = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
       }, 1000);
@@ -58,6 +52,15 @@ export default function Home() {
         }
       });
  }
+    const newLoop = () => {
+      socket.on('data', (msg) => {
+        if(msg){
+            if(msg.route==="statasa"){
+                setCondition(msg.status)
+            }
+        }
+      });
+ }
 
     const getAdverts = () => {
       axios.get('http://localhost:5000/adverts/get_all_adverts').then((data)=> {
@@ -71,7 +74,6 @@ export default function Home() {
       axios.get('http://localhost:5000/tickets/getTickets',{params:{disability: condition}}).then((data)=> {
         setTickets(data.data)
         setLoading(false)
-        console.log("tickets are ",data.data)
       }).catch((error)=> {
         setLoading(false)
         alert(error)
@@ -138,7 +140,7 @@ export default function Home() {
             ? <div className={styles.queue_div}>
               {
                 tickets.map((item:any,index:number)=> (
-                  <div className={cx(styles.div,index===0 && styles.serving,index===1 && styles.next)}>
+                  <div className={cx(styles.div,index===0 && styles.serving,index===1 && styles.next)} key={index}>
                     <div className={cx(styles.indi,index===0 && styles.serving,index===1 && styles.next)}> <p>{index+1}</p> </div>
                     <div className={styles.ticket_info}>
                     <p>M{item.ticket.ticket_no}</p>
@@ -152,7 +154,7 @@ export default function Home() {
             : <div className={styles.queue_div}>
               {
               Array.from({length: 10}).map((item:any,index)=> (
-                <div className={styles.shimmer_top}>
+                <div className={styles.shimmer_top} key={index}>
                   <div className={styles.shimmer}></div>
                 </div>
               ))
@@ -160,41 +162,16 @@ export default function Home() {
             </div>
           }
         </div>
+        {/* <button onClick={()=> setCondition('normal')}>normal</button>
+        <button onClick={()=> setCondition('disabled')}>normal</button> */}
       </div>
-      {/* {folen} */}
-      {/* <div className={styles.color_expla}>
-        <div className={styles.item}>
-          <div className={cx(styles.color_left,styles.main)}></div>
-          <div className={styles.color_right}>Namba</div>
-        </div>
-        <div className={styles.item}>
-          <div className={cx(styles.color_left,styles.gold)}></div>
-          <div className={styles.color_right}>Dirisha</div>
-        </div>
-        <div className={styles.item}>
-          <div className={cx(styles.color_left,styles.red)}></div>
-          <div className={styles.color_right}>Anahudumiwa</div>
-        </div>
-        <div className={styles.item}>
-          <div className={cx(styles.color_left,styles.green)}></div>
-          <div className={styles.color_right}>Anaefata</div>
-        </div>
-        <div className={styles.item}>
-          <div className={cx(styles.color_left,styles.yellow)}></div>
-          <div className={styles.color_right}>Kaa Tayari</div>
-        </div>
-      </div> */}
       <div className={styles.ads}>
         <div className={styles.ad}>
           {
             adverts.length>0 && (<AdvertScroller adverts={adverts}/>)
           }
         </div>
-        <div className={styles.time}>
-          MATANGAZO
-          {/* <div className={styles.time_date}>{date.getDate()}/{date.getMonth()}/{date.getFullYear()}</div>
-          <div className={styles.time_time}>{date.getHours().toString().padStart(2, '0')}<span>:</span>{date.getMinutes().toString().padStart(2, '0')}<span>:</span>{date.getSeconds().toString().padStart(2, '0')}</div> */}
-        </div>
+        <div className={styles.time}>MATANGAZO</div>
       </div>
     </div>
   )

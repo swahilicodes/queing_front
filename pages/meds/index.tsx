@@ -59,6 +59,7 @@ export default function MedicalRecords() {
  }
 
  const setDisability = (index:number,disability:string) => {
+  socket.emit("data",{route:"statasa",status: disability})
     setSpecialIndex(index)
     setDisable(disability)
  }
