@@ -13,7 +13,7 @@ import { FaArrowTrendUp } from 'react-icons/fa6';
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
     //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getAllTickets")
-    const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
     const [tickets, setTickets] = useState<any>([])
     const date = new Date()
     const [adverts,setAdverts] = useState([])
@@ -27,11 +27,6 @@ export default function Home() {
       getTickets()
       getAdverts()
       // checkStatus()
-      if(loading){
-        console.log('loading...')
-      }else{
-        console.log('loading data',queue)
-      }
       // socket.on('connect', () => {
       //   console.log('Connected to Socket.io server');
       //   });
@@ -125,7 +120,8 @@ export default function Home() {
             <div className={styles.counter}>
               <p>{tickets.length>0 ? tickets[0].ticket.mr_no: "0000"}</p>
               <FaArrowTrendUp className={styles.con} size={40}/>
-              <span>COUNTER <span>{tickets.length>0 ? tickets[0].counter === undefined ?"0000":tickets[0].counter.namba:"0000"}</span> </span>
+              {/* <span>COUNTER <span>{tickets.length>0 ? tickets[0].counter === undefined ?"0000":tickets[0].counter.namba:"0000"}</span> </span> */}
+              <span>COUNTER <span>{tickets.length>0 ? tickets[0].doctor === undefined ?tickets[0].counter===undefined?"0000":tickets[0].counter.namba:tickets[0].doctor.room:"0000"}</span> </span>
             </div>
           </div>
         </div>
@@ -140,7 +136,8 @@ export default function Home() {
                     <div className={styles.ticket_info}>
                     <p>{item.ticket.mr_no}</p>
                     <FaArrowTrendUp className={styles.con} size={40}/>
-                    <span>COUNTER <span>{item.counter.namba}</span> </span>
+                    {/* <span>COUNTER <span>{item.counter.namba}</span> </span> */}
+                    <span>COUNTER <span>{item.doctor===undefined? item.counter.namba: item.doctor.room}</span> </span>
                     </div>
                   </div>
                 ))

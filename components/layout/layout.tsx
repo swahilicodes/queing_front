@@ -20,25 +20,35 @@ import { BiSolidError } from 'react-icons/bi'
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 
+
 export default function Layout({children}:any) {
   const [full, setFull] = useRecoilState(isFull)
   const [isUser, setUser] = useRecoilState(isUserState)
   const [isExpand, setExpand] = useRecoilState(isExpandState)
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
-  const socket = io('http://localhost:5000');
   const restrictedRoutes = ['/accounts','/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts','/clinic','/counters','/meds','/payment']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add','/clinic']
   const medRoutes = ['/meds','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
   const doctorRoutes = ['/clinic','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
   const accountRoutes = ['/accounts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
+  const socket = io('http://localhost:5000',{ transports: ['websocket'] });
 
   useEffect(() => {
     checkAuth()
     const handleStart = () => NProgress.start();
     const handleStop = () => NProgress.done();
+
+    // socket.on("connection", (socket) => {
+    //   socket.on("disconnect", () => {
+    //     const lastToDisconnect = socket.of("/").sockets.size === 0;
+    //     if (lastToDisconnect) {
+    //       // gc();
+    //     }
+    //   });
+    // });
 
     router.events.on('routeChangeStart', handleStart);
     router.events.on('routeChangeComplete', handleStop);

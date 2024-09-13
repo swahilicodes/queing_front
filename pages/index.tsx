@@ -32,6 +32,9 @@ export default function Home() {
       getAdverts()
       newLoop()
       checkStatus()
+      // socket.on('disconnect', () => {
+      //     console.log('User disconnected');
+      // });
       const intervalId = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
       }, 1000);

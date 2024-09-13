@@ -247,7 +247,8 @@ const [finiLoading, setFiniLoading] = useState(false)
                             <div className={styles.item} onClick={()=> prepare(clients[0].id,"pending")}>Pend</div>
                             <div className={styles.item_red} onClick={()=> prepare(clients[0].id,"cancelled")}>Cancel</div>
                           </div>
-                          <div className={styles.finish} onClick={()=> prepare(clients[0].id,"done")}>Finish</div>
+                          {/* <div className={styles.finish} onClick={()=> prepare(clients[0].id,"done")}>Finish</div> */}
+                          <div className={styles.finish} onClick={()=> finishPatient(clients[0].id)}>Finish</div>
                           {/* <div className={styles.finish} onClick={()=> prepare01(clients[0].id)}>Finish</div> */}
                           <div className={styles.reload} onClick={()=> reloda()}>{refresh?<SlRefresh className={styles.icon}/>:"Refresh"}</div>
                           </div>
