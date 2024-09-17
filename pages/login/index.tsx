@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import errorState from '@/store/atoms/error'
 import currentUserState from '@/store/atoms/currentUser'
+import { headers } from 'next/headers'
 
 export default function Login() {
  const [phone, setPhone] = useState('')
@@ -12,6 +13,10 @@ export default function Login() {
  const router = useRouter()
  const [error,setError] = useRecoilState(errorState)
  const currentUser:any = useRecoilValue(currentUserState)
+ const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer `  // Example header for authorization
+};
 
  useEffect(()=> {
   if(currentUser.name !== undefined){
@@ -21,7 +26,7 @@ export default function Login() {
 
  const login = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/users/login",{phone,password:pass}).then((data:any)=> {
+    axios.post("http://localhost:5000/users/login",{phone,password:pass},{headers}).then((data:any)=> {
         localStorage.setItem("token",data.data)
         router.reload()
     }).catch((error)=> {

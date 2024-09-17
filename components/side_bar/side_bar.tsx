@@ -136,6 +136,10 @@ export default function SideBar() {
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/clinic_display" className={styles.link}>Clinic Queue</Link>
                 </li>
+                <li className={cx(styles.link,router.pathname==="/doctor_patient" && styles.active)}>
+                    <RiNurseFill className={styles.icon}/>
+                    <Link href="/doctor_patient" className={styles.link}>Doc Patient</Link>
+                </li>
             </ul>
         </div>
     </div>

@@ -19,7 +19,7 @@ export default function Home() {
     const date = new Date()
     const [adverts,setAdverts] = useState([])
     // const socket = io('http://localhost:5000',{ transports: ['websocket'] });
-    const socket = io('http://localhost:5000',{ transports: ['websocket'] });
+    const socket = io('http://localhost:5000',{ transports: ['websocket','polling'] });
     const router = useRouter()
     const [time, setTime] = useState(0);
     const minutes = Math.floor(time / 60);
@@ -54,6 +54,7 @@ export default function Home() {
             // router.reload()
         }
       });
+      return () => socket.close();
  }
     const newLoop = () => {
       socket.on('data', (msg) => {
