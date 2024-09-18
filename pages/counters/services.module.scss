@@ -51,6 +51,30 @@
             align-items: center;
             justify-content: center;
             animation: move .5s ease-in-out;
+            .item{
+                width: 100%;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                flex-direction: column;
+                margin: 2px 0;
+                label{
+                    color: $mainColor;
+                    padding: 3px 0;
+                    font-size: 18px;
+                }
+                select{
+                    width: 100%;
+                    outline: none;
+                    padding: 15px;
+                    border: 1px solid grey;
+                    text-align: center;
+                    margin: 5px 0;
+                    &:focus{
+                        border: 1px solid $mainColor;
+                    }
+                }
+            }
             input{
                 width: 100%;
                 padding: 15px;
@@ -117,60 +141,43 @@
             margin-top: 70px;
             table{
                 width: 100%;
-                thead{
-                    width: 100%;
-                tr{
-                    width: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    background: $divColor;
-                    padding: 5px;
-                    th{
-                        color: $mainBold;
-                        font-weight: 600;
-                        font-size: 18px;
-                        text-align: right;
-                    }
-                }
+                border-collapse: collapse;
+                th,td{
+                    text-align: left;
+                    padding: 10px;
                 }
                 tbody{
                     width: 100%;
-                tr{
-                    width: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 5px;
-                    background: $divColor;
-                    &.active{
-                        background: white;
-                    }
-                    td{
-                        font-weight: 400;
-                        display: flex;
-                        text-align: left;
-                        .delete{
-                            background: red;
-                            padding: 3px;
-                            color: white;
-                            cursor: pointer;
-                            margin-right: 10px;
-                            .icon{
-                                color: white;
-                            }
+                    tr{
+                        width: 100%;
+                        &.active{
+                            background: $divColor;
                         }
-                        .edit{
-                            background: green;
-                            padding: 3px;
-                            color: white;
-                            cursor: pointer;
-                            .icon{
+                        td{
+                         .acta{
+                            display: flex;
+                            .delete{
+                                background: red;
+                                padding: 3px;
                                 color: white;
+                                cursor: pointer;
+                                margin-right: 10px;
+                                .icon{
+                                    color: white;
+                                }
                             }
+                            .edit{
+                                background: green;
+                                padding: 3px;
+                                color: white;
+                                cursor: pointer;
+                                .icon{
+                                    color: white;
+                                }
+                            }
+                         }
                         }
                     }
-                }
                 }
             }
             .pagination{

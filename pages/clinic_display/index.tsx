@@ -13,7 +13,7 @@ import { FaArrowTrendUp } from 'react-icons/fa6';
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
     //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getAllTickets")
-    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    const {data:services,loading,error} = useFetchData("http://localhost:5000/services/get_all_services")
     const [tickets, setTickets] = useState<any>([])
     const date = new Date()
     const [adverts,setAdverts] = useState([])
@@ -22,10 +22,22 @@ export default function Home() {
     const [time, setTime] = useState(0);
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
+    const [clinic, setClinic] = useState<any>('')
 
     useEffect(()=> {
-      getTickets()
+      setClinic(localStorage.getItem('clinic'))
       getAdverts()
+      if(clinic.trim() !== '' && clinic.trim() !== null){
+        setClinic(localStorage.getItem('clinic'))
+        setTimeout(()=> {
+          getTickets()
+        },2000)
+      }else{
+        setTimeout(()=> {
+          getTickets()
+        },2000)
+        //setClinic(localStorage.getItem("clinic"))
+      }
       // checkStatus()
       // socket.on('connect', () => {
       //   console.log('Connected to Socket.io server');
@@ -40,7 +52,7 @@ export default function Home() {
   
       // Clean up the interval on component unmount
       return () => clearInterval(intervalId);
-    },[])
+    },[clinic])
 
 //     const checkStatus = () => {
 //       socket.on('data', (msg) => {
@@ -55,6 +67,19 @@ export default function Home() {
 //       });
 //  }
 
+  const handleClinic = (clacka:string) => {
+    if(localStorage.getItem('token')?.trim() !== ''){
+      localStorage.removeItem('token')
+      localStorage.setItem('clinic',clacka)
+      setClinic(clacka)
+      console.log('clinic is ',clinic)
+    }else{
+      localStorage.setItem('clinic',clacka)
+      setClinic(clacka)
+      console.log('clinic is ',clinic)
+    }
+  }
+
     const getAdverts = () => {
       axios.get('http://localhost:5000/adverts/get_all_adverts').then((data)=> {
         setAdverts(data.data)
@@ -63,9 +88,8 @@ export default function Home() {
       })
     }
     const getTickets = () => {
-      axios.get('http://localhost:5000/patients/getPatientTickets',{params: {stage:"clinic"}}).then((data)=> {
+      axios.get('http://localhost:5000/patients/getPatientTickets',{params: {stage:"clinic",clinic: clinic}}).then((data)=> {
         setTickets(data.data)
-        console.log(data.data)
       }).catch((error)=> {
         alert(error)
       })
@@ -100,7 +124,15 @@ export default function Home() {
     <div className={styles.index}>
       <div className={styles.top_bar}>
         <h1>MUHIMBILI NATIONAL HOSPITAL-MLOGANZILA</h1>
-        <div className={styles.date}>Thursday 19 june 2024 10:30:50 Pm</div>
+        <div className={styles.opta}>
+        <select onChange={e => handleClinic(e.target.value)} value={clinic}>
+          {
+            services.map((item:any,index:number)=> (
+              <option value={item.name} key={index}>{item.name}</option>
+            ))
+          }
+        </select>
+        </div>
       </div>
       <div className={styles.new_look}>
         <div className={styles.new_left}>

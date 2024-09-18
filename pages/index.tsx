@@ -149,7 +149,7 @@ export default function Home() {
                     <div className={styles.ticket_info}>
                     <p>M{item.ticket.ticket_no}</p>
                     <FaArrowTrendUp className={styles.con} size={40}/>
-                    <span>COUNTER <span>{item.counter.namba}</span> </span>
+                    <span>COUNTER <span>{item.counter===undefined?"000":item.counter.namba}</span> </span>
                     </div>
                   </div>
                 ))

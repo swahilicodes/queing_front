@@ -20,17 +20,19 @@
         h1{
             color: white;
         }
-        .date{
-            width: 100%;
+        .opta{
             position: absolute;
-            bottom: 0;
-            border: 2px solid $mainColor;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            padding: 5px;
-            display: none;
+            right: 10px;
+            select{
+                padding: 10px;
+                outline: none;
+                border: 1px solid $mainColor;
+                background: $mainColor;
+                color: white;
+                option{
+                    color: white;
+                }
+            }
         }
     }
     .new_look{

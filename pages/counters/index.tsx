@@ -5,10 +5,9 @@ import { MdDelete, MdOutlineClear } from 'react-icons/md'
 import { useRouter } from 'next/router'
 import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
+import useFetchData from '@/custom_hooks/fetch'
 
 export default function Services() {
-const [name,setName] = useState("")
-const [namba,setNamba] = useState("")
 const [isAdd, setAdd] = useState(false)
 const [isDelete, setDelete] = useState(false)
 const [isEdit, setEdit] = useState(false)
@@ -19,6 +18,12 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
+const {data,loading,error} = useFetchData("http://localhost:5000/services/get_all_services")
+const [fields, setFields] = useState({
+    service: "",
+    sub_service: "",
+    namba: ""
+})
 
 useEffect(()=> {
     getServices()
@@ -26,7 +31,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/counters/create_counter",{name,namba}).then((data:any)=> {
+    axios.post("http://localhost:5000/counters/create_counter",{service:fields.service,namba: fields.namba, sub_service: fields.sub_service}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -54,7 +59,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{name,namba}).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.sub_service}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error:any)=> {
@@ -74,11 +79,10 @@ useEffect(()=> {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (id:string, namba:string,name:string) => {
+ const handleEdit = (id:string, namba:string,name:string, clinic:string) => {
     setId(id);
     setEdit(true)
-    setName(name)
-    setNamba(namba)
+    setFields({...fields,service:name,namba:namba,sub_service:clinic})
   };
  const getServices  = () => {
     setFetchLoading(true)
@@ -108,18 +112,38 @@ useEffect(()=> {
         {
             isAdd && ( <div className={styles.add_service}>
                 <form onSubmit={submit}>
+                    <div className={styles.item}>
+                        <label>Service</label>
+                        <select onChange={e => setFields({...fields, service: e.target.value})} value={fields.service}>
+                        <option value="" selected disabled>--Please choose an option--</option>
+                            <option value="meds">Medical Records</option>
+                            <option value="accounts">Accounts</option>
+                            <option value="payment">Payment</option>
+                            <option value="clinic">Clinic</option>
+                        </select>
+                    </div>
+                    {
+                        fields.service === "clinic" && (<div className={styles.item}>
+                            <label>Sub-Service</label>
+                            <select onChange={e => setFields({...fields, sub_service: e.target.value})} value={fields.sub_service}>
+                            <option value="" selected disabled>--Please choose an option--</option>
+                                {
+                                    data.map((data_:any,index:number)=> (
+                                        <option value={data_.name}>{data_.name}</option>
+                                    ))
+                                }
+                            </select>
+                        </div>)
+                    }
+                    <div className={styles.item}>
+                    <label>Counter</label>
                     <input 
                     type="text" 
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder='name*'
-                    />
-                    <input 
-                    type="text" 
-                    value={namba}
-                    onChange={e => setNamba(e.target.value)}
+                    value={fields.namba}
+                    onChange={e => setFields({...fields, namba: e.target.value})}
                     placeholder='number*'
                     />
+                    </div>
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
                     <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>
@@ -130,18 +154,38 @@ useEffect(()=> {
         {
             isEdit && ( <div className={styles.add_service}>
                 <form>
+                <div className={styles.item}>
+                        <label>Service</label>
+                        <select onChange={e => setFields({...fields, service: e.target.value})} value={fields.service}>
+                            <option value="" selected disabled>--Please choose an option--</option>
+                            <option value="meds">Medical Records</option>
+                            <option value="accounts">Accounts</option>
+                            <option value="payment">Payment</option>
+                            <option value="clinic">Clinic</option>
+                        </select>
+                    </div>
+                    {
+                        fields.service === "clinic" && (<div className={styles.item}>
+                            <label>Sub-Service</label>
+                            <select onChange={e => setFields({...fields, sub_service: e.target.value})} value={fields.sub_service}>
+                            <option value="" selected disabled>--Please choose an option--</option>
+                                {
+                                    data.map((data_:any,index:number)=> (
+                                        <option value={data_.name}>{data_.name}</option>
+                                    ))
+                                }
+                            </select>
+                        </div>)
+                    }
+                    <div className={styles.item}>
+                    <label>Counter</label>
                     <input 
                     type="text" 
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder='name*'
-                    />
-                    <input 
-                    type="text" 
-                    value={namba}
-                    onChange={e => setNamba(e.target.value)}
+                    value={fields.namba}
+                    onChange={e => setFields({...fields, namba: e.target.value})}
                     placeholder='number*'
                     />
+                    </div>
                     <div className={styles.action}>
                     <button onClick={editService}>submit</button>
                     <div className={styles.clear} onClick={()=> setEdit(false)}><MdOutlineClear className={styles.icon}/></div>
@@ -183,8 +227,9 @@ useEffect(()=> {
                             <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Name</th>
-                                    <th>Number</th>
+                                    <th>Service</th>
+                                    <th>Sub-Service</th>
+                                    <th>Counter</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -193,11 +238,14 @@ useEffect(()=> {
                                 services.map((data:any,index:number)=> (
                                     <tr key={index} className={cx(index%2===0 && styles.active)}>
                                         <td>{data.id}</td>
-                                        <td>{data.name}</td>
+                                        <td>{data.service}</td>
+                                        <td>{(data.subservice===null || data.subservice==="")?"N/A":data.subservice}</td>
                                         <td>{data.namba}</td>
                                         <td>
+                                            <div className={styles.acta}>
                                             <div className={styles.delete} onClick={()=> handleDelete(data.id)}><MdDelete className={styles.icon}/></div> 
-                                            <div className={styles.edit} onClick={()=> handleEdit(data.id,data.namba,data.name)}><FiEdit2 className={styles.icon}/></div> 
+                                            <div className={styles.edit} onClick={()=> handleEdit(data.id,data.namba,data.name,data.subservice)}><FiEdit2 className={styles.icon}/></div> 
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

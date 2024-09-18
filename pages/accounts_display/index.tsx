@@ -13,7 +13,7 @@ import { FaArrowTrendUp } from 'react-icons/fa6';
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
     //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getAllTickets")
-    const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
     const [tickets, setTickets] = useState<any>([])
     const date = new Date()
     const [adverts,setAdverts] = useState([])
@@ -27,11 +27,6 @@ export default function Home() {
       getTickets()
       getAdverts()
       // checkStatus()
-      if(loading){
-        console.log('loading...')
-      }else{
-        console.log('loading data',queue)
-      }
       // socket.on('connect', () => {
       //   console.log('Connected to Socket.io server');
       //   });
@@ -68,7 +63,7 @@ export default function Home() {
       })
     }
     const getTickets = () => {
-      axios.get('http://localhost:5000/patients/getPatientTickets',{params: {stage:"accounts"}}).then((data)=> {
+      axios.get('http://localhost:5000/patients/get_pats',{params: {stage:"accounts"}}).then((data)=> {
         setTickets(data.data)
         console.log(data.data)
       }).catch((error)=> {

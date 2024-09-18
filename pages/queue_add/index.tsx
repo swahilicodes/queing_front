@@ -73,7 +73,7 @@ export default function QueueAdd() {
     );
   };
 
-  const enterNumber = (cat:string,) => {
+  const enterNumber = () => {
     setcat(cat)
     setClicked(true)
   }
@@ -228,11 +228,7 @@ export default function QueueAdd() {
         }
         {
             services.length>0 && (<div className={styles.items}>
-                {
-                    services.map((item:any,index:number)=> (
-                        <div className={styles.item} key={index} onClick={()=> enterNumber(item.name)}>{item.name}</div>
-                    ))
-                }
+                <div className={styles.item} onClick={()=> enterNumber()}>Get Ticket</div>
             </div>)
         }
     </div>

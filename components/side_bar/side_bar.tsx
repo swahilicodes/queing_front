@@ -107,7 +107,7 @@ export default function SideBar() {
               </li>)  
                 }
                 {
-                  (currentUser !== undefined && currentUser.role === 'cashier') && (<li className={cx(styles.link,router.pathname==="/accounts" && styles.active)}>
+                  (currentUser !== undefined && currentUser.role === 'cashier' || currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/accounts" && styles.active)}>
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/accounts" className={styles.link}>Accounts</Link>
                 </li>)  
@@ -117,7 +117,7 @@ export default function SideBar() {
                     <Link href="/accounts_display" className={styles.link}>Accounts Display</Link>
                 </li>
                 {
-                (currentUser !== undefined && currentUser.role === 'cashier') && (<li className={cx(styles.link,router.pathname==="/payment" && styles.active)}>
+                (currentUser !== undefined && currentUser.role === 'cashier' || currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/payment" && styles.active)}>
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/payment" className={styles.link}>Payment</Link>
                 </li>)

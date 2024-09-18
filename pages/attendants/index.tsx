@@ -30,6 +30,7 @@ const [fields, setFields] = useState({
     role: "",
     service: "",
     counter: "",
+    subservice: "",
     phone: ""
 })
 
@@ -39,7 +40,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter}).then((data:any)=> {
+    axios.post("http://localhost:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter,clinic: fields.subservice}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -163,14 +164,47 @@ useEffect(()=> {
                     onChange={e => setFields({...fields,service:e.target.value})}>
                         <option selected disabled defaultValue="Select Service">Select Service</option>
                         {
-                            Array.from(new Set(counters.map((item:any) => item.name))).map(name => counters.find((item:any) => item.name === name)).map((data01:any,index)=> (
-                                <option value={data01.name} key={index}>{data01.name}</option>
+                            Array.from(new Set(counters.map((item:any) => item.service))).map(name => counters.find((item:any) => item.service === name)).map((data01:any,index)=> (
+                                <option value={data01.service} key={index}>{data01.service}</option>
                             ))
                         }
                     </select>
                     </div>
                     {
-                        fields.service !== "" && (<div className={styles.add_item}>
+                        fields.service === "clinic" && (<div className={styles.add_item}>
+                            <label htmlFor="counter">Select Sub-Service:</label>
+                            <select value={fields.subservice}
+                            onChange={e => setFields({...fields,subservice: e.target.value})}>
+                                <option selected disabled>Select Sub service</option>
+                                {
+                                    Array.from(new Set(counters.map((item:any) => item.subservice))).map(name => counters.find((item:any) => item.subservice === name)).map((data01:any,index)=> (
+                                        <option value={data01.subservice} key={index}>{data01.subservice}</option>
+                                    ))
+                                }
+                                {/* {
+                                    counters.filter((data:any)=> data.subservice !== null).map((item:any,index:number)=> (
+                                        <option value={item.subservice} key={index}>{item.subservice}</option>
+                                    ))
+                                } */}
+                            </select>
+                            </div>)
+                    }
+                    {
+                        (fields.service === "clinic" && fields.subservice !== '') && (<div className={styles.add_item}>
+                            <label htmlFor="counter">Select Counter:</label>
+                            <select value={fields.counter}
+                            onChange={e => setFields({...fields,counter: e.target.value})}>
+                                <option selected disabled>Select Counter</option>
+                                {
+                                    counters.filter((data:any)=> data.subservice === fields.subservice).map((item:any,index:number)=> (
+                                        <option value={item.namba} key={index}>{item.namba}</option>
+                                    ))
+                                }
+                            </select>
+                            </div>)
+                    }
+                    {
+                        (fields.service !== "" && fields.service !== "clinic") && (<div className={styles.add_item}>
                             <label htmlFor="counter">Select counter:</label>
                             <select value={fields.counter}
                             onChange={e => setFields({...fields,counter: e.target.value})}>
@@ -179,7 +213,7 @@ useEffect(()=> {
                                     fields.service !== "clinic" && (<option selected value={counters[0].namba}>Select Counter</option>)
                                 }
                                 {
-                                    counters.filter((data:any)=> data.name === fields.service).map((item:any,index:number)=> (
+                                    counters.filter((data:any)=> data.service === fields.service).map((item:any,index:number)=> (
                                         <option value={item.namba} key={index}>{item.namba}</option>
                                     ))
                                 }
@@ -280,6 +314,7 @@ useEffect(()=> {
                                 <th>Phone</th>
                                 <th>Service</th>
                                 <th>Counter</th>
+                                <th>Clinic</th>
                                 <th>role</th>
                                 <th>Action</th>
                             </tr>
@@ -292,6 +327,7 @@ useEffect(()=> {
                                     <td>{item.phone}</td>
                                     <td>{toCamelCase(item.service)}</td>
                                     <td>{item.room}</td>
+                                    <td>{item.clinic===null?"N/A":item.clinic}</td>
                                     <td>{item.role}</td>
                                     <td>
                                         <div className={styles.delete} onClick={()=> handleDelete(item.id)}><MdDelete className={styles.icon}/></div> 

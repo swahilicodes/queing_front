@@ -45,8 +45,8 @@ const full = useRecoilValue(isFull)
       const newPatients = generatePatients();
       setPatients(newPatients);
       router.reload()
-    }, 120000); // 10 seconds
-    // }, 10000); // 10 seconds
+    // }, 120000); // 10 seconds
+    }, 10000); // 10 seconds
 
     return () => clearInterval(intervalId);
   }, [patients,status,mr_no]);
@@ -64,7 +64,7 @@ const full = useRecoilValue(isFull)
             if(item.mr_no===patient.mrNumber){
               console.log('patient exists')
             }else{
-              axios.post('http://localhost:5000/patients/register_patient',{name:patient.name,stage:"meds",clinic:"hello there",mr_no:patient.mrNumber,age:patient.age,sex:patient.sex,status:"waiting",reg_date: regDateTime,doctor:patient.doctor,consult_doctor:patient.consultationDoctor}).then((data)=> {
+              axios.post('http://localhost:5000/patients/register_patient',{name:patient.name,stage:"accounts",clinic:"cardiology",mr_no:patient.mrNumber,age:patient.age,sex:patient.sex,status:"waiting",reg_date: regDateTime,doctor:patient.doctor,consult_doctor:patient.consultationDoctor}).then((data)=> {
                 setClients(data.data)
               }).catch((err)=> {
                 console.log(err)
