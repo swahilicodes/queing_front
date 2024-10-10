@@ -8,7 +8,6 @@ import { GiSpeaker } from 'react-icons/gi'
 import currentUserState from '@/store/atoms/currentUser'
 import cx from 'classnames'
 import { SlRefresh } from 'react-icons/sl'
-import { io } from 'socket.io-client'
 import Ticket_Category_Length from '@/components/ticket_category_length/ticket_category_length'
 import { IoArrowRedoOutline, IoSearch } from 'react-icons/io5'
 import { MdOutlineClear } from 'react-icons/md'
@@ -27,7 +26,6 @@ export default function MedicalRecords() {
   const [namba, setNumber] = useState(0)
   const [talking, setTalking] = useState(false)
   const currentUser:any = useRecoilValue(currentUserState)
-  const socket = io('http://localhost:5000');
   const [refresh, setRefresh] = useState(false)
   const [edLoading,setEdLoading] = useState(false)
   const [specialIndex, setSpecialIndex] = useState(0)
@@ -59,7 +57,6 @@ export default function MedicalRecords() {
  }
 
  const setDisability = (index:number,disability:string) => {
-  socket.emit("data",{route:"statasa",status: disability})
     setSpecialIndex(index)
     setDisable(disability)
  }
@@ -110,7 +107,6 @@ export default function MedicalRecords() {
   const editTicket = (id:string,status:string) => {
     setEdLoading(true)
     axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`,{status,disable}).then((data:any)=> {
-      socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)
         router.reload()
@@ -129,7 +125,6 @@ export default function MedicalRecords() {
   const penalize = (id:string) => {
     setEdLoading(true)
     axios.put(`http://localhost:5000/tickets/penalize/${id}`).then((data:any)=> {
-      socket.emit("data",{data:data.data,route:"tickets"})
       setInterval(()=> {
         setEdLoading(false)
         router.reload()

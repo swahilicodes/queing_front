@@ -1,0 +1,230 @@
+@import '../../global.scss';
+.recorder{
+    width: 100vw;
+    height: calc(100vh - 70px);
+    position: relative;
+    .meds_top{
+        width: 100%;
+        background: $mainBold;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        position: fixed;
+        top: 0;
+        .left{
+            color: white;
+            font-weight: 500;
+            font-size: 20px;
+        }
+        .right{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .search{
+                border: 2px solid grey;
+                border-radius: 50%;
+                padding: 3px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all .5s ease-in-out;
+                .icon___{
+                    color: grey;
+                }
+                &:hover{
+                    background: $mainColor;
+                    border: 2px solid $divColor;
+                    .icon___{
+                        color: white;
+                    }
+                }
+                &.active{
+                    background: $mainColor;
+                    border: 2px solid $divColor;
+                    .icon___{
+                        color: white;
+                    }
+                }
+            }
+            .special{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .one{
+                    background: $divColor;
+                    //border-radius: 100px;
+                    padding: 5px;
+                    margin: 5px;
+                    cursor: pointer;
+                    transition: all .5s ease-in-out;
+                    color: $mainColor;
+                    &.active{
+                        background: $mainColor;
+                        color: white;
+                    }
+                }
+            }
+            .side{
+                color: $mainBold;
+                font-size: 20px;
+                label{
+                    color: $mainColor;
+                }
+                select{
+                    padding: 5px;
+                    outline: none;
+                    margin-left: 10px;
+                    border: 2px solid $mainBold;
+                    border-radius: 4px;
+                    font-size: 17px;
+                    color: $mainColor;
+                    option{
+                        color: $mainColor;
+                        font-size: 17px;
+                    }
+                }
+            }
+        }
+    }
+    .list{
+        margin-top: 70px;
+        width: 100%;
+        height: calc(100% - 70px);
+        .loader{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .list_items{
+            width: 100%;
+            .wrap{
+                width: 100%;
+                table{
+                    width: 100%;
+                    border-collapse: collapse;
+                    thead{
+                        width: 100%;
+                        tr{
+                            width: 100%;
+                            background: $mainColor;
+                            padding: 10px 0;
+                            th{
+                                color: white;
+                                padding: 10px 0;
+                                text-align: left;
+                            }
+                        }
+                    }
+                    tbody{
+                        width: 100%;
+                        tr{
+                            width: 100%;
+                            background: white;
+                            &.even{
+                                background: $divColor;
+                            }
+                        }
+                    }
+                    td{
+                        text-align: left;
+                        padding: 5px;
+                        font-size: 17px;
+                        opacity: .6;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+    .serving{
+        opacity: 0;
+        width: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        bottom: 80px;
+        flex-direction: column;
+        transition: all .5s ease;
+        display: none;
+        &.active{
+            opacity: 1;
+            display: flex;
+        }
+        .speaker{
+            cursor: pointer;
+            .icon{
+                color: $secondColor;
+            }
+        }
+        .row{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .row_item{
+                margin: 10px;
+                .button{
+                    background: $mainColor;
+                    padding: 5px 10px;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all .5s ease-in-out;
+                    font-size: 25px;
+                    &:hover{
+                        background: $mainBold;
+                    }
+                }
+                .token{
+                    font-size: 50px;
+                    color: $secondColor;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+    .chini{
+        width: 100%;
+        height: 70px;
+        position: absolute;
+        bottom: 0;
+        border-top: 2px solid $divColor;
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        .top{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 15px;
+            .item{
+                p{
+                    font-weight: 500;
+                    color: $mainColor;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    span{
+                        font-weight: 600;
+                        color: $secondColor;
+                        margin-left: 10px;
+                    }
+                }
+            }
+            .item_out{
+                background: red;
+                padding: 5px;
+                cursor: pointer;
+                .icon{
+                    color: white;
+                }
+            }
+        }
+    }
+}

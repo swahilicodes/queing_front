@@ -65,7 +65,6 @@ export default function Home() {
     const getTickets = () => {
       axios.get('http://localhost:5000/patients/get_pats',{params: {stage:"accounts"}}).then((data)=> {
         setTickets(data.data)
-        console.log(data.data)
       }).catch((error)=> {
         alert(error)
       })
@@ -136,7 +135,8 @@ export default function Home() {
                     <div className={styles.ticket_info}>
                     <p>{item.ticket.mr_no}</p>
                     <FaArrowTrendUp className={styles.con} size={40}/>
-                    <span>COUNTER <span>{item.counter.namba}</span> </span>
+                    {/* <span>COUNTER <span>{item.counter.namba}</span> </span> */}
+                    <span>COUNTER <span>{item.counter !== undefined?item.counter.namba:"000"}</span> </span>
                     </div>
                   </div>
                 ))

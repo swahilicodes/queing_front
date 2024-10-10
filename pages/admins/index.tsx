@@ -31,7 +31,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/admins/create_admin",{name,phone,service,counter,role:"admin"}).then((data:any)=> {
+    axios.post("http://localhost:5000/admins/create_admin",{name,phone,service:"administration",counter:"101",role:"admin"}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -135,7 +135,7 @@ useEffect(()=> {
                     name="phone"
                     />
                     </div>
-                    <div className={styles.add_item}>
+                    {/* <div className={styles.add_item}>
                     <label htmlFor="service">Select service:</label>
                     <select value={service}
                     onChange={e => setService(e.target.value)}>
@@ -146,8 +146,8 @@ useEffect(()=> {
                             ))
                         }
                     </select>
-                    </div>
-                    <div className={styles.add_item}>
+                    </div> */}
+                    {/* <div className={styles.add_item}>
                     <label htmlFor="counter">Select counter:</label>
                     <select value={counter}
                     onChange={e => setCounter(e.target.value)}>
@@ -158,7 +158,7 @@ useEffect(()=> {
                             ))
                         }
                     </select>
-                    </div>
+                    </div> */}
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
                     <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>

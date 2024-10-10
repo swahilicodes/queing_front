@@ -16,7 +16,6 @@ import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import cx from 'classnames'
 import useFetchData from '@/custom_hooks/fetch'
 import html2canvas from 'html2canvas'
-import io from 'socket.io-client'
 
 export default function QueueAdd() {
   const {data:services,loading,error} = useFetchData("http://localhost:5000/services/get_all_services")
@@ -32,7 +31,6 @@ export default function QueueAdd() {
   const date = new Date(qr.createdAt);
   const month = date.getMonth()+1
  const qrData = `phone:${qr.phone},clinic:${qr.category}`
- const socket = io('http://localhost:5000');
  const [disabled, setDisabled] = useState('')
  const [index,setIndex] = useState(0)
  const [items, setItems] = useState([
@@ -96,7 +94,6 @@ export default function QueueAdd() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    console.log('creating ticket',numberString,cat)
     axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
     .then((data:any)=> {
         setQrState(data.data)
@@ -129,8 +126,6 @@ export default function QueueAdd() {
     //   a.click();
       setQr(false)
       printImage(a.href)
-      //window.print()
-      socket.emit("data",{data:{},route:"tickets"})
       router.reload()
     });
   };
@@ -226,11 +221,9 @@ export default function QueueAdd() {
                 </div>
             )
         }
-        {
-            services.length>0 && (<div className={styles.items}>
-                <div className={styles.item} onClick={()=> enterNumber()}>Get Ticket</div>
-            </div>)
-        }
+        <div className={styles.items}>
+            <div className={styles.item} onClick={()=> enterNumber()}>Get Ticket</div>
+        </div>
     </div>
   )
 }

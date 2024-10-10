@@ -86,9 +86,10 @@
                 .token_no{
                     width: 60%;
                     border: 2px solid $secondColor;
-                    padding: 15px;
+                    padding: 5px;
                     border-radius: 4px;
-                    font-size: 120px;
+                    font-size: 200px;
+                    word-spacing: 5px;
                     color: $secondColor;
                     margin: 15px;
                     font-weight: 600;
@@ -102,7 +103,9 @@
                     align-items: center;
                     justify-content: center;
                     p{
-                        color: grey;
+                        opacity: .7;
+                        font-weight: 600;
+                        font-size: 20px;
                     }
                     span{
                         color: $mainColor;
@@ -178,22 +181,55 @@
                             font-size: 30px;
                         }
                         &.serving{
-                            background: red;
+                            background: #34e734;
                         }
                         &.next{
-                            background: green;
+                            background: yellow;
+                        }
+                    }
+                    .ishara{
+                        position: absolute;
+                        height: 85%;
+                        right: 2px;
+                        width: 1.5%;
+                        background: black;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-top-right-radius: 10px;
+                        border-bottom-right-radius: 10px;
+                        &.red{
+                            background: red;
                         }
                     }
                     .ticket_info{
                         position: absolute;
+                        width: 100%;
                         right: 0;
                         width: 80%;
                         padding: 10px;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
+                        .indicator{
+                            background: $secondColor;
+                            border-radius: 50%;
+                            padding: 1px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            .con{
+                                color: white;
+                                opacity: 0;
+                                transition: all .5s ease-in-out;
+                                &.blink{
+                                    opacity: 1;
+                                }
+                            }
+                        }
                         .con{
                             color: $secondColor;
+                            transition: all .5s ease-in-out;
                         }
                         p{
                             font-weight: 600;
@@ -202,9 +238,33 @@
                         span{
                             font-weight: 400;
                             font-size: 30px;
+                            margin-right: 10px;
                             span{
-                                color: $secondColor;
+                                font-weight: 600;
+                                color: white;
                             }
+                        }
+                    }
+                }
+                .color_description{
+                    width: 100%;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: flex-start;
+                    .color_item{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        .item{
+                            width: 20px;
+                            height: 20px;
+                        }
+                        p{
+                            color: $mainColor;
+                            margin: 5px;
+                            font-weight: 600;
+                            font-size: 20px;
+                            opacity: .7;
                         }
                     }
                 }

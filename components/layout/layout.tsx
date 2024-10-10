@@ -8,7 +8,6 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 import currentUserState from '@/store/atoms/currentUser'
 import cx from 'classnames'
-import io from 'socket.io-client';
 import Profile from '../profile/profile'
 import isUserState from '@/store/atoms/isUser'
 import isExpandState from '@/store/atoms/isExpand'
@@ -19,6 +18,7 @@ import errorState from '@/store/atoms/error'
 import { BiSolidError } from 'react-icons/bi'
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import LanguageState from '@/store/atoms/language'
 
 
 export default function Layout({children}:any) {
@@ -29,37 +29,36 @@ export default function Layout({children}:any) {
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const restrictedRoutes = ['/accounts','/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts','/clinic','/counters','/meds','/payment']
   const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add','/clinic']
-  const medRoutes = ['/meds','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
-  const doctorRoutes = ['/clinic','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
+  const medRoutes = ['/meds','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add','/admins','/attendants']
+  const doctorRoutes = ['/clinic','/admins','/attendants','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add',]
   const accountRoutes = ['/accounts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
-  const socket = io('http://localhost:5000',{ transports: ['websocket'] });
+  const [language, setLanguage] = useRecoilState(LanguageState)
 
   useEffect(() => {
     checkAuth()
     const handleStart = () => NProgress.start();
     const handleStop = () => NProgress.done();
 
-    // socket.on("connection", (socket) => {
-    //   socket.on("disconnect", () => {
-    //     const lastToDisconnect = socket.of("/").sockets.size === 0;
-    //     if (lastToDisconnect) {
-    //       // gc();
-    //     }
-    //   });
-    // });
-
     router.events.on('routeChangeStart', handleStart);
     router.events.on('routeChangeComplete', handleStop);
     router.events.on('routeChangeError', handleStop);
+    const intervalId = setInterval(()=> {
+      if(language==="English"){
+        setLanguage("Swahili")
+      }else{
+        setLanguage("English")
+      }
+    },5000)
 
     return () => {
+      clearInterval(intervalId);
       router.events.off('routeChangeStart', handleStart);
       router.events.off('routeChangeComplete', handleStop);
       router.events.off('routeChangeError', handleStop);
     };
-}, [error]);
+}, [error,language]);
 
 const checkAuth = () => {
     const token:any = localStorage.getItem("token")

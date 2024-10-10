@@ -95,7 +95,7 @@ export default function SideBar() {
                 </li>)
                 }
                 {
-                    (currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/attendants" && styles.active)}>
+                    (currentUser !== undefined && (currentUser.role === 'admin' || currentUser.role === 'doctor')) && (<li className={cx(styles.link,router.pathname==="/attendants" && styles.active)}>
                     <FaUserDoctor className={styles.icon}/>
                     <Link href="/attendants" className={styles.link}>Attendants</Link>
                 </li>)
