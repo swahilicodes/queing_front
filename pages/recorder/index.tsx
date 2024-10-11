@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./recorder.module.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
@@ -11,6 +11,7 @@ import currentConditionState from "@/store/atoms/current";
 import axios from "axios";
 import Cubes from "@/components/loaders/cubes/cubes";
 import SequentialAudioPlayer from "@/components/audio_player/audio";
+import { useRouter } from "next/router";
 
 function Recorder() {
   const currentUser: any = useRecoilValue(currentUserState);
@@ -23,60 +24,42 @@ function Recorder() {
   const [disable, setDisable] = useRecoilState(currentConditionState);
   const [ticket, setTicket] = useState("");
   const [fetchLoading, setFetchLoading] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [finLoading, setFinLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioFiles = [
-    "/audio/mteja.mp3",
-    "/audio/moja.mp3",
-    "/audio/nenda.mp3",
-    "/audio/tatu.mp3",
-  ];
+  const [next, setNext] = useState(false)
+  const [mr_number, setMrNumber] = useState("")
+  const [found, setFound] = useState(false)
+  const [patName, setPatName] = useState("")
+  const router = useRouter()
+  
 
   useEffect(() => {
     getTicks();
   }, [status, disable, ticket]);
 
-  // Function to play the next audio
-  const playNextAudio = () => {
-    setCurrentIndex((prevIndex) => {
-      const nextIndex = prevIndex + 1;
-      return nextIndex < audioFiles.length ? nextIndex : 0;
-    });
-  };
-
-  // Function to handle audio end event
-  const onAudioEnd = () => {
-    playNextAudio();
-  };
-
-  // Function to start the audio playback sequence
-  const playAudioSequence = () => {
-    setIsPlaying(true);
-    audioRef.current?.play();
-  };
-
-  // Function to handle play/pause toggle
-  const handlePlayPause = () => {
-    if (isPlaying) {
-      audioRef.current?.pause();
-      setIsPlaying(false);
+  const editTicket = (id:string,status:string) => {
+    setFinLoading(true)
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`,{status: "",disable}).then((data:any)=> {
+      setInterval(()=> {
+        setFinLoading(false)
+        router.reload()
+      },3000)
+    }).catch((error)=> {
+      setFinLoading(false)
+      if (error.response && error.response.status === 400) {
+        console.log(`there is an error ${error.message}`)
+        alert(error.response.data.error);
     } else {
-      playAudioSequence();
+        console.log(`there is an error message ${error.message}`)
+        alert(error.message);
     }
-  };
+    })
+  }
 
-  // Function to replay the sequence from the beginning
-  const replaySequence = () => {
-    setCurrentIndex(0);
-    setIsPlaying(true);
-    audioRef.current?.play();
-  };
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios
-      .get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("http://localhost:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket },
       })
       .then((data: any) => {
@@ -88,6 +71,28 @@ function Recorder() {
       })
       .catch((error: any) => {
         setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const nextToken = (e: React.FormEvent) => {
+    e.preventDefault()
+    setFinLoading(true);
+    axios.get("http://localhost:5000/tickets/next_stage", {
+        params: { mr_number: mr_number },
+      })
+      .then((data) => {
+        setFound(true)
+        setPatName(data.data[0].fullname)
+        setFinLoading(false);
+      })
+      .catch((error: any) => {
+        setFinLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
           alert(error.response.data.error);
@@ -126,6 +131,31 @@ function Recorder() {
           </div>
         </div>
       </div>
+      <div className={cx(styles.overlay, next && styles.active)}>
+        <div className={styles.next_stage}>
+            <div className={styles.close} onClick={()=> setNext(false)}>close</div>
+            <form>
+                <input 
+                type="text"
+                placeholder="Mr Number" 
+                value={mr_number}
+                onChange={e => setMrNumber(e.target.value)}
+                />
+                {
+                    !patName
+                    ? <p>Patient: -----</p>
+                    : <p>Patient: <span>{patName}</span></p>
+                }
+                <div className={styles.buttons}>
+                <button onClick={nextToken}>Search</button>
+                <button onClick={nextToken} className={cx(styles.finish, found && styles.found)}>Finish</button>
+                </div>
+            </form>
+            <div className={cx(styles.fin_loader,finLoading && styles.active)}>
+                <div className={styles.progress}></div>
+            </div>
+        </div>
+      </div>
       <div className={styles.list}>
         {fetchLoading ? (
           <div className={styles.loader}>
@@ -135,14 +165,6 @@ function Recorder() {
           <div className={styles.list_items}>
             {tokens.length > 0 ? (
               <div className={styles.wrap}>
-                <audio
-                    ref={audioRef}
-                    src={audioFiles[currentIndex]}
-                    onEnded={onAudioEnd}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    style={{display:"none"}}
-                />
                 <table>
                   <thead>
                     <tr>
@@ -177,18 +199,20 @@ function Recorder() {
         )}
       >
         <div className={styles.speaker}>
-          <HiOutlineSpeakerphone size={150} className={styles.icon} onClick={replaySequence}/>
+        {
+            tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].ticket_no}`} counter={`${tokens[0].ticket_no}`}/>)
+        }
         </div>
-        <SequentialAudioPlayer audioFiles={audioFiles} token={tokens.length>0?`${tokens[0].ticket_no}`:"097563482"} counter="200"/>
         <div className={styles.row}>
           <div className={styles.row_item}>
             <div className={styles.button}>Pend</div>
           </div>
-          <div className={styles.row_item}>
-            <div className={styles.button}>Cancel</div>
+          {/* <div className={styles.row_item} onClick={nextToken}> */}
+          <div className={styles.row_item} onClick={()=> setNext(true)}>
+            <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>
-            <div className={styles.token}>01234</div>
+            <div className={styles.token}>{tokens.length> 0 && tokens[0].ticket_no}</div>
           </div>
           <div className={styles.row_item}>
             <div className={styles.button}>Cancel</div>

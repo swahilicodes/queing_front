@@ -130,20 +130,55 @@ export default function QueueAdd() {
     });
   };
 
-  function printImage(src:any) {
-    var win:any = window.open('about:blank', `${src}`);
+//   function printImage(src:any) {
+//     var win:any = window.open('about:blank', `${src}`);
+//     win.document.open();
+//     win.document.write([
+//         '<html>',
+//         '   <head>',
+//         '   </head>',
+//         '   <body onload="window.print()" onafterprint="window.close()" style="width: 100%; height: 25%; display: flex; align-items: center; justify-content: center; padding: 5px; margin: 0;">',
+//         '       <img src="' + src + '" style="width: 100%; height: 100%; object-fit: cover;"/>',
+//         '   </body>',
+//         '</html>'
+//     ].join(''));
+//     win.document.close();
+// }
+
+function printImage(src: any) {
+    var win: any = window.open('about:blank', '_blank');
     win.document.open();
     win.document.write([
         '<html>',
         '   <head>',
+        '       <style>',
+        '           @media print {',
+        '               body, html {',
+        '                   width: 100%;',
+        '                   height: 20%;',
+        '                   margin: 0;',
+        '                   padding: 0;',
+        '                   display: flex;',
+        '                   align-items: center;',
+        '                   justify-content: center;',
+        '               }',
+        '               img {',
+        '                   width: 100%;',
+        '                   max-width: 300px;', // Adjust width to match thermal printer
+        '                   height: auto;',
+        '                   object-fit: cover;', // Ensure the image fits properly
+        '               }',
+        '           }',
+        '       </style>',
         '   </head>',
-        '   <body onload="window.print()" onafterprint="window.close()" style="width: 100%; height: 50%; display: flex; align-items: center; justify-content: center; padding: 15px;">',
-        '       <img src="' + src + '"/>',
+        '   <body onload="window.print()" onafterprint="window.close()">',
+        '       <img src="' + src + '" alt="Printed Image" />',
         '   </body>',
         '</html>'
     ].join(''));
     win.document.close();
 }
+
 
   return (
     <div className={styles.queue_add}>
@@ -160,13 +195,13 @@ export default function QueueAdd() {
         {
          <div className={cx(styles.printable, isQr && styles.active)} style={{background:"white"}}>
                 <form id='myFrame' ref={formRef}>
-                    <h1>MNH MLOGANZILA</h1>
                     <div className={styles.contents}>
-                    <h2>{qr.ticket_no}</h2>
+                    <h2 style={{fontSize: "60px"}}>{qr.ticket_no}</h2>
                     <div className={styles.qr}><QRCode value={qrData} /></div>
-                    <p>Karibu Hospitali ya Taifa Muhimbili Mloganzila</p>
+                    {/* <p style={{fontWeight: "600", fontSize: "18px"}}>Karibu Hospitali ya Taifa Muhimbili Mloganzila</p> */}
                     </div>
-                    <p className={styles.date}>{date.getDate().toString().padStart(2, '0') }/{month.toString().padStart(2, '0')}/{date.getUTCFullYear()}   <span>{date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}</span></p>
+                    <p style={{fontWeight: "600", fontSize: "18px"}} className={styles.date}>{date.getDate().toString().padStart(2, '0') }/{month.toString().padStart(2, '0')}/{date.getUTCFullYear()}   <span>{date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}</span></p>
+                    <h6 style={{fontWeight: "600", fontSize: "20px", color:"blue"}}>www.mloganzila.or.tz</h6>
                 </form>
             </div>
         }
