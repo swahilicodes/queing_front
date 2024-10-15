@@ -12,6 +12,7 @@ import axios from "axios";
 import Cubes from "@/components/loaders/cubes/cubes";
 import SequentialAudioPlayer from "@/components/audio_player/audio";
 import { useRouter } from "next/router";
+import TimeAgo from "@/components/time";
 
 function Recorder() {
   const currentUser: any = useRecoilValue(currentUserState);
@@ -31,6 +32,8 @@ function Recorder() {
   const [found, setFound] = useState(false)
   const [patName, setPatName] = useState("")
   const router = useRouter()
+  const [penalized, setPenalized] = useState(false)
+  const [expired, setExpired] = useState<Token[]>([]);
   
 
   useEffect(() => {
@@ -40,7 +43,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number}).then((data:any)=> {
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized}).then((data:any)=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -69,11 +72,75 @@ function Recorder() {
       .then((data: any) => {
         setTokens(data.data.data);
         setTotalItems(data.data.totalItems);
+        setExpired(data.data.data)
         setInterval(() => {
           setFetchLoading(false);
         }, 2000);
       })
       .catch((error: any) => {
+        setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+
+  const preparePnF = () => {
+    setPenalized(true)
+    setNext(true)
+    console.log('penalized ',penalized)
+  }
+  const editTicket = (id:number, status: string) => {
+    setFetchLoading(true);
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const deleteToken = (id:number) => {
+    console.log('deleting expired tokens')
+    axios.put(`http://localhost:5000/tickets/delete_token/${id}`)
+      .then(() => {
+        console.log('token deleted')
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const penalize = (id:number) => {
+    setFetchLoading(true);
+    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
@@ -124,13 +191,17 @@ function Recorder() {
                 type="text" 
                 value={ticket}
                 onChange={e => setTicket(e.target.value)}
-                placeholder="Type Phone"
+                placeholder="Phone Number"
                 />
-                <div className={styles.icon}><MdClear className={styles.icon__}onClick={() => setSearch(!search)}/></div>
               </div>
             ) : (
-              <IoSearch size={20} className={styles.icon___} onClick={() => setSearch(!search)}/>
+              <div className={styles.icon}></div>
             )}
+            {
+                  search
+                  ?<MdClear className={styles.icon__}onClick={() => setSearch(!search)} size={40}/>
+                  :<IoSearch className={styles.icon__}onClick={() => setSearch(!search)} size={40}/>
+                }
           </div>
           <div className={styles.side}>
             <label>Status:</label>
@@ -180,26 +251,32 @@ function Recorder() {
                 <table>
                   <thead>
                     <tr>
+                      <th>#</th>
                       <th>Token</th>
                       <th>Phone</th>
                       <th>Status</th>
                       <th>CreatedAt</th>
+                      <th>Challenge</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tokens.map((item:Token, index: number) => (
                       <tr key={index} className={cx(index%2 === 0 && styles.even)}>
+                        <td>{index+1}</td>
                         <td>{item.token.ticket_no}</td>
                         <td>{item.token.phone}</td>
                         <td>{item.token.status}</td>
-                        <td>{item.token.disability}</td>
+                        <td><TimeAgo isoDate={new Date(item.token.createdAt).toISOString()} /></td>
+                        <td>{item.token.disability===""?"N/A":item.token.disability}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <div className={styles.wrap}>There is no Data</div>
+              <div className={styles.wrap}>
+                <div className={styles.no_data}>There are no <span>{status}</span> patients</div>
+              </div>
             )}
           </div>
         )}
@@ -216,7 +293,7 @@ function Recorder() {
         }
         </div>
         <div className={styles.row}>
-          <div className={styles.row_item}>
+          <div className={styles.row_item} onClick={()=> editTicket(tokens[0].token.id,"pending")}>
             <div className={styles.button}>Pend</div>
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
@@ -226,11 +303,11 @@ function Recorder() {
           <div className={styles.row_item}>
             <div className={styles.token}>{tokens.length> 0 && tokens[0].token.ticket_no}</div>
           </div>
-          <div className={styles.row_item}>
-            <div className={styles.button}>Cancel</div>
+          <div className={styles.row_item} onClick={()=> penalize(tokens[0].token.id)}>
+            <div className={styles.button}>Penalize</div>
           </div>
-          <div className={styles.row_item}>
-            <div className={styles.button}>Cancel</div>
+          <div className={styles.row_item} onClick={()=> preparePnF()}>
+            <div className={styles.button}>Finish & Penalize</div>
           </div>
         </div>
       </div>

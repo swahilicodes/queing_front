@@ -84,7 +84,7 @@ const validRoutes = () => {
   }else{
     if(restrictedRoutes.includes(path)){
       if(user==="admin" && !adminRoutes.includes(path)){
-        router.push('/')
+        router.push('/accounts')
       }else if(user ==="medical_recorder" && !medRoutes.includes(path)){
         router.push('/')
       }else if(user ==="cashier" && !accountRoutes.includes(path)){
