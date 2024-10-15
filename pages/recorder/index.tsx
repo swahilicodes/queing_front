@@ -3,7 +3,7 @@ import styles from "./recorder.module.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
-import { MdOutlineClear } from "react-icons/md";
+import { MdClear, MdOutlineClear } from "react-icons/md";
 import { IoArrowRedoOutline, IoSearch } from "react-icons/io5";
 import Ticket_Category_Length from "@/components/ticket_category_length/ticket_category_length";
 import { HiOutlineSpeakerphone } from "react-icons/hi";
@@ -37,9 +37,10 @@ function Recorder() {
     getTicks();
   }, [status, disable, ticket]);
 
-  const editTicket = (id:string,status:string) => {
-    setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`,{status: "",disable}).then((data:any)=> {
+  const finishToken = (id:number,stage:string,mr_number:string) => {
+    if(found){
+      setFinLoading(true)
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number}).then((data:any)=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -54,13 +55,16 @@ function Recorder() {
         alert(error.message);
     }
     })
+    }else{
+      alert('Patient not found')
+    }
   }
 
 
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getMedsTickets", {
-        params: { page, pagesize, status, disable, phone: ticket },
+        params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data: any) => {
         setTokens(data.data.data);
@@ -112,12 +116,20 @@ function Recorder() {
         <div className={styles.right}>
           <div
             className={cx(styles.search, search && styles.active)}
-            onClick={() => setSearch(!search)}
+            // onClick={() => setSearch(!search)}
           >
             {search ? (
-              <MdOutlineClear size={20} className={styles.icon___} />
+              <div className={styles.search_bar}>
+                <input 
+                type="text" 
+                value={ticket}
+                onChange={e => setTicket(e.target.value)}
+                placeholder="Type Phone"
+                />
+                <div className={styles.icon}><MdClear className={styles.icon__}onClick={() => setSearch(!search)}/></div>
+              </div>
             ) : (
-              <IoSearch size={20} className={styles.icon___} />
+              <IoSearch size={20} className={styles.icon___} onClick={() => setSearch(!search)}/>
             )}
           </div>
           <div className={styles.side}>
@@ -147,8 +159,8 @@ function Recorder() {
                     : <p>Patient: <span>{patName}</span></p>
                 }
                 <div className={styles.buttons}>
-                <button onClick={nextToken}>Search</button>
-                <button onClick={nextToken} className={cx(styles.finish, found && styles.found)}>Finish</button>
+                <div onClick={nextToken} className={styles.button}>Search</div>
+                <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
                 </div>
             </form>
             <div className={cx(styles.fin_loader,finLoading && styles.active)}>
@@ -177,10 +189,10 @@ function Recorder() {
                   <tbody>
                     {tokens.map((item:Token, index: number) => (
                       <tr key={index} className={cx(index%2 === 0 && styles.even)}>
-                        <td>{item.ticket_no}</td>
-                        <td>{item.phone}</td>
-                        <td>{item.status}</td>
-                        <td>{item.id}</td>
+                        <td>{item.token.ticket_no}</td>
+                        <td>{item.token.phone}</td>
+                        <td>{item.token.status}</td>
+                        <td>{item.token.disability}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -200,7 +212,7 @@ function Recorder() {
       >
         <div className={styles.speaker}>
         {
-            tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].ticket_no}`} counter={`${tokens[0].ticket_no}`}/>)
+            tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`}/>)
         }
         </div>
         <div className={styles.row}>
@@ -212,7 +224,7 @@ function Recorder() {
             <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>
-            <div className={styles.token}>{tokens.length> 0 && tokens[0].ticket_no}</div>
+            <div className={styles.token}>{tokens.length> 0 && tokens[0].token.ticket_no}</div>
           </div>
           <div className={styles.row_item}>
             <div className={styles.button}>Cancel</div>
@@ -226,22 +238,13 @@ function Recorder() {
         <div className={styles.chini}>
           <div className={styles.top}>
             <div className={styles.item}>
-              {/* <p>On Queue: <span> <Ticket_Category_Length category="meds" status='waiting'/> </span> </p> */}
-              <p>
-                On Queue: <span> 12</span>{" "}
-              </p>
+              <p>On Queue: <span> <Ticket_Category_Length category="meds" status='waiting'/> </span> </p>
             </div>
             <div className={styles.item}>
-              {/* <p>Pending: <span><Ticket_Category_Length category="meds" status='pending'/></span> </p> */}
-              <p>
-                Pending: <span>0</span>{" "}
-              </p>
+              <p>Pending: <span><Ticket_Category_Length category="meds" status='pending'/></span> </p>
             </div>
             <div className={styles.item}>
-              {/* <p>Cancelled: <span><Ticket_Category_Length category="meds" status='cancelled'/></span> </p> */}
-              <p>
-                Cancelled: <span>12</span>{" "}
-              </p>
+              <p>Cancelled: <span><Ticket_Category_Length category="meds" status='cancelled'/></span> </p>
             </div>
             <div className={styles.item_out}>
               <IoArrowRedoOutline className={styles.icon} />
