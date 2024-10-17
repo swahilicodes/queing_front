@@ -194,7 +194,7 @@ useEffect(()=> {
                             <label htmlFor="counter">Select Counter:</label>
                             <select value={fields.counter}
                             onChange={e => setFields({...fields,counter: e.target.value})}>
-                                <option selected disabled>Select Counter</option>
+                                <option selected>Select Counter</option>
                                 {
                                     counters.filter((data:any)=> data.subservice === fields.subservice).map((item:any,index:number)=> (
                                         <option value={item.namba} key={index}>{item.namba}</option>
@@ -346,7 +346,7 @@ useEffect(()=> {
                         ))}
             </div>
                 </div> 
-                    : <div className={styles.message}>No Doctors </div>
+                    : <div className={styles.message}>No Attendants</div>
                 }
             </div>
             }

@@ -90,18 +90,35 @@
     }
     .items{
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         width: 100%;
+        .icon{
+            width: 200px;
+            height: 200px;
+            img{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
         .item{
             background: $divColor;
-            float: left;
-            margin-left: 10px;
-            padding: 20px;
             cursor: pointer;
             color: $mainBold;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 20%;
             font-size: 25px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            p{
+                color: $mainBold;
+                font-size: 40px;
+            }
         }
     }
     .overlay{

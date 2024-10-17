@@ -27,11 +27,11 @@ export default function Layout({children}:any) {
   const [isExpand, setExpand] = useRecoilState(isExpandState)
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
-  const restrictedRoutes = ['/accounts','/admins','/attendants','/counters','/dashboard','/queue_list','/services','/settings','/login','/adverts','/clinic','/counters','/meds','/payment']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add','/clinic']
-  const medRoutes = ['/meds','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add','/admins','/attendants']
-  const doctorRoutes = ['/clinic','/admins','/attendants','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add',]
-  const accountRoutes = ['/accounts','accounts_display','/','/clinic_display','/login','/payment_display','/queue_add']
+  const restrictedRoutes = ['/accounts','/admins','/attendants','/dashboard','/services','/settings','/adverts','/counters','/recorder','/payment']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','/','/login','/queue_add','/clinic']
+  const medRoutes = ['/recorder','/','/login','/queue_add','/']
+  const doctorRoutes = ['/clinic','/','/login','/queue_add','/']
+  const accountRoutes = ['/accounts','/','/login','/queue_add']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
   const [language, setLanguage] = useRecoilState(LanguageState)
@@ -63,6 +63,7 @@ export default function Layout({children}:any) {
 const checkAuth = () => {
     const token:any = localStorage.getItem("token")
     if (isTokenExpired(token)) {
+        localStorage.removeItem('token')
         validRoutes()
     } else {
         const decoded:any = jwtDecode(token)
@@ -84,13 +85,29 @@ const validRoutes = () => {
   }else{
     if(restrictedRoutes.includes(path)){
       if(user==="admin" && !adminRoutes.includes(path)){
-        router.push('/accounts')
+        if(defaultPage){
+          router.push(defaultPage)
+        }else{
+          router.push('/')
+        }
       }else if(user ==="medical_recorder" && !medRoutes.includes(path)){
-        router.push('/')
+        if(defaultPage){
+          router.push(defaultPage)
+        }else{
+          router.push('/')
+        }
       }else if(user ==="cashier" && !accountRoutes.includes(path)){
-        router.push('/')
+        if(defaultPage){
+          router.push(defaultPage)
+        }else{
+          router.push('/')
+        }
       }else if(user ==="doctor" && !doctorRoutes.includes(path)){
-        router.push('/')
+        if(defaultPage){
+          router.push(defaultPage)
+        }else{
+          router.push('/')
+        }
       }else{
         router.push(path)
       }
@@ -129,6 +146,7 @@ const getAdmin = (phone: string) => {
 }
   function isTokenExpired(token: any) {
     if (!token) {
+        localStorage.removeItem('token')
         return true; // Consider expired if no token is present
     }else{
       try {

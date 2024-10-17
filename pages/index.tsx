@@ -122,9 +122,8 @@ export default function Home() {
             ? <div className={styles.queue_div}>
               {
                 tickets.map((item:any,index:number)=> (
-                  <div className={cx(styles.div,index===0 && styles.serving,index===1 && styles.next)} key={index}>
+                  <div className={cx(styles.div,item.ticket.disability !=="" && styles.serving)} key={index}>
                     <div className={cx(styles.indi,index===0 && styles.serving,index===1 && styles.next)}> <p>{index+1}</p> </div>
-                    <div className={cx(styles.ishara,item.ticket.disability !== "" && styles.red)}></div>
                     <div className={styles.ticket_info}>
                     <p>{item.ticket.ticket_no}</p>
                     {
@@ -142,16 +141,16 @@ export default function Home() {
                   <p>Uhitaji</p>
                 </div>
                 <div className={styles.color_item}>
-                  <div className={styles.item} style={{backgroundColor: "black"}}></div>
-                  <p>Kawaida</p>
-                </div>
-                <div className={styles.color_item}>
                   <div className={styles.item} style={{backgroundColor: "#34E734"}}></div>
                   <p>Anae Hudumiwa</p>
                 </div>
                 <div className={styles.color_item}>
                   <div className={styles.item} style={{backgroundColor: "#FFFF00"}}></div>
                   <p>Anae Fata</p>
+                </div>
+                <div className={styles.color_item}>
+                  <div className={styles.item} style={{backgroundColor: "#FF5D00"}}></div>
+                  <p>Tokeni</p>
                 </div>
               </div>
             </div>

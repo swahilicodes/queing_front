@@ -103,19 +103,15 @@ export default function SideBar() {
                 {
                   ((currentUser !== undefined && currentUser.role === 'medical_recorder') || currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/meds" && styles.active)}>
                   <RiNurseFill className={styles.icon}/>
-                  <Link href="/meds" className={styles.link}>Medical Records</Link>
+                  <Link href="/recorder" className={styles.link}>Meds</Link>
               </li>)  
                 }
                 {
-                  (currentUser !== undefined && currentUser.role === 'cashier' || currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/accounts" && styles.active)}>
+                  (currentUser !== undefined && currentUser.role === 'accountant' || currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/accounts" && styles.active)}>
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/accounts" className={styles.link}>Accounts</Link>
                 </li>)  
                 }
-                <li className={cx(styles.link,router.pathname==="/accounts_display" && styles.active)}>
-                    <RiNurseFill className={styles.icon}/>
-                    <Link href="/accounts_display" className={styles.link}>Accounts Display</Link>
-                </li>
                 {
                 (currentUser !== undefined && currentUser.role === 'cashier' || currentUser !== undefined && currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/payment" && styles.active)}>
                     <RiNurseFill className={styles.icon}/>
@@ -123,19 +119,11 @@ export default function SideBar() {
                 </li>)
                 }
                 {
-                    (currentUser !== undefined || currentUser.role === 'doctor' || currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/clinic" && styles.active)}>
+                    ((currentUser !== undefined && currentUser.role === 'doctor') || currentUser.role === 'admin') && (<li className={cx(styles.link,router.pathname==="/clinic" && styles.active)}>
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/clinic" className={styles.link}>Clinic</Link>
                 </li>)
                 }
-                <li className={cx(styles.link,router.pathname==="/payment_display" && styles.active)}>
-                    <RiNurseFill className={styles.icon}/>
-                    <Link href="/payment_display" className={styles.link}>Payment Queue</Link>
-                </li>
-                <li className={cx(styles.link,router.pathname==="/clinic_display" && styles.active)}>
-                    <RiNurseFill className={styles.icon}/>
-                    <Link href="/clinic_display" className={styles.link}>Clinic Queue</Link>
-                </li>
                 <li className={cx(styles.link,router.pathname==="/doctor_patient" && styles.active)}>
                     <RiNurseFill className={styles.icon}/>
                     <Link href="/doctor_patient" className={styles.link}>Doc Patient</Link>

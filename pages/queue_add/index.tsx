@@ -189,7 +189,7 @@ function printImage(src: any) {
                 </div>
             </div> */}
             <div className={styles.title}>
-                <h1>MUHIMBILI NATIONAL HOSPITAL MLOGANZILA</h1>
+                <h1>HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA</h1>
             </div>
         </div>
         {
@@ -257,7 +257,17 @@ function printImage(src: any) {
             )
         }
         <div className={styles.items}>
-            <div className={styles.item} onClick={()=> enterNumber()}>Get Ticket</div>
+            <div className={styles.icon}>
+                <img src="/mnh.png" alt="" />
+            </div>
+            <div className={styles.item} onClick={()=> enterNumber()}>
+                <p>Chukua Tiketi</p>
+            </div>
+            <div className={styles.suggestions}>
+                <div className={styles.title}>
+                    <h3>Unaonaje Huduma Zetu?</h3>
+                </div>
+            </div>
         </div>
     </div>
   )
