@@ -109,6 +109,18 @@
                 }
             }
         }
+        .error{
+            position: absolute;
+            bottom: -100px;
+            background: $mainColor;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &.display{
+            bottom: 0;
+            }
+        }
         &.full{
             width: 100%;
         }

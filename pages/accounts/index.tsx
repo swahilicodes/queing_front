@@ -63,6 +63,20 @@ function Recorder() {
     }
   }
 
+  const clinicGo = (mr_no:string) => {
+    setFinLoading(true)
+    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"clinic",mr_number: mr_no}).then((data)=> {
+      console.log('success data ',data.data)
+      setFinLoading(false)
+    }).catch((error)=> {
+      if(error.response && error.response.status === 400){
+        alert(error.response.data.error)
+      }else{
+        alert(error.message)
+      }
+    })
+  }
+
 
   const getTicks = () => {
     setFetchLoading(true);
@@ -271,7 +285,7 @@ function Recorder() {
             <div className={styles.button}>Pend</div>
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
-          <div className={styles.row_item} onClick={()=> setNext(true)}>
+          <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}>
             <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>

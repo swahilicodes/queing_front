@@ -7,7 +7,7 @@ import axios from 'axios'
 import Printable from '../../components/printable/printable'
 import { useRouter } from 'next/router'
 import Print from '@/pages/print'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import qrState from '@/store/atoms/qr'
 import { IoMdCheckmark } from 'react-icons/io'
 import jsPDF from 'jspdf'
@@ -16,9 +16,11 @@ import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import cx from 'classnames'
 import useFetchData from '@/custom_hooks/fetch'
 import html2canvas from 'html2canvas'
+import { FiChevronsRight } from 'react-icons/fi'
+import { TiChevronRight, TiChevronRightOutline } from 'react-icons/ti'
+import errorState from '@/store/atoms/error'
 
 export default function QueueAdd() {
-  const {data:services,loading,error} = useFetchData("http://localhost:5000/services/get_all_services")
   const [cat,setcat] = useState("")
   const [clicked,setClicked] = useState(false)
   const [isQr,setQr] = useState(false)
@@ -33,6 +35,16 @@ export default function QueueAdd() {
  const qrData = `phone:${qr.phone},clinic:${qr.category}`
  const [disabled, setDisabled] = useState('')
  const [index,setIndex] = useState(0)
+ const [subLoading, setSubLoading] = useState(false)
+ const [error, setError] = useRecoilState(errorState)
+ const [seleccted, setSelected] = useState({
+    index: 0,
+    reason: "",
+    type: "",
+ })
+ const suggestions = [
+    "Kawaida","Mbaya","Nzuri"
+ ]
  const [items, setItems] = useState([
     { id: 1, name: 'mzee', isActive: false },
     { id: 2, name: 'mjamzito', isActive: false },
@@ -69,6 +81,23 @@ export default function QueueAdd() {
         item.id === id ? { ...item, isActive: true } : { ...item, isActive: false }
       )
     );
+  };
+  const handleSubmit = () => {
+    setSubLoading(true)
+    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then((data)=> {
+        setSubLoading(false)
+        setSelected({...seleccted,index:0,type:"",reason: ""})
+        setError("Asante kwa Maoni Yako...")
+        setTimeout(()=> {
+            setError("")
+        },3000)
+    }).catch((error)=> {
+        setSubLoading(false)
+        console.log(error.response)
+    })
+    setTimeout(()=> {
+        setSubLoading(false)
+    },3000)
   };
 
   const enterNumber = () => {
@@ -130,21 +159,6 @@ export default function QueueAdd() {
     });
   };
 
-//   function printImage(src:any) {
-//     var win:any = window.open('about:blank', `${src}`);
-//     win.document.open();
-//     win.document.write([
-//         '<html>',
-//         '   <head>',
-//         '   </head>',
-//         '   <body onload="window.print()" onafterprint="window.close()" style="width: 100%; height: 25%; display: flex; align-items: center; justify-content: center; padding: 5px; margin: 0;">',
-//         '       <img src="' + src + '" style="width: 100%; height: 100%; object-fit: cover;"/>',
-//         '   </body>',
-//         '</html>'
-//     ].join(''));
-//     win.document.close();
-// }
-
 function printImage(src: any) {
     var win: any = window.open('about:blank', '_blank');
     win.document.open();
@@ -182,12 +196,10 @@ function printImage(src: any) {
 
   return (
     <div className={styles.queue_add}>
+        <div className={cx(styles.note,error && styles.display)}>
+            {error}
+        </div>
         <div className={styles.top_notch}>
-            {/* <div className={styles.item}>
-                <div className={styles.logo}>
-                    <img src="/mnh.png" alt="" />
-                </div>
-            </div> */}
             <div className={styles.title}>
                 <h1>HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA</h1>
             </div>
@@ -261,12 +273,38 @@ function printImage(src: any) {
                 <img src="/mnh.png" alt="" />
             </div>
             <div className={styles.item} onClick={()=> enterNumber()}>
-                <p>Chukua Tiketi</p>
+                <p>Chukua Tokeni</p>
             </div>
             <div className={styles.suggestions}>
                 <div className={styles.title}>
                     <h3>Unaonaje Huduma Zetu?</h3>
                 </div>
+                <div className={styles.sugs}>
+                    {
+                        suggestions.map((item,index:number)=> (
+                            <div className={cx(styles.sug,seleccted.index===index+1 && styles.active)} key={index} onClick={()=> setSelected({...seleccted,index:index+1,type: item})}>{item}</div>
+                        ))
+                    }
+                </div>
+                {
+                    seleccted.index !== 0 && (
+                        <div className={styles.sug_action}>
+                            {
+                                seleccted.type =="Mbaya" && (
+                                    <input 
+                                    type="text"
+                                    placeholder='Tuambie Kwanini' 
+                                    value={seleccted.reason}
+                                    onChange={e => setSelected({...seleccted,reason: e.target.value})}
+                                    />
+                                )
+                            }
+                            <div className={cx(styles.buttona,subLoading && styles.loading)} onClick={handleSubmit}>
+                                <TiChevronRight className={styles.icon} size={20}/>
+                            </div>
+                        </div>
+                    )
+                }
             </div>
         </div>
     </div>

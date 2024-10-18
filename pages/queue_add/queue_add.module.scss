@@ -7,6 +7,22 @@
     position: relative;
     height: 100vh;
     overflow: hidden;
+    .note{
+        position: absolute;
+        width: 100%;
+        padding: 15px;
+        background: $mainColor;
+        bottom: -100px;
+        transition: all .5s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+        &.display{
+            bottom: 0;
+        }
+    }
     .top_notch{
         width: 100%;
         background: $mainBold;
@@ -104,7 +120,7 @@
             }
         }
         .item{
-            background: $divColor;
+            background: $mainColor;
             cursor: pointer;
             color: $mainBold;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -115,9 +131,77 @@
             align-items: center;
             justify-content: center;
             padding: 15px;
+            border-radius: 100px;
             p{
-                color: $mainBold;
+                color: white;
                 font-size: 40px;
+            }
+        }
+        .suggestions{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            .title{
+                h3{
+                    font-size: 25px;
+                    color: $mainColor;
+                    font-weight: 500;
+                }
+            }
+            .sugs{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .sug{
+                    border: 2px solid $divColor;
+                    padding: 10px;
+                    border-radius: 100px;
+                    font-size: 25px;
+                    margin: 10px;
+                    color: $mainBold;
+                    cursor: pointer;
+                    transition: all .5s ease-in-out;
+                    &.active{
+                        background: $mainColor;
+                        color: white;
+                    }
+                }
+            }
+            .sug_action{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                input{
+                    padding: 15px;
+                    border: 2px solid $divColor;
+                    border-radius: 10px;
+                    outline: none;
+                    margin-right: 10px;
+                    width: 270px;
+                    height: 60px;
+                    font-size: 20px;
+                }
+                .buttona{
+                    background: $mainColor;
+                    border-radius: 50%;
+                    padding: 10px;
+                    cursor: pointer;
+                    width: 50px;
+                    height: 50px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    .icon{
+                        color: white;
+                        animation: move .5s infinite;
+                    }
+                    &.loading{
+                        animation: borderCycle .5s infinite;
+                        opacity: .8;
+                    }
+                }
             }
         }
     }
@@ -360,5 +444,21 @@
     100% {
         transform: rotate(0deg);
         color: white;
+    }
+}
+@keyframes move {
+    0%{
+        right: 0;
+    }
+    100%{
+        right: 20%;
+    }
+}
+@keyframes borderCycle {
+    0%{
+        border: 3px solid $secondColor;
+    }
+    100%{
+        border: 3px solid transparent;
     }
 }
