@@ -4,22 +4,40 @@ import { useRouter } from 'next/router'
 import { BsFeather } from 'react-icons/bs'
 import { MdOutlineClear } from 'react-icons/md'
 import { IoSettingsOutline } from 'react-icons/io5'
+import useFetchData from '@/custom_hooks/fetch'
 
 export default function Settings() {
  const pages = ["/","/attendants","/counters","/dashboard","/login","/queue_list","/services","/settings","/queue_add"]
+ const {data:clinics,loading} = useFetchData("http://localhost:5000/clinic/get_clinics")
  const [page,setPage] = useState('')
+ const [clinic,setClinic] = useState('')
  const [defaultPage, setDefaultPage] = useState('')
+ const [defaultClinic, setDefaultClinic] = useState('')
  const router = useRouter()
  const [isAddDefaultPage, setAddDefaultPage] = useState(false)
+ const [isAddDefaultClinic, setAddDefaultClinic] = useState(false)
 
  useEffect(()=> {
+    retrievePage(),
+    retrieveClinic()
+ },[clinics])
+
+ const retrievePage = () => {
     const saved = localStorage.getItem('page')
     if(saved) {
         setDefaultPage(saved)
     }else{
         setDefaultPage("index")
     }
- })
+ }
+ const retrieveClinic = () => {
+    const saved = localStorage.getItem('clinic')
+    if(saved) {
+        setDefaultClinic(saved)
+    }else{
+        setDefaultClinic("index")
+    }
+ }
 
  const changePage = (e:React.FormEvent) => {
     e.preventDefault()
@@ -33,6 +51,22 @@ export default function Settings() {
             router.reload()
         }else{
             localStorage.setItem('page',page)
+            router.reload()
+        }
+    }
+ }
+ const changeClinic = (e:React.FormEvent) => {
+    e.preventDefault()
+    const saved = localStorage.getItem('clinic')
+    if(!clinic){
+        alert("clinic is required")
+    }else{
+        if(saved){
+            localStorage.removeItem('clinic')
+            localStorage.setItem('clinic',clinic)
+            router.reload()
+        }else{
+            localStorage.setItem('clinic',clinic)
             router.reload()
         }
     }
@@ -63,6 +97,26 @@ export default function Settings() {
                     </div>
             </form></div> )
         }
+        {
+            isAddDefaultClinic && ( <div className={styles.overlay}><form onSubmit={changeClinic}>
+                <div className={styles.add_item}>
+                    <label htmlFor="service">Select Clinic:</label>
+                    <select value={clinic}
+                    onChange={e => setClinic(e.target.value)}>
+                        <option selected disabled defaultValue="Select Service">Select Clinic</option>
+                        {
+                            clinics.map((item:any,index:number)=> (
+                                <option value={item.clinicicode} key={index}>{item.cliniciname}-{item.clinicicode}</option>
+                            ))
+                        }
+                    </select>
+                    </div>
+                    <div className={styles.action}>
+                    <button type='submit'>submit</button>
+                    <div className={styles.clear} onClick={()=> setAddDefaultClinic(false)}><MdOutlineClear className={styles.icon}/></div>
+                    </div>
+            </form></div> )
+        }
         <div className={styles.wrap}>
             <div className={styles.setting}>
                 <div className={styles.set_left}>
@@ -70,6 +124,15 @@ export default function Settings() {
                     <h5>{defaultPage}</h5>
                 </div>
                 <div className={styles.set_right} onClick={()=> setAddDefaultPage(true)}>
+                    <BsFeather className={styles.icon}/>
+                </div>
+            </div>
+            <div className={styles.setting}>
+                <div className={styles.set_left}>
+                    <h4>Default Clinic</h4>
+                    <h5>{defaultClinic}</h5>
+                </div>
+                <div className={styles.set_right} onClick={()=> setAddDefaultClinic(true)}>
                     <BsFeather className={styles.icon}/>
                 </div>
             </div>

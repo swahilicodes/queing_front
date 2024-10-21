@@ -18,20 +18,26 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading,error} = useFetchData("http://localhost:5000/services/get_all_services")
+const {data,loading,error} = useFetchData("http://localhost:5000/clinic/get_clinics")
 const [fields, setFields] = useState({
     service: "",
-    sub_service: "",
-    namba: ""
+    clinic: "",
+    namba: "",
+    code: ""
 })
 
 useEffect(()=> {
     getServices()
 },[page])
+
+const clinicSeta = (code:string) => {
+   const name =  data.find((coda:any )=> coda.clinicicode   === code)
+   setFields({...fields,code:code,clinic: name.cliniciname})
+}
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/counters/create_counter",{service:fields.service,namba: fields.namba, sub_service: fields.sub_service}).then((data:any)=> {
+    axios.post("http://localhost:5000/counters/create_counter",{service:fields.service,namba: fields.namba, clinic: fields.clinic,code: fields.code}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -59,7 +65,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.sub_service}).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error:any)=> {
@@ -82,7 +88,7 @@ useEffect(()=> {
  const handleEdit = (id:string, namba:string,name:string, clinic:string) => {
     setId(id);
     setEdit(true)
-    setFields({...fields,service:name,namba:namba,sub_service:clinic})
+    setFields({...fields,service:name,namba:namba,clinic:clinic})
   };
  const getServices  = () => {
     setFetchLoading(true)
@@ -117,19 +123,19 @@ useEffect(()=> {
                         <select onChange={e => setFields({...fields, service: e.target.value})} value={fields.service}>
                         <option value="" selected disabled>--Please choose an option--</option>
                             <option value="meds">Medical Records</option>
-                            <option value="accounts">Accounts</option>
-                            <option value="payment">Payment</option>
-                            <option value="clinic">Clinic</option>
+                            <option value="accounts">Cashier</option>
+                            <option value="nurse_station">Nurse Station</option>
                         </select>
                     </div>
                     {
-                        fields.service === "clinic" && (<div className={styles.item}>
+                        fields.service === "nurse_station" && (<div className={styles.item}>
                             <label>Sub-Service</label>
-                            <select onChange={e => setFields({...fields, sub_service: e.target.value})} value={fields.sub_service}>
+                            {/* <select onChange={e => setFields({...fields, clinic: e.target.value})} value={fields.clinic}> */}
+                            <select onChange={e=> clinicSeta(e.target.value)} value={fields.code}>
                             <option value="" selected disabled>--Please choose an option--</option>
                                 {
                                     data.map((data_:any,index:number)=> (
-                                        <option value={data_.name}>{data_.name}</option>
+                                        <option value={data_.clinicicode}>{data_.cliniciname}</option>
                                     ))
                                 }
                             </select>
@@ -160,14 +166,13 @@ useEffect(()=> {
                             <option value="" selected disabled>--Please choose an option--</option>
                             <option value="meds">Medical Records</option>
                             <option value="accounts">Accounts</option>
-                            <option value="payment">Payment</option>
-                            <option value="clinic">Clinic</option>
+                            <option value="nurse_station">Clinic</option>
                         </select>
                     </div>
                     {
                         fields.service === "clinic" && (<div className={styles.item}>
                             <label>Sub-Service</label>
-                            <select onChange={e => setFields({...fields, sub_service: e.target.value})} value={fields.sub_service}>
+                            <select onChange={e => setFields({...fields, clinic: e.target.value})} value={fields.clinic}>
                             <option value="" selected disabled>--Please choose an option--</option>
                                 {
                                     data.map((data_:any,index:number)=> (
@@ -228,7 +233,7 @@ useEffect(()=> {
                                 <tr>
                                     <th>Id</th>
                                     <th>Service</th>
-                                    <th>Sub-Service</th>
+                                    <th>Clinic</th>
                                     <th>Counter</th>
                                     <th>Action</th>
                                 </tr>
@@ -239,7 +244,7 @@ useEffect(()=> {
                                     <tr key={index} className={cx(index%2===0 && styles.active)}>
                                         <td>{data.id}</td>
                                         <td>{data.service}</td>
-                                        <td>{(data.subservice===null || data.subservice==="")?"N/A":data.subservice}</td>
+                                        <td>{(data.clinic===null || data.clinic==="")?"N/A":data.clinic}</td>
                                         <td>{data.namba}</td>
                                         <td>
                                             <div className={styles.acta}>

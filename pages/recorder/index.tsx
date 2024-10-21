@@ -31,6 +31,7 @@ function Recorder() {
   const [mr_number, setMrNumber] = useState("")
   const [found, setFound] = useState(false)
   const [patName, setPatName] = useState("")
+  const [sex, setSex] = useState("")
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [expired, setExpired] = useState<Token[]>([]);
@@ -40,10 +41,10 @@ function Recorder() {
     getTicks();
   }, [status, disable, ticket]);
 
-  const finishToken = (id:number,stage:string,mr_number:string) => {
+  const finishToken = (id:number,stage:string,mr_number:string,sex:string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized}).then((data:any)=> {
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex}).then((data:any)=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -92,7 +93,6 @@ function Recorder() {
   const preparePnF = () => {
     setPenalized(true)
     setNext(true)
-    console.log('penalized ',penalized)
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
@@ -159,7 +159,8 @@ function Recorder() {
       })
       .then((data) => {
         setFound(true)
-        setPatName(data.data[0].fullname)
+        setPatName(data.data[0].fullname.toUpperCase())
+        setSex(data.data[0].sex)
         setFinLoading(false);
       })
       .catch((error: any) => {
@@ -231,7 +232,7 @@ function Recorder() {
                 }
                 <div className={styles.buttons}>
                 <div onClick={nextToken} className={styles.button}>Search</div>
-                <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
+                <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number,sex)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
                 </div>
             </form>
             <div className={cx(styles.fin_loader,finLoading && styles.active)}>

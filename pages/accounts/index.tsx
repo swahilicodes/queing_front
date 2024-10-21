@@ -66,9 +66,12 @@ function Recorder() {
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
     axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"clinic",mr_number: mr_no}).then((data)=> {
-      console.log('success data ',data.data)
-      setFinLoading(false)
+      setInterval(()=> {
+        setFinLoading(false)
+        router.reload()
+      },2000)
     }).catch((error)=> {
+      setFinLoading(false)
       if(error.response && error.response.status === 400){
         alert(error.response.data.error)
       }else{
@@ -228,7 +231,7 @@ function Recorder() {
         </div>
       </div>
       <div className={styles.list}>
-        {fetchLoading ? (
+        {(fetchLoading || finLoading) ? (
           <div className={styles.loader}>
             <Cubes />
           </div>
@@ -241,7 +244,8 @@ function Recorder() {
                     <tr>
                       <th>#</th>
                       <th>Token</th>
-                      <th>Phone</th>
+                      <th>Mr-Number</th>
+                      <th>Gender</th>
                       <th>Status</th>
                       <th>CreatedAt</th>
                       <th>Challenge</th>
@@ -252,7 +256,8 @@ function Recorder() {
                       <tr key={index} className={cx(index%2 === 0 && styles.even)}>
                         <td>{index+1}</td>
                         <td>{item.token.ticket_no}</td>
-                        <td>{item.token.phone}</td>
+                        <td>{item.token.mr_no}</td>
+                        <td>{item.token.gender}</td>
                         <td>{item.token.status}</td>
                         <td><TimeAgo isoDate={new Date(item.token.createdAt).toISOString()} /></td>
                         <td>{item.token.disability===""?"N/A":item.token.disability}</td>
