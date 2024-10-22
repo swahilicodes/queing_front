@@ -1,0 +1,227 @@
+@import '../../global.scss';
+.services{
+    width: 100%;
+    position: relative;
+    height: 100vh;
+    .service_top{
+        width: 100%;
+        position: absolute;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: $mainBold;
+        padding: 15px 20px;
+        height: 70px;
+        .service_left{
+            font-size: 25px;
+            color: white;
+            font-size: 18px;
+            //margin: 20px;
+        }
+        .service_right{
+            display: flex;
+            .change_clinic{
+                select{
+                    padding: 15px;
+                    outline: none;
+                    border-radius: 10px;
+                    margin: 0 10px;
+                    width: 150px;
+                    background: $mainColor;
+                    color: white;
+                }
+            }
+            .add_new{
+                background: $mainColor;
+                padding: 10px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                p{
+                    color: white;
+                    text-align: center;
+                }
+            }
+        }
+    }
+    .add_service{
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        form{
+            width: 20%;
+            position: inherit;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: move .5s ease-in-out;
+            .item{
+                width: 100%;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                flex-direction: column;
+                margin: 2px 0;
+                label{
+                    color: $mainColor;
+                    padding: 3px 0;
+                    font-size: 18px;
+                }
+                select{
+                    width: 100%;
+                    outline: none;
+                    padding: 15px;
+                    border: 1px solid grey;
+                    text-align: center;
+                    margin: 5px 0;
+                    &:focus{
+                        border: 1px solid $mainColor;
+                    }
+                }
+            }
+            input{
+                width: 100%;
+                padding: 15px;
+                outline: none;
+                border: 1px solid grey;
+                text-align: center;
+                margin: 5px 0;
+                &:focus{
+                    border: 1px solid $mainColor;
+                }
+            }
+            .action{
+                width: 100%;
+                margin: 10px 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                button{
+                    background: $mainColor;
+                    padding: 15px;
+                    color: white;
+                    outline: none;
+                    border: none;
+                    text-align: center;
+                    cursor: pointer;
+                }
+                .clear{
+                    padding: 15px;
+                    background-color: $mainColor;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    .icon{
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+    .service_list{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        .check{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        .message{
+            font-size: 20px;
+            color: $mainBold;
+        }
+        .services_list{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            height: calc(100% - 70px);
+            margin-top: 70px;
+            table{
+                width: 100%;
+                border-collapse: collapse;
+                th,td{
+                    text-align: left;
+                    padding: 10px;
+                }
+                tbody{
+                    width: 100%;
+                    tr{
+                        width: 100%;
+                        &.active{
+                            background: $divColor;
+                        }
+                        td{
+                         .acta{
+                            display: flex;
+                            .delete{
+                                background: red;
+                                padding: 3px;
+                                color: white;
+                                cursor: pointer;
+                                margin-right: 10px;
+                                .icon{
+                                    color: white;
+                                }
+                            }
+                            .edit{
+                                background: green;
+                                padding: 3px;
+                                color: white;
+                                cursor: pointer;
+                                .icon{
+                                    color: white;
+                                }
+                            }
+                         }
+                        }
+                    }
+                }
+            }
+            .pagination{
+                width: 100%;
+                display: flex;
+                align-items: flex-start;
+                button{
+                    padding: 10px;
+                    margin: 5px;
+                    cursor: pointer;
+                    outline: none;
+                    border: none;
+                    background: $divColor;
+                    &.active{
+                        background: $mainBold;
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+    }
+}
+@keyframes move {
+    0% {
+        top: -100px;
+        opacity: 0;
+    }
+    100% {
+        top: 50%;
+        opacity: 1;
+    }
+}

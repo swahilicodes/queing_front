@@ -22,27 +22,46 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/services/get_all_services")
-const {data:counters,loading:cLoading, error: cError} = useFetchData("http://localhost:5000/counters/get_all_counters")
+const {data:clinics,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/clinic/get_clinics")
+const [rooms, setRooms] = useState([])
 const [editData, setEditData] = useState<any>({})
 const [fields, setFields] = useState({
     name: "",
-    role: "",
     service: "",
-    counter: "",
     clinic: "",
-    clinic_code: "",
-    phone: ""
+    clinic_code: "204",
+    phone: "",
+    room: ""
 })
 
 useEffect(()=> {
     getAttendants()
-},[page,data])
+    getRooms()
+},[page,fields.clinic_code])
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
+    axios.post("http://localhost:5000/doktas/create_dokta",{name:fields.name,phone:fields.phone,room:fields.room,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
         setAdd(false)
+        router.reload()
+    }).catch((error:any)=> {
+        console.log(error.response)
+        if (error.response && error.response.status === 400) {
+            console.log(`there is an error ${error.message}`)
+            alert(error.response.data.error);
+        } else {
+            console.log(`there is an error message ${error.message}`)
+            alert(error.message);
+        }
+    })
+ }
+
+ const handleClinic = (code:string) => {
+    const coder = clinics.find((count:any) => count.clinicicode === code)
+    setFields({...fields,clinic:coder.cliniciname,clinic_code: code,room: ""})
+ }
+ const deleteService  = (id:any) => {
+    axios.put(`http://localhost:5000/doktas/delete_dokta/${id}`).then((data:any)=> {
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
@@ -54,15 +73,9 @@ useEffect(()=> {
         }
     })
  }
-
- const handleCounter = (name:string) => {
-    const code = counters.find((count:any) => count.clinic === name)
-    setFields({...fields,clinic:name,clinic_code: code.code})
-    console.log(name,code.code)
- }
- const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/doctors/delete_doctor/${id}`).then((data:any)=> {
-        router.reload()
+ const getRooms  = () => {
+    axios.get(`http://localhost:5000/rooms/get_rooms`,{params: {clinic_code: fields.clinic_code}}).then((data:any)=> {
+        setRooms(data.data.data)
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -103,12 +116,12 @@ useEffect(()=> {
         name: doctor.name,
         phone: doctor.phone,
         service: doctor.service,
-        counter: doctor.room
+        room: doctor.room
     })
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/doctors/get_doctors",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/doktas/get_doktas",{params: {page,pagesize,clinic_code: fields.clinic_code}}).then((data:any)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -135,8 +148,20 @@ useEffect(()=> {
     <div className={styles.services}>
         <div className={styles.service_top}>
             <div className={styles.service_left}>{router.pathname}</div>
-            <div className={styles.service_right} onClick={()=> setAdd(!isAdd)}>
-                <p>Add new</p>
+            <div className={styles.service_right}>
+            <div className={styles.change_clinic}>
+                    <select onChange={e => setFields({...fields,clinic_code: e.target.value})}>
+                        <option value="" selected disabled>Select Clinic</option>
+                        {
+                            clinics.map((item:any,index:number)=> (
+                                <option value={item.clinicicode}>{item.cliniciname}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+                <div className={styles.add_new} onClick={()=> setAdd(!isAdd)}>
+                 <p>Add new</p>
+                </div>
             </div>
         </div>
         {
@@ -166,131 +191,38 @@ useEffect(()=> {
                     />
                     </div>
                     <div className={styles.add_item}>
-                    <label htmlFor="service">Select service:</label>
-                    <select value={fields.service}
-                    onChange={e => setFields({...fields,service:e.target.value})}>
-                        <option selected disabled defaultValue="Select Service">Select Service</option>
+                    <label htmlFor="clinic">Select Clinic:</label>
+                    <select
+                    onChange={e => handleClinic(e.target.value)}
+                    >
+                        <option value="" selected disabled>Select Clinic</option>
                         {
-                            Array.from(new Set(counters.map((item:any) => item.service))).map(name => counters.find((item:any) => item.service === name)).map((data01:any,index)=> (
-                                <option value={data01.service} key={index}>{data01.service}</option>
+                            clinics.map((item:any,index:number)=> (
+                                <option value={item.clinicicode}>{item.cliniciname}</option>
                             ))
                         }
                     </select>
                     </div>
                     {
-                        fields.service === "nurse_station" && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select Clinic:</label>
-                            <select value={fields.clinic}
-                            // onChange={e => setFields({...fields,clinic: e.target.value})}>
-                            onChange={e => handleCounter(e.target.value)}>
-                                <option selected disabled>Select Clinic</option>
+                        rooms.length>0 && (
+                            <div className={styles.add_item}>
+                            <label htmlFor="phone">Select Room:</label>
+                            <select
+                            onChange={e => setFields({...fields,room: e.target.value})}
+                            >
+                                <option value="" selected disabled>Select Clinic</option>
                                 {
-                                    Array.from(new Set(counters.map((item:any) => item.clinic))).map(name => counters.find((item:any) => item.clinic === name)).map((data01:any,index)=> (
-                                        <option value={data01.clinic} key={index}>{data01.clinic}</option>
-                                    ))
-                                }
-                                {/* {
-                                    counters.filter((data:any)=> data.subservice !== null).map((item:any,index:number)=> (
-                                        <option value={item.subservice} key={index}>{item.subservice}</option>
-                                    ))
-                                } */}
-                            </select>
-                            </div>)
-                    }
-                    {
-                        (fields.service === "nurse_station" && fields.clinic !== '') && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select Counter:</label>
-                            <select value={fields.counter}
-                            onChange={e => setFields({...fields,counter: e.target.value})}>
-                                <option selected>Select Counter</option>
-                                {
-                                    counters.filter((data:any)=> data.clinic === fields.clinic).map((item:any,index:number)=> (
-                                        <option value={item.namba} key={index}>{item.namba}</option>
+                                    rooms.map((item:any,index:number)=> (
+                                        <option value={item.namba}>{item.namba}</option>
                                     ))
                                 }
                             </select>
-                            </div>)
-                    }
-                    {
-                        (fields.service !== "" && fields.service !== "nurse_station") && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select counter:</label>
-                            <select value={fields.counter}
-                            onChange={e => setFields({...fields,counter: e.target.value})}>
-                                <option selected disabled>Select Counter</option>
-                                {
-                                    fields.service !== "nurse_station" && (<option selected value={counters[0].namba}>Select Counter</option>)
-                                }
-                                {
-                                    counters.filter((data:any)=> data.service === fields.service).map((item:any,index:number)=> (
-                                        <option value={item.namba} key={index}>{item.namba}</option>
-                                    ))
-                                }
-                            </select>
-                            </div>)
+                            </div>
+                        )
                     }
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
                     <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>
-                    </div>
-                    </div>
-                </form>
-            </div> )
-        }
-        {
-            isEdit && ( <div className={styles.add_service}>
-                <form onSubmit={submit}>
-                    <div className={styles.add_items}>
-                    <div className={styles.add_item}>
-                    <label htmlFor="name">Enter name:</label>
-                    <input 
-                    type="text" 
-                    value={fields.name}
-                    onChange={e => setFields({...fields,name: e.target.value})}
-                    placeholder='name*'
-                    id="name" 
-                    name="name"
-                    />
-                    </div>
-                    <div className={styles.add_item}>
-                    <label htmlFor="phone">Enter phone:</label>
-                    <input 
-                    type="text" 
-                    value={fields.phone}
-                    onChange={e => setFields({...fields,phone: e.target.value})}
-                    placeholder='phone*'
-                    id="phone" 
-                    name="phone"
-                    />
-                    </div>
-                    <div className={styles.add_item}>
-                    <label htmlFor="service">Select service:</label>
-                    <select value={fields.service}
-                    onChange={e => setFields({...fields,service:e.target.value})}>
-                        <option selected disabled defaultValue="Select Service">Select Service</option>
-                        {
-                            Array.from(new Set(counters.map((item:any) => item.name))).map(name => counters.find((item:any) => item.name === name)).map((data01:any,index)=> (
-                                <option value={data01.name} key={index}>{data01.name}</option>
-                            ))
-                        }
-                    </select>
-                    </div>
-                    {
-                        fields.service !== "" && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select counter:</label>
-                            <select value={fields.counter}
-                            onChange={e => setFields({...fields,counter: e.target.value })}>
-                                <option selected disabled>Select Counter</option>
-                                {
-                                    counters.filter((data:any)=> data.name === fields.service).map((item:any,index:number)=> (
-                                        <option value={item.namba} key={index}>{item.namba}</option>
-                                    ))
-                                }
-                            </select>
-                            </div>)
-                    }
-                    <div className={styles.action}>
-                    <button onClick={editService}>submit</button>
-                    <div className={styles.clear} onClick={()=> setEdit(false)}><MdOutlineClear className={styles.icon}/></div>
                     </div>
                     </div>
                 </form>
@@ -321,7 +253,7 @@ useEffect(()=> {
                                 <th>Name</th>
                                 <th>Phone</th>
                                 <th>Service</th>
-                                <th>Counter</th>
+                                <th>Room</th>
                                 <th>Clinic</th>
                                 <th>role</th>
                                 <th>Action</th>
@@ -334,7 +266,7 @@ useEffect(()=> {
                                     <td>{item.name}</td>
                                     <td>{item.phone}</td>
                                     <td>{toCamelCase(item.service)}</td>
-                                    <td>{item.counter}</td>
+                                    <td>{item.room}</td>
                                     <td>{item.clinic===null?"N/A":item.clinic}</td>
                                     <td>{item.role}</td>
                                     <td>

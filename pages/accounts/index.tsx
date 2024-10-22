@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
-import styles from "./recorder.module.scss";
+import styles from "./accounts.module.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
@@ -34,11 +34,20 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [bill, setBill] = useState("")
+  const [fields, setFields] = useState({
+    mr_no: "",
+    status: ""
+  })
   
 
   useEffect(() => {
     getTicks();
   }, [status, disable, ticket]);
+
+  const handleNext = (token: any) => {
+    setNext(true)
+    setFields({...fields,mr_no: token.mr_no})
+  }
 
   const finishToken = (id:number,stage:string,mr_number:string) => {
     if(found){
@@ -65,7 +74,8 @@ function Recorder() {
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"clinic",mr_number: mr_no}).then((data)=> {
+    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no}).then((data)=> {
+      setFields({...fields,status:"Paid"})
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -73,9 +83,11 @@ function Recorder() {
     }).catch((error)=> {
       setFinLoading(false)
       if(error.response && error.response.status === 400){
-        alert(error.response.data.error)
+        setFields({...fields,status:error.response.data.error})
+        //alert(error.response.data.error)
       }else{
-        alert(error.message)
+        setFields({...fields,status:error.message})
+        //alert(error.message)
       }
     })
   }
@@ -170,6 +182,9 @@ function Recorder() {
   };
   return (
     <div className={styles.recorder}>
+      <div className={cx(styles.overlaya,next && styles.active)}>
+        <div className={styles.data}></div>
+      </div>
       <div className={styles.meds_top}>
         <div className={styles.left}>
           {(currentUser.name !== undefined && currentUser.name) ||
@@ -212,16 +227,10 @@ function Recorder() {
         <div className={styles.next_stage}>
             <div className={styles.close} onClick={()=> setNext(false)}>close</div>
             <form>
-              <select
-              value={bill}
-              onChange={e => setBill(e.target.value)}
-              >
-                <option value="" selected disabled>Select Billing Type</option>
-                <option value="insurance">Insurance</option>
-                <option value="cash">Cash</option>
-              </select>
+                <div className={styles.status}>Status: <span className={cx(fields.status==="Not Paid"?styles.red:styles.green)}>{fields.status ===""?"N/A": fields.status}</span></div>
                 <div className={styles.buttons}>
-                <div onClick={()=> submit(tokens[0].token.id,bill)} className={styles.button}>Submit</div>
+                <div className={styles.button} onClick={()=> clinicGo(fields.mr_no)}>Check Status</div>
+                {/* <div onClick={()=> submit(tokens[0].token.id,bill)} className={styles.button}>Check Status</div> */}
                 {/* <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div> */}
                 </div>
             </form>
@@ -231,7 +240,7 @@ function Recorder() {
         </div>
       </div>
       <div className={styles.list}>
-        {(fetchLoading || finLoading) ? (
+        {fetchLoading  ? (
           <div className={styles.loader}>
             <Cubes />
           </div>
@@ -289,8 +298,8 @@ function Recorder() {
           <div className={styles.row_item} onClick={()=> editTicket(tokens[0].token.id,"pending")}>
             <div className={styles.button}>Pend</div>
           </div>
-          {/* <div className={styles.row_item} onClick={nextToken}> */}
-          <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}>
+          {/* <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}> */}
+          <div className={styles.row_item} onClick={()=> handleNext(tokens[0].token)}>
             <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>

@@ -29,7 +29,7 @@ export default function Layout({children}:any) {
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const restrictedRoutes = ['/accounts','/admins','/attendants','/dashboard','/services','/settings','/adverts','/counters','/recorder','/payment']
   const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','/','/login','/queue_add','/clinic']
-  const medRoutes = ['/recorder','/','/login','/queue_add','/']
+  const medRoutes = ['/recorder','/','/login','/queue_add','/','/counters']
   const doctorRoutes = ['/clinic','/','/login','/queue_add','/']
   const accountRoutes = ['/accounts','/','/login','/queue_add']
   const [error,setError] = useRecoilState(errorState)

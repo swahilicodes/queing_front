@@ -34,7 +34,7 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [bill, setBill] = useState("")
-  const [clinic, setClinic] = useState('')
+  const [clinic, setClinic] = useState('204')
   
 
   useEffect(() => {
@@ -99,7 +99,7 @@ function Recorder() {
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
-        params: { page, pagesize, status, disable, phone: ticket, stage: "clinic",clinic_code: clinic, mr_no: ticket },
+        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: clinic, mr_no: ticket },
       })
       .then((data: any) => {
         setTokens(data.data.data);
