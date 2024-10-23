@@ -1,0 +1,25 @@
+@import '../../../global.scss';
+.audio_player01{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .player{
+        width: 100%;
+        .button{
+            width: 100%;
+            background: $mainBold;
+            outline: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .5s ease-in-out;
+            &:hover{
+                background: $mainColor;
+            }
+        }
+    }
+}

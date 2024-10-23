@@ -13,6 +13,7 @@ import Cubes from "@/components/loaders/cubes/cubes";
 import SequentialAudioPlayer from "@/components/audio_player/audio";
 import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
+import SequentialAudioPlayerFinish from "@/components/audio_player/finish/audio";
 
 function Recorder() {
   const currentUser: any = useRecoilValue(currentUserState);
@@ -25,6 +26,7 @@ function Recorder() {
   const [disable, setDisable] = useRecoilState(currentConditionState);
   const [ticket, setTicket] = useState("");
   const [fetchLoading, setFetchLoading] = useState(false);
+  const [docLoading, setDocLoading] = useState(false);
   const [finLoading, setFinLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [next, setNext] = useState(false)
@@ -34,31 +36,38 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [bill, setBill] = useState("")
-  const [clinic, setClinic] = useState('204')
+  const [clinica, setClinic] = useState('188')
+  const [doktas, setDoktas] = useState([])
+  const [fields, setFields] = useState({
+    doctor_id: '',
+    patient_id: '',
+    room: ''
+  })
   
 
   useEffect(() => {
-    getClinic();
-    if(clinic){
-      getTicks()
+    //getClinic();
+    getDoktas()
+    //getTicks()
+    if(clinica.trim() !== ''){
+      getTicks(clinica)
     }
-  }, [status, disable, ticket,clinic]);
+  }, [status, disable, ticket,clinica]);
 
-  const getClinic = () => {
-    const data = localStorage.getItem("clinic")
-    if(data){
-      setClinic(data)
-    }else{
-      setInterval(()=> {
-        setClinic("210")
-      },3000)
-    }
-  }
+  // const getClinic = () => {
+  //   const data = localStorage.getItem("clinic")
+  //   if(data){
+  //     setClinic(data)
+  //   }else{
+  //     setInterval(()=> {
+  //       setClinic("210")
+  //     },3000)
+  //   }
+  // }
 
-  const finishToken = (id:number,stage:string,mr_number:string) => {
-    if(found){
+  const finishToken = () => {
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number}).then((data:any)=> {
+    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id}).then((data:any)=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -73,9 +82,6 @@ function Recorder() {
         alert(error.message);
     }
     })
-    }else{
-      alert('Patient not found')
-    }
   }
 
   const clinicGo = (mr_no:string) => {
@@ -96,7 +102,7 @@ function Recorder() {
   }
 
 
-  const getTicks = () => {
+  const getTicks = (clinic:string) => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: clinic, mr_no: ticket },
@@ -119,11 +125,41 @@ function Recorder() {
         }
       });
   };
+  const getDoktas = () => {
+    setDocLoading(true);
+    axios.get("http://localhost:5000/doktas/get_free_doktas", {
+        params: { page, pagesize,clinic_code: clinica},
+      })
+      .then((data: any) => {
+        setDoktas(data.data.data);
+        setTotalItems(data.data.totalItems);
+        setInterval(() => {
+          setDocLoading(false);
+        }, 2000);
+      })
+      .catch((error: any) => {
+        setDocLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
 
   const preparePnF = () => {
     setPenalized(true)
     setNext(true)
     console.log('penalized ',penalized)
+  }
+  const prepareDoctorPush = (doctor: string) => {
+    const doc = doktas.find((doka:Doctor)=> doka.phone===doctor)
+    if(doc){
+      const docta: Doctor = doc
+      setFields({...fields,doctor_id: doctor,patient_id: tokens[0].token.mr_no,room: docta.room})
+    }
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
@@ -156,24 +192,6 @@ function Recorder() {
       })
       .catch((error) => {
         setFetchLoading(false);
-        if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
-        } else {
-          console.log(`there is an error message ${error.message}`);
-          alert(error.message);
-        }
-      });
-  };
-  const submit = (id:number,bill:string) => {
-    setFinLoading(true);
-    axios.put(`http://localhost:5000/tickets/bill/${id}`, {bill: bill})
-      .then(() => {
-        setFinLoading(false);
-        router.reload()
-      })
-      .catch((error: any) => {
-        setFinLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
           alert(error.response.data.error);
@@ -227,16 +245,40 @@ function Recorder() {
         <div className={styles.next_stage}>
             <div className={styles.close} onClick={()=> setNext(false)}>close</div>
             <form>
-              <select
-              value={bill}
-              onChange={e => setBill(e.target.value)}
-              >
-                <option value="" selected disabled>Select Billing Type</option>
-                <option value="insurance">Insurance</option>
-                <option value="cash">Cash</option>
-              </select>
+              {
+                docLoading
+                ? <select>
+                  <option value="" selected disabled>loading..</option>
+                </select>
+                : <div className={styles.other}>
+                  <label htmlFor="">Select Doctor</label>
+                  {
+                    doktas.length>0 
+                    ? <select
+                    onChange={e => prepareDoctorPush(e.target.value)}
+                    >
+                    <option value="" selected disabled>Select Doctor</option>
+                    {
+                      doktas.map((item:any,index:number)=> (
+                        <option value={item.phone}>{item.name}</option>
+                      ))
+                    }
+                  </select>
+                  :<select>
+                  <option value="" selected disabled>No Available Doctors</option>
+                </select>
+                  }
+                </div>
+              }
                 <div className={styles.buttons}>
-                <div onClick={()=> submit(tokens[0].token.id,bill)} className={styles.button}>Submit</div>
+                <div onClick={()=> finishToken()} className={styles.button}>Submit</div>
+                  {
+                    (fields.room !== '' && tokens.length > 0 ) &&(
+                      <div className={styles.button}>
+                        <SequentialAudioPlayerFinish  token={`${tokens[0].token.ticket_no}`} counter={fields.room}/>
+                      </div>
+                    )
+                  }
                 {/* <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div> */}
                 </div>
             </form>
@@ -246,7 +288,7 @@ function Recorder() {
         </div>
       </div>
       <div className={styles.list}>
-        {(fetchLoading || finLoading) ? (
+        {fetchLoading  ? (
           <div className={styles.loader}>
             <Cubes />
           </div>
@@ -307,7 +349,8 @@ function Recorder() {
             <div className={styles.button}>Pend</div>
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
-          <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}>
+          {/* <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}> */}
+          <div className={styles.row_item} onClick={()=> setNext(true)}>
             <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>

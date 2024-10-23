@@ -223,7 +223,7 @@ function Recorder() {
                 type="text"
                 placeholder="Mr Number" 
                 value={mr_number}
-                onChange={e => setMrNumber(e.target.value)}
+                onChange={e => setMrNumber(e.target.value.toUpperCase())}
                 />
                 {
                     !patName

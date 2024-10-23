@@ -27,10 +27,11 @@ export default function Layout({children}:any) {
   const [isExpand, setExpand] = useRecoilState(isExpandState)
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
-  const restrictedRoutes = ['/accounts','/admins','/attendants','/dashboard','/services','/settings','/adverts','/counters','/recorder','/payment']
+  const restrictedRoutes = ['/accounts','/admins','/attendants','/dashboard','/services','/settings','/adverts','/counters','/recorder','/payment','/clinic','/doctor_patient']
   const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','/','/login','/queue_add','/clinic']
-  const medRoutes = ['/recorder','/','/login','/queue_add','/','/counters']
-  const doctorRoutes = ['/clinic','/','/login','/queue_add','/']
+  const medRoutes = ['/recorder','/','/login','/queue_add','/']
+  const doctorRoutes = ['/doctor_patient','/','/login','/queue_add','/']
+  const nurseRoutes = ['/clinic','/','/login','/queue_add','/']
   const accountRoutes = ['/accounts','/','/login','/queue_add']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
@@ -58,7 +59,7 @@ export default function Layout({children}:any) {
       router.events.off('routeChangeComplete', handleStop);
       router.events.off('routeChangeError', handleStop);
     };
-}, [error,language]);
+}, [error]);
 
 const checkAuth = () => {
     const token:any = localStorage.getItem("token")
@@ -76,7 +77,8 @@ const validRoutes = () => {
   const path = router.pathname
   const user = localStorage.getItem('user_role')
   const defaultPage = localStorage.getItem('page')
-  if(!currentUser){
+   if(!currentUser){
+  //if(Object.keys(currentUser).length < 1){
     if(defaultPage){
       router.push(`${defaultPage}`)
     }else{
@@ -91,23 +93,13 @@ const validRoutes = () => {
           router.push('/')
         }
       }else if(user ==="medical_recorder" && !medRoutes.includes(path)){
-        if(defaultPage){
-          router.push(defaultPage)
-        }else{
-          router.push('/')
-        }
+        router.push('/recorder')
       }else if(user ==="cashier" && !accountRoutes.includes(path)){
-        if(defaultPage){
-          router.push(defaultPage)
-        }else{
-          router.push('/')
-        }
+        router.push('/accounts')
+      }else if(user ==="nurse" && !nurseRoutes.includes(path)){
+        router.push('/clinic')
       }else if(user ==="doctor" && !doctorRoutes.includes(path)){
-        if(defaultPage){
-          router.push(defaultPage)
-        }else{
-          router.push('/')
-        }
+        router.push('/doctor_patient')
       }else{
         router.push(path)
       }

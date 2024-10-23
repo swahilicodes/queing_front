@@ -19,7 +19,7 @@ export default function Login() {
 };
 
  useEffect(()=> {
-  if(currentUser.name !== undefined){
+  if(currentUser !== undefined && currentUser.name !== undefined){
     router.push('/')
   }
  })
@@ -28,6 +28,7 @@ export default function Login() {
     e.preventDefault()
     axios.post("http://localhost:5000/users/login",{phone,password:pass},{headers}).then((data:any)=> {
         localStorage.setItem("token",data.data)
+        router.push("/")
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {

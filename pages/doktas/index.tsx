@@ -29,7 +29,7 @@ const [fields, setFields] = useState({
     name: "",
     service: "",
     clinic: "",
-    clinic_code: "204",
+    clinic_code: "188",
     phone: "",
     room: ""
 })

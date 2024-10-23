@@ -248,7 +248,7 @@ useEffect(()=> {
                         ))}
             </div>
                 </div> 
-                    : <div className={styles.message}>No Attendants </div>
+                    : <div className={styles.message}>No Admins</div>
                 }
             </div>
             }

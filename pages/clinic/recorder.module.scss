@@ -125,14 +125,23 @@
                     font-weight: 600;
                     opacity: .7;
                 }
-                select{
-                    outline: none;
-                    padding: 15px;
-                    border: 2px solid $divColor;
-                    margin-top: 20px;
-                    font-size: 18px;
-                    font-weight: 600;
-                    opacity: .7;  
+                .other{
+                    width: 100%;
+                    label{
+                        font-weight: 600;
+                        color: black;
+                        opacity: .7;
+                    }
+                    select{
+                        width: 100%;
+                        outline: none;
+                        padding: 15px;
+                        border: 2px solid $divColor;
+                        margin-top: 20px;
+                        font-size: 18px;
+                        font-weight: 600;
+                        opacity: .7;  
+                    }
                 }
                 p{
                     font-size: 18px;
@@ -146,11 +155,13 @@
                     }
                 }
                 .buttons{
+                    width: 100%;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
                     margin: 10px 0;
                     .button{
+                        width: 40%;
                         outline: none;
                         padding: 15px;
                         border: none;
@@ -158,6 +169,12 @@
                         cursor: pointer;
                         background: $mainBold;
                         transition: all .5s ease-in-out;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        &:nth-child(1){
+                            margin-right: 10px;
+                        }
                         &:hover{
                             background: $mainColor;
                         }

@@ -7,12 +7,15 @@ import { HiOutlineSpeakerphone } from 'react-icons/hi'
 import { RiSendPlaneLine } from 'react-icons/ri'
 import { useRouter } from 'next/router'
 import Cubes from '@/components/loaders/cubes/cubes'
+import cx from 'classnames'
 
 export default function DoctorPatient() {
  const currentUser:any = useRecoilValue(currentUserState)
  const [pat, setPat] = useState<any>({})
  const [loading, setLoading] = useState(false)
  const router = useRouter()
+ const [finish, setFinish] = useState(false)
+ const [finLoading, setFinLoading] = useState(false)
  useEffect(()=> {
     if(Object.keys(currentUser).length > 0 ){
         getDocPat()
@@ -20,7 +23,7 @@ export default function DoctorPatient() {
  },[currentUser])
 
  const getDocPat = () => {
-    axios.get(`http://localhost:5000/doctors/doctor_patient`,{params: {phone: currentUser.phone}}).then((data)=> {
+    axios.get(`http://localhost:5000/tickets/clinic_patient`,{params: {clinic_code: currentUser.clinic_code}}).then((data)=> {
         setPat(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -49,8 +52,31 @@ export default function DoctorPatient() {
         }
     })
  }
+
+ const finishToken = () => {
+    setFinLoading(true)
+    setInterval(()=> {
+        setFinLoading(false)
+        setFinish(false)
+        router.reload()
+    },10000)
+ }
   return (
     <div className={styles.patient_doc}>
+        {
+            finish && ( <div className={styles.overlay}>
+                <div className={cx(styles.data,finLoading && styles.active)}>
+                    <div className={cx(styles.title,finLoading && styles.active)}>Are You Sure!</div>
+                    <div className={cx(styles.actions,finLoading && styles.active)}>
+                        <div className={styles.action} onClick={finishToken}>Yes</div>
+                        <div className={styles.action} onClick={()=> setFinish(false)}>Cancel</div>
+                    </div>
+                    <div className={cx(styles.loader,finLoading && styles.active)}>
+                    <div className={styles.inside}></div>
+                    </div>
+                </div>
+            </div> )
+        }
         {
             loading && ( <div className={styles.overlay}>
                 <Cubes/>
@@ -68,26 +94,26 @@ export default function DoctorPatient() {
                 <table>
                     <thead>
                         <tr>
-                        <th>name</th>
+                        <th>#</th>
                         <th>mr_no</th>
                         <th>sex</th>
-                        <th>age</th>
+                        <th>Token</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{pat.name}</td>
+                            <td>1</td>
                             <td>{pat.mr_no}</td>
-                            <td>{pat.sex}</td>
-                            <td>{pat.age}</td>
+                            <td>{pat.gender}</td>
+                            <td>{pat.ticket_no}</td>
                         </tr>
                     </tbody>
                 </table>
                 </div>
                 <div className={styles.doc_action}>
-                    <div className={styles.acta} onClick={()=> editDoctor()}>Finish</div>
-                    <HiOutlineSpeakerphone className={styles.icon} size={100}/>
-                    <div className={styles.acta} onClick={()=> editDoctor()}>Finish</div>
+                    <div className={styles.acta} onClick={()=> setFinish(true)}>Finish</div>
+                    {/* <HiOutlineSpeakerphone className={styles.icon} size={100}/>
+                    <div className={styles.acta} onClick={()=> editDoctor()}>Finish</div> */}
                 </div>
             </div>
             : <div className={styles.wrap}>
