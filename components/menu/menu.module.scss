@@ -1,0 +1,53 @@
+@import '../../global.scss';
+.menu_bottom{
+    height: 60px;
+    background: $mainColor;
+    z-index: 300;
+    display: block;
+    align-items: center;
+    justify-content: center;
+    .links{
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .link{
+            margin: 0 10px;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .title{
+                opacity: 0;
+                transition: all .5s ease-in-out;
+                display: none;
+                &.active{
+                    opacity: 1;
+                    position: absolute;
+                    top: -60px;
+                    display: flex;
+                    font-size: 18px; 
+                    font-weight: 600;
+                    background: $mainColor;
+                    border-radius: 100px;
+                    color: white;
+                    padding: 15px;
+                }
+            }
+            .icon{
+                font-size: 25px;
+                color: $mainBold;
+            }
+            &.remove{
+                display: none;
+            }
+            &.active{
+                .icon{
+                    color: white;
+                    transform: scale(1.1);
+                }
+            }
+        }
+    }
+}

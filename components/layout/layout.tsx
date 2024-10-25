@@ -19,16 +19,20 @@ import { BiSolidError } from 'react-icons/bi'
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import LanguageState from '@/store/atoms/language'
+import isMenuState from '@/store/atoms/isMenu'
+import Menu from '../menu/menu'
+import Chakula_Menu from '../menu/menu'
 
 
 export default function Layout({children}:any) {
   const [full, setFull] = useRecoilState(isFull)
+  const [isMenu, setMenu] = useRecoilState(isMenuState)
   const [isUser, setUser] = useRecoilState(isUserState)
   const [isExpand, setExpand] = useRecoilState(isExpandState)
   const router = useRouter()
   const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
   const restrictedRoutes = ['/accounts','/admins','/attendants','/dashboard','/services','/settings','/adverts','/counters','/recorder','/payment','/clinic','/doctor_patient']
-  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','/','/login','/queue_add','/clinic']
+  const adminRoutes = ['/admins','/attendants','/counters','/dashboard','/services','/settings','/adverts','/','/login','/queue_add','/clinic','/recorder','/accounts']
   const medRoutes = ['/recorder','/','/login','/queue_add','/']
   const doctorRoutes = ['/doctor_patient','/','/login','/queue_add','/']
   const nurseRoutes = ['/clinic','/','/login','/queue_add','/']
@@ -53,13 +57,26 @@ export default function Layout({children}:any) {
       }
     },5000)
 
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       clearInterval(intervalId);
       router.events.off('routeChangeStart', handleStart);
       router.events.off('routeChangeComplete', handleStop);
       router.events.off('routeChangeError', handleStop);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-}, [error]);
+}, [error,full, isUser]);
+
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === 'e') {
+    setFull((prevFull) => !prevFull);
+  }else if(event.key === 'p'){
+    setUser((prevFull) => !prevFull);
+  }else if(event.key === "<"){
+    setMenu((prevFull) => !prevFull)
+  }
+};
 
 const checkAuth = () => {
     const token:any = localStorage.getItem("token")
@@ -163,6 +180,9 @@ const clearError = () => {
           <Profile/>
         </div>)
       }
+          <div className={cx(styles.menu, isMenu && styles.active)}>
+            <Chakula_Menu/>
+          </div>
       <div className={cx(styles.side,full && styles.full)}>
         <SideBar/>
       </div>
@@ -184,35 +204,6 @@ const clearError = () => {
           </div>
         )
       }
-      </div>
-      <div className={styles.expand}>
-      {
-        isExpand && (<div className={styles.absa}>
-          <div className={styles.absa_icons}>
-            <div className={styles.absa_icon} onClick={()=> setFull(!full)}>
-              {
-                full
-                ? <GoZoomOut className={styles.absa_icon_}/>
-                : <GoZoomIn className={styles.absa_icon_}/>
-              }
-            </div>
-            <div className={styles.absa_icon} onClick={()=> setUser(!isUser)}>
-             {
-              isUser 
-              ?<GoPerson className={styles.absa_icon_}/>
-              : <GoPersonAdd className={styles.absa_icon_}/>
-             }
-            </div>
-          </div>
-        </div>)
-      }
-      <div className={styles.absa_default} onClick={()=> setExpand(!isExpand)}>
-        {
-          isExpand
-          ? <FaMinus className={styles.expa_icon}/>
-          : <MdOutlineAdd className={styles.expa_icon}/>
-        }
-      </div>
       </div>
     </div>
   )

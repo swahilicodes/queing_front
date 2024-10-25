@@ -46,24 +46,11 @@ function Recorder() {
   
 
   useEffect(() => {
-    //getClinic();
-    getDoktas()
-    //getTicks()
-    if(clinica.trim() !== ''){
-      getTicks(clinica)
+    if(Object.keys(currentUser).length > 0 ){
+      getTicks(currentUser.clinic_code)
+      getDoktas()
     }
-  }, [status, disable, ticket,clinica]);
-
-  // const getClinic = () => {
-  //   const data = localStorage.getItem("clinic")
-  //   if(data){
-  //     setClinic(data)
-  //   }else{
-  //     setInterval(()=> {
-  //       setClinic("210")
-  //     },3000)
-  //   }
-  // }
+  }, [status, disable, ticket,currentUser]);
 
   const finishToken = () => {
       setFinLoading(true)
@@ -105,7 +92,7 @@ function Recorder() {
   const getTicks = (clinic:string) => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
-        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: clinic, mr_no: ticket },
+        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: currentUser.clinic_code, mr_no: ticket },
       })
       .then((data: any) => {
         setTokens(data.data.data);
@@ -115,6 +102,7 @@ function Recorder() {
         }, 2000);
       })
       .catch((error: any) => {
+        console.log('get tickets error ',error.response.status)
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
@@ -128,7 +116,7 @@ function Recorder() {
   const getDoktas = () => {
     setDocLoading(true);
     axios.get("http://localhost:5000/doktas/get_free_doktas", {
-        params: { page, pagesize,clinic_code: clinica},
+        params: { page, pagesize,clinic_code: currentUser.clinic_code},
       })
       .then((data: any) => {
         setDoktas(data.data.data);
@@ -138,6 +126,7 @@ function Recorder() {
         }, 2000);
       })
       .catch((error: any) => {
+        console.log('get doktas error ',error.response.status)
         setDocLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
@@ -205,8 +194,8 @@ function Recorder() {
     <div className={styles.recorder}>
       <div className={styles.meds_top}>
         <div className={styles.left}>
-          {(currentUser.name !== undefined && currentUser.name) ||
-            (currentUser.counter !== undefined && currentUser.counter)}
+          {currentUser.name !== undefined && <h4>{currentUser.name}|<span>{currentUser.role}</span> </h4> 
+          }
         </div>
         <div className={styles.right}>
           <div

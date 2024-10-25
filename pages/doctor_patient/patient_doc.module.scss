@@ -77,8 +77,32 @@
         width: 100%;
         background: $mainBold;
         padding: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         .side{
-            color: white;
+            h4{
+                color: white;
+                span{
+                    color: $mainColor;
+                }
+            }
+            .icon{
+                background: $mainColor;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 10px;
+                cursor: pointer;
+                transition: all .5s ease-in-out;
+                .icon_{
+                    color: white;
+                }
+                &:hover{
+                    background: red;
+                }
+            }
         }
     }
     .wrap{

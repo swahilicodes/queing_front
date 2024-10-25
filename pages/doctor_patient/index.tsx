@@ -1,16 +1,17 @@
 import currentUserState from '@/store/atoms/currentUser'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import styles from './patient_doc.module.scss'
 import { HiOutlineSpeakerphone } from 'react-icons/hi'
 import { RiSendPlaneLine } from 'react-icons/ri'
 import { useRouter } from 'next/router'
 import Cubes from '@/components/loaders/cubes/cubes'
 import cx from 'classnames'
+import { GiPowerButton } from 'react-icons/gi'
 
 export default function DoctorPatient() {
- const currentUser:any = useRecoilValue(currentUserState)
+ const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
  const [pat, setPat] = useState<any>({})
  const [loading, setLoading] = useState(false)
  const router = useRouter()
@@ -35,31 +36,27 @@ export default function DoctorPatient() {
         }
     })
  }
- const editDoctor = () => {
-    setLoading(true)
-    axios.get(`http://localhost:5000/doctors/finish_doctor_patient`,{params: {phone: currentUser.phone}}).then((data)=> {
-        setPat(data.data)
-        setLoading(false)
-        router.reload()
-    }).catch((error)=> {
-        setLoading(false)
-        if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
-        } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
-        }
-    })
+ const signOut = () => {
+    localStorage.removeItem('token')
+    setCurrentUser({})
+    router.push('/login')
+
  }
 
  const finishToken = () => {
     setFinLoading(true)
-    setInterval(()=> {
+    axios.post("http://localhost:5000/doktas/finish_patient",{doctor_id: currentUser.phone,patient_id: pat.mr_no}).then((data)=> {
+        console.log(data)
+        setInterval(()=> {
+            setFinLoading(false)
+            setFinish(false)
+            router.reload()
+        },2000)
+    }).catch((error)=> {
+        console.log(error)
         setFinLoading(false)
         setFinish(false)
-        router.reload()
-    },10000)
+    })
  }
   return (
     <div className={styles.patient_doc}>
@@ -72,7 +69,8 @@ export default function DoctorPatient() {
                         <div className={styles.action} onClick={()=> setFinish(false)}>Cancel</div>
                     </div>
                     <div className={cx(styles.loader,finLoading && styles.active)}>
-                    <div className={styles.inside}></div>
+                    <div className={styles.inside}>
+                    </div>
                     </div>
                 </div>
             </div> )
@@ -83,8 +81,12 @@ export default function DoctorPatient() {
             </div> )
         }
         <div className={styles.doc_top}>
-            <div className={styles.side}>{router.pathname}</div>
-            <div className={styles.side}></div>
+            <div className={styles.side}>{currentUser.name !== undefined && <h4>{currentUser.name}| <span>{currentUser.role}</span></h4> }</div>
+            <div className={styles.side}>
+            <div className={styles.icon} onClick={signOut}>
+            <GiPowerButton className={styles.icon_}/>
+            </div>
+            </div>
         </div>
         {
             // Object.keys(pat).length>0
@@ -112,13 +114,11 @@ export default function DoctorPatient() {
                 </div>
                 <div className={styles.doc_action}>
                     <div className={styles.acta} onClick={()=> setFinish(true)}>Finish</div>
-                    {/* <HiOutlineSpeakerphone className={styles.icon} size={100}/>
-                    <div className={styles.acta} onClick={()=> editDoctor()}>Finish</div> */}
                 </div>
             </div>
             : <div className={styles.wrap}>
                 <div className={styles.wait}>
-                    <h1>No Waiting Patient</h1>
+                    <h1>No Assigned Patient</h1>
                 </div>
             </div>
         }

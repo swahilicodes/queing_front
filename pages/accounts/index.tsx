@@ -187,8 +187,7 @@ function Recorder() {
       </div>
       <div className={styles.meds_top}>
         <div className={styles.left}>
-          {(currentUser.name !== undefined && currentUser.name) ||
-            (currentUser.counter !== undefined && currentUser.counter)}
+          {currentUser.name !== undefined &&  <h4>{currentUser.name}| <span>{currentUser.role}</span> </h4> }
         </div>
         <div className={styles.right}>
           <div

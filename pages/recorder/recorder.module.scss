@@ -17,6 +17,11 @@
             color: white;
             font-weight: 500;
             font-size: 20px;
+            h4{
+                span{
+                    color: $mainColor
+                }
+            }
         }
         .right{
             display: flex;

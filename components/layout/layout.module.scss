@@ -5,7 +5,7 @@
     min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    //justify-content: space-between;
     .profile_page{
         position: fixed;
         // left: 50%;
@@ -16,15 +16,33 @@
         height: 100vh;
     }
     .side{
-        width: 10%;
-        min-height: 100%;
+        width: 3%;
+        min-height: 100vh;
         transition: all .5s ease-in-out;
+        background: $mainColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
         &.full{
             display: none;
         }
     }
+    .menu{
+        position: fixed;
+        bottom: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: all .5s ease-in-out;
+        opacity: 0;
+        z-index: 10000;
+        &.active{
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
     .children{
-        width: 89.9%;
+        width: 97%;
         transition: all .5s ease-in-out;
         height: 100vh;
         box-shadow: -3px 0 3px rgba(0, 0, 0, 0.1);
