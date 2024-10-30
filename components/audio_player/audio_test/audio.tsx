@@ -2,16 +2,21 @@ import React, { useState, useEffect } from 'react';
 import styles from './audio.module.scss'
 import { PiSpeakerHighLight } from 'react-icons/pi';
 import { useRouter } from 'next/router';
+import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from 'react-icons/hi2';
+import cx from 'classnames'
 
 interface SequentialAudioPlayerProps {
   token: string,
-  counter: string
+  counter: string,
+  stage: string,
+  isButton: boolean
 }
 
-const AudioTest: React.FC<SequentialAudioPlayerProps> = ({ token, counter }) => {
+const AudioTest: React.FC<SequentialAudioPlayerProps> = ({ token, counter, stage, isButton }) => {
   const [individualNumbers, setIndividualNumbers] = useState<string[]>([]);
   const [counterFiles, setCounterFiles] = useState<string[]>([]);
   const [tokens, setTokens] = useState<string[]>([]);
+  const [isCalling, setCalling] = useState(false)
   const audios = "/mp3/"
   const [fields, setFields] = useState({
     token: "",
@@ -124,7 +129,6 @@ const AudioTest: React.FC<SequentialAudioPlayerProps> = ({ token, counter }) => 
     try {
       const response = await fetch('/api/audiofiles');
       const data = await response.json();
-      playOne(data.files[0])
     } catch (error) {
       console.error('Error fetching files:', error);
     }
@@ -152,19 +156,69 @@ const AudioTest: React.FC<SequentialAudioPlayerProps> = ({ token, counter }) => 
         }
     })
   };
+  const playToken= async (data: string) => {
+    return new Promise((resolve)=> {
+      const aud = removeLeadingZeros(data)
+      const audio = new Audio(`/mp3/${aud}.mp3`)
+        if(audio){
+            audio.play();
+            audio.onended = resolve
+        }
+    })
+  };
+  const playCounter= async () => {
+    return new Promise((resolve)=> {
+      const aud = removeLeadingZeros(counter)
+        if(stage==="clinic"){
+          const audio = new Audio("/mp3/elekea_chumba_number.mp3")
+          if(audio){
+            audio.play();
+            audio.onended = resolve
+        }
+        }else{
+          const audio = new Audio("/mp3/elekea_dirisha_number.mp3")
+          if(audio){
+            audio.play();
+            audio.onended = resolve
+        }
+        }
+    })
+  };
+
+  function removeLeadingZeros(value: string | number): number {
+    const strValue = String(value);
+    const result = strValue.replace(/^0+/, '');
+    return Number(result);
+  }
 
   async function playThem() {
-    await playOne("/audio/mteja.mp3");
-    await tokenFiles()
-    await playOne("/audio/nenda.mp3");
-    await countingFiles();
-    setFields({...fields,token:"",counter: ""})
+    if(!isCalling){
+      setCalling(true)
+      await playOne("/audio/before.m4a");
+      await playOne("/audio/before.m4a");
+      await playOne("/mp3/mwenye_card_number.mp3");
+      await playToken(token)
+      await playCounter();
+      await playToken(counter)
+      setFields({...fields,token:"",counter: ""})
+      setCalling(false)
+    }
   }
 
   return (
     <div className={styles.audio_player01}>
         <div className={styles.player} onClick={playThem}>
-            <div className={styles.button}>Call</div>
+            {
+              isButton
+              ? <div className={styles.button}>Call</div>
+              : <div className={cx(styles.icon,isCalling && styles.calling)}>
+                {
+                  !isCalling
+                  ? <HiOutlineSpeakerWave className={styles.icon__} size={30}/>
+                  : <HiOutlineSpeakerXMark className={styles.icon__} size={30}/>
+                }
+              </div>
+            }
         </div>
     </div>
   );

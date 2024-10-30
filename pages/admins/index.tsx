@@ -10,8 +10,6 @@ import useFetchData from '@/custom_hooks/fetch'
 export default function Admins() {
 const [name,setName] = useState("")
 const [phone,setPhone] = useState("")
-const [service,setService] = useState("")
-const [counter,setCounter] = useState("")
 const [isAdd, setAdd] = useState(false)
 const [isDelete, setDelete] = useState(false)
 const [isEdit, setEdit] = useState(false)
@@ -22,8 +20,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/services/get_all_services")
-const {data:counters,loading:cLoading, error: cError} = useFetchData("http://localhost:5000/counters/get_all_counters")
+const {data} = useFetchData("http://localhost:5000/services/get_all_services")
 
 useEffect(()=> {
     getAttendants()
@@ -44,10 +41,10 @@ useEffect(()=> {
         }
     })
  }
- const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/admins/delete_admin/${id}`).then((data:any)=> {
+ const deleteService  = (id:string) => {
+    axios.put(`http://localhost:5000/admins/delete_admin/${id}`).then(()=> {
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -62,7 +59,7 @@ useEffect(()=> {
     axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then((data:any)=> {
         setEdit(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -75,7 +72,7 @@ useEffect(()=> {
  const handlePageChange = (namba:number) => {
     setPage(namba);
   };
- const handleDelete = (namba:any) => {
+ const handleDelete = (namba:string) => {
     setId(namba);
     setDelete(true)
   };
@@ -86,11 +83,11 @@ useEffect(()=> {
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/admins/get_admins",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/admins/get_admins",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -135,30 +132,6 @@ useEffect(()=> {
                     name="phone"
                     />
                     </div>
-                    {/* <div className={styles.add_item}>
-                    <label htmlFor="service">Select service:</label>
-                    <select value={service}
-                    onChange={e => setService(e.target.value)}>
-                        <option selected disabled defaultValue="Select Service">Select Service</option>
-                        {
-                            data.map((item:any,index:number)=> (
-                                <option value={item.name} key={index}>{item.name}</option>
-                            ))
-                        }
-                    </select>
-                    </div> */}
-                    {/* <div className={styles.add_item}>
-                    <label htmlFor="counter">Select counter:</label>
-                    <select value={counter}
-                    onChange={e => setCounter(e.target.value)}>
-                        <option selected disabled>Select Counter</option>
-                        {
-                            counters.map((item:any,index:number)=> (
-                                <option value={item.name} key={index}>{item.name}</option>
-                            ))
-                        }
-                    </select>
-                    </div> */}
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
                     <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>
@@ -225,7 +198,7 @@ useEffect(()=> {
                         </thead>
                         <tbody>
                         {
-                            services.map((data:any,index:number)=> (
+                            services.map((data: Admin,index:number)=> (
                                 <tr key={index} className={cx(index%2===0 && styles.active)}>
                                     <td>{data.id}</td>
                                     <td>{data.name}</td>

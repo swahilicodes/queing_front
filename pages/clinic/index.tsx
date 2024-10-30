@@ -1,42 +1,34 @@
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./recorder.module.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
-import { MdClear, MdOutlineClear } from "react-icons/md";
+import { MdClear } from "react-icons/md";
 import { IoArrowRedoOutline, IoSearch } from "react-icons/io5";
 import Ticket_Category_Length from "@/components/ticket_category_length/ticket_category_length";
-import { HiOutlineSpeakerphone } from "react-icons/hi";
 import currentConditionState from "@/store/atoms/current";
 import axios from "axios";
 import Cubes from "@/components/loaders/cubes/cubes";
-import SequentialAudioPlayer from "@/components/audio_player/audio";
 import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
-import SequentialAudioPlayerFinish from "@/components/audio_player/finish/audio";
+import AudioTest from "@/components/audio_player/audio_test/audio";
 
 function Recorder() {
-  const currentUser: any = useRecoilValue(currentUserState);
+  const currentUser: User = useRecoilValue(currentUserState);
   const [status, setStatus] = useState("waiting");
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [page, setPage] = useState(1);
   const [pagesize, setPageSize] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
+  const [, setTotalItems] = useState(0);
   const [disable, setDisable] = useRecoilState(currentConditionState);
   const [ticket, setTicket] = useState("");
   const [fetchLoading, setFetchLoading] = useState(false);
   const [docLoading, setDocLoading] = useState(false);
   const [finLoading, setFinLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [next, setNext] = useState(false)
-  const [mr_number, setMrNumber] = useState("")
-  const [found, setFound] = useState(false)
-  const [patName, setPatName] = useState("")
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
-  const [bill, setBill] = useState("")
-  const [clinica, setClinic] = useState('188')
   const [doktas, setDoktas] = useState([])
   const [fields, setFields] = useState({
     doctor_id: '',
@@ -47,14 +39,14 @@ function Recorder() {
 
   useEffect(() => {
     if(Object.keys(currentUser).length > 0 ){
-      getTicks(currentUser.clinic_code)
+      getTicks()
       getDoktas()
     }
   }, [status, disable, ticket,currentUser]);
 
   const finishToken = () => {
       setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id}).then((data:any)=> {
+    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -71,37 +63,20 @@ function Recorder() {
     })
   }
 
-  const clinicGo = (mr_no:string) => {
-    setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"clinic",mr_number: mr_no}).then((data)=> {
-      setInterval(()=> {
-        setFinLoading(false)
-        router.reload()
-      },2000)
-    }).catch((error)=> {
-      setFinLoading(false)
-      if(error.response && error.response.status === 400){
-        alert(error.response.data.error)
-      }else{
-        alert(error.message)
-      }
-    })
-  }
 
-
-  const getTicks = (clinic:string) => {
+  const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: currentUser.clinic_code, mr_no: ticket },
       })
-      .then((data: any) => {
+      .then((data) => {
         setTokens(data.data.data);
         setTotalItems(data.data.totalItems);
         setInterval(() => {
           setFetchLoading(false);
         }, 2000);
       })
-      .catch((error: any) => {
+      .catch((error) => {
         console.log('get tickets error ',error.response.status)
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
@@ -118,14 +93,14 @@ function Recorder() {
     axios.get("http://localhost:5000/doktas/get_free_doktas", {
         params: { page, pagesize,clinic_code: currentUser.clinic_code},
       })
-      .then((data: any) => {
+      .then((data) => {
         setDoktas(data.data.data);
         setTotalItems(data.data.totalItems);
         setInterval(() => {
           setDocLoading(false);
         }, 2000);
       })
-      .catch((error: any) => {
+      .catch((error) => {
         console.log('get doktas error ',error.response.status)
         setDocLoading(false);
         if (error.response && error.response.status === 400) {
@@ -248,7 +223,7 @@ function Recorder() {
                     >
                     <option value="" selected disabled>Select Doctor</option>
                     {
-                      doktas.map((item:any,index:number)=> (
+                      doktas.map((item:Doctor,index:number)=> (
                         <option value={item.phone}>{item.name}</option>
                       ))
                     }
@@ -264,7 +239,8 @@ function Recorder() {
                   {
                     (fields.room !== '' && tokens.length > 0 ) &&(
                       <div className={styles.button}>
-                        <SequentialAudioPlayerFinish  token={`${tokens[0].token.ticket_no}`} counter={fields.room}/>
+                        <AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={true}/>
+                        {/* <SequentialAudioPlayerFinish  token={`${tokens[0].token.ticket_no}`} counter={fields.room}/> */}
                       </div>
                     )
                   }
@@ -330,7 +306,7 @@ function Recorder() {
       >
         <div className={styles.speaker}>
         {
-            tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`}/>)
+            tokens.length > 0 && (<AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={false}/>)
         }
         </div>
         <div className={styles.row}>

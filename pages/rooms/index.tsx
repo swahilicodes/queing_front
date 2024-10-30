@@ -116,7 +116,7 @@ const clinicSeta = (code:string) => {
                     <select onChange={e => setFields({...fields,code: e.target.value})}>
                         <option value="" selected disabled>Select Clinic</option>
                         {
-                            data.map((item:any,index:number)=> (
+                            data.map((item: { clinicicode: string | number | readonly string[] | undefined; cliniciname: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined },index:number)=> (
                                 <option value={item.clinicicode}>{item.cliniciname}</option>
                             ))
                         }
@@ -136,8 +136,8 @@ const clinicSeta = (code:string) => {
                             <select onChange={e=> clinicSeta(e.target.value)} value={fields.code}>
                             <option value="" selected disabled>--Please choose an option--</option>
                                 {
-                                    data.map((data_:any,index:number)=> (
-                                        <option value={data_.clinicicode}>{data_.cliniciname}/{data_.clinicicode}</option>
+                                    data.map((data_: Counter,index:number)=> (
+                                        <option value={data_.clinicicode} key={index}>{data_.cliniciname}/{data_.clinicicode}</option>
                                     ))
                                 }
                             </select>
@@ -176,7 +176,7 @@ const clinicSeta = (code:string) => {
                             <select onChange={e => setFields({...fields, clinic: e.target.value})} value={fields.clinic}>
                             <option value="" selected disabled>--Please choose an option--</option>
                                 {
-                                    data.map((data_:any,index:number)=> (
+                                    data.map((data_: Counter,index:number)=> (
                                         <option value={data_.name}>{data_.name}</option>
                                     ))
                                 }
@@ -241,7 +241,7 @@ const clinicSeta = (code:string) => {
                             </thead>
                             <tbody>
                             {
-                                services.map((data:any,index:number)=> (
+                                services.map((data: Counter,index:number)=> (
                                     <tr key={index} className={cx(index%2===0 && styles.active)}>
                                         <td>{data.id}</td>
                                         <td>{data.clinic_code}</td>

@@ -1,8 +1,8 @@
 import { atom } from 'recoil' 
 
-const currentUserState = atom({
+const currentUserState = atom<User>({
     key: 'current-user-state',
-    default: {}
+    default: {} as User
 }) 
 
 export default currentUserState

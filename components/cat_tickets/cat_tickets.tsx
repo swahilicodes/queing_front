@@ -2,9 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import styles from './cat_tickets.module.scss'
 import cx from 'classnames'
-import { FaLongArrowAltRight } from 'react-icons/fa';
 import { FaArrowTrendUp } from 'react-icons/fa6';
-import io from 'socket.io-client';
 import { useRouter } from 'next/router';
 
 interface MyComponentProps {

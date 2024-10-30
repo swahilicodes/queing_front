@@ -1,64 +1,57 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './index.module.scss'
 import cx from 'classnames'
 import AdvertScroller from '@/components/adverts/advert';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { FaArrowTrendUp } from 'react-icons/fa6';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import currentConditionState from '@/store/atoms/current';
 import LanguageState from '@/store/atoms/language';
 import { BiCurrentLocation } from 'react-icons/bi';
+import currentUserState from '@/store/atoms/currentUser';
 
 export default function Home() {
-    const [isFullScreen, setIsFullScreen] = useState(false);
-    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
     const [tickets, setTickets] = useState<any>([])
-    const [adverts,setAdverts] = useState([])
+    const [adverts,] = useState([])
     const router = useRouter()
     const [time, setTime] = useState(0);
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    const [condition, setCondition] = useRecoilState(currentConditionState)
+    const [condition, ] = useRecoilState(currentConditionState)
     const [, setLoading] = useState(false)
-    const [language,] = useRecoilState(LanguageState)
+    const [language, setLanguage] = useRecoilState(LanguageState)
     const [blink, setBlink] = useState(false)
+    const currentUser = useRecoilValue(currentUserState)
 
     useEffect(()=> {
-      getTickets()
-      getAdverts()
+      if(Object.keys(currentUser).length > 0){
+        getTickets()
+      }
       const intervalId = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
         setBlink(!blink)
       }, 1000);
-      // setInterval(() => {
-      //   getTickets()
-      //   //router.reload()
-      // // }, 30000);
-      // }, 30000);
+      setInterval(() => {
+        router.reload()
+      }, 30000);
       return () => {
         clearInterval(intervalId);
       }
-    },[condition,blink])
+    },[condition,blink,currentUser])
 
 
-    const getAdverts = () => {
-      axios.get('http://localhost:5000/adverts/get_all_adverts').then((data)=> {
-        setAdverts(data.data)
-      }).catch((error)=> {
-        alert(error)
-      })
-    }
     const getTickets = () => {
       setLoading(true)
-      axios.get('http://localhost:5000/tickets/get_display_tokens',{params:{stage: "meds", clinic_code: ""}}).then((data)=> {
+      axios.get('http://localhost:5000/tickets/get_display_tokens',{params:{stage: "nurse_station",clinic_code: currentUser.clinic_code}}).then((data)=> {
         setTickets(data.data)
         setLoading(false)
       }).catch((error)=> {
         setLoading(false)
-        alert(error)
+        alert(error.response.data.error)
       })
     }
+
 
   return (
     <div className={styles.index}>

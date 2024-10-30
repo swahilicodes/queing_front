@@ -137,7 +137,7 @@ function Chakula_Menu() {
   ];
 
   useEffect(() => {
-    if (Object.keys(currentUser).length > 0) {
+    if (currentUser && Object.keys(currentUser).length > 0) {
       const right = routes.filter((user) =>
         user.users.includes(currentUser.role)
       );
@@ -160,7 +160,7 @@ function Chakula_Menu() {
   };
   return (
     <div className={styles.menu_bottom}>
-      {Object.keys(currentUser).length > 0 && allowed.length > 0 && (
+      {( currentUser !== undefined  && allowed.length > 0) && (
         <div className={styles.links}>
           {allowed.map((item: any, index: number) => (
             <Link
@@ -190,7 +190,7 @@ function Chakula_Menu() {
           ))}
         </div>
       )}
-      {currentUser.role === undefined && restricted.length > 0 && (
+      {(currentUser !== undefined  && restricted.length > 0) && (
         <div className={styles.links}>
           {restricted.map((item: any, index: number) => (
             <Link

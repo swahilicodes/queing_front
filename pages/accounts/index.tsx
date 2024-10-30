@@ -1,39 +1,34 @@
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState } from "react";
 import styles from "./accounts.module.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
-import { MdClear, MdOutlineClear } from "react-icons/md";
+import { MdClear } from "react-icons/md";
 import { IoArrowRedoOutline, IoSearch } from "react-icons/io5";
 import Ticket_Category_Length from "@/components/ticket_category_length/ticket_category_length";
-import { HiOutlineSpeakerphone } from "react-icons/hi";
 import currentConditionState from "@/store/atoms/current";
 import axios from "axios";
 import Cubes from "@/components/loaders/cubes/cubes";
-import SequentialAudioPlayer from "@/components/audio_player/audio";
 import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
+import AudioTest from "@/components/audio_player/audio_test/audio";
 
 function Recorder() {
-  const currentUser: any = useRecoilValue(currentUserState);
+  const currentUser = useRecoilValue(currentUserState);
   const [status, setStatus] = useState("waiting");
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [page, setPage] = useState(1);
   const [pagesize, setPageSize] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
+  const [, setTotalItems] = useState(0);
   const [disable, setDisable] = useRecoilState(currentConditionState);
   const [ticket, setTicket] = useState("");
   const [fetchLoading, setFetchLoading] = useState(false);
   const [finLoading, setFinLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [next, setNext] = useState(false)
-  const [mr_number, setMrNumber] = useState("")
   const [found, setFound] = useState(false)
-  const [patName, setPatName] = useState("")
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
-  const [bill, setBill] = useState("")
   const [fields, setFields] = useState({
     mr_no: "",
     status: ""
@@ -74,7 +69,7 @@ function Recorder() {
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no}).then((data)=> {
+    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:"Paid"})
       setInterval(()=> {
         setFinLoading(false)
@@ -290,7 +285,8 @@ function Recorder() {
       >
         <div className={styles.speaker}>
         {
-            tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`}/>)
+            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`}/>)
+            tokens.length > 0 && (<AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={false}/>)
         }
         </div>
         <div className={styles.row}>

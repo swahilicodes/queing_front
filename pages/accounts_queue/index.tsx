@@ -5,23 +5,21 @@ import AdvertScroller from '@/components/adverts/advert';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { FaArrowTrendUp } from 'react-icons/fa6';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import currentConditionState from '@/store/atoms/current';
 import LanguageState from '@/store/atoms/language';
 import { BiCurrentLocation } from 'react-icons/bi';
 
 export default function Home() {
-    const [isFullScreen, setIsFullScreen] = useState(false);
-    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
     const [tickets, setTickets] = useState<any>([])
     const [adverts,setAdverts] = useState([])
     const router = useRouter()
     const [time, setTime] = useState(0);
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    const [condition, setCondition] = useRecoilState(currentConditionState)
-    const [, setLoading] = useState(false)
-    const [language,] = useRecoilState(LanguageState)
+    const [condition,] = useRecoilState(currentConditionState)
+    const [,setLoading] = useState(false)
+    const language = useRecoilValue(LanguageState)
     const [blink, setBlink] = useState(false)
 
     useEffect(()=> {
@@ -31,11 +29,9 @@ export default function Home() {
         setTime((prevTime) => prevTime + 1);
         setBlink(!blink)
       }, 1000);
-      // setInterval(() => {
-      //   getTickets()
-      //   //router.reload()
-      // // }, 30000);
-      // }, 30000);
+      setInterval(() => {
+        router.reload()
+      }, 30000);
       return () => {
         clearInterval(intervalId);
       }
@@ -51,7 +47,7 @@ export default function Home() {
     }
     const getTickets = () => {
       setLoading(true)
-      axios.get('http://localhost:5000/tickets/get_display_tokens',{params:{stage: "meds", clinic_code: ""}}).then((data)=> {
+      axios.get('http://localhost:5000/tickets/get_display_tokens',{params:{stage: "accounts",clinic_code: ""}}).then((data)=> {
         setTickets(data.data)
         setLoading(false)
       }).catch((error)=> {
@@ -59,6 +55,7 @@ export default function Home() {
         alert(error)
       })
     }
+
 
   return (
     <div className={styles.index}>

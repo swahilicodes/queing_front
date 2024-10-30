@@ -22,4 +22,40 @@
             }
         }
     }
+    .icon{
+        background: $secondColor;
+        padding: 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        .icon__{
+            color: white;
+        }
+        &.calling{
+            opacity: .5;
+            cursor: no-drop;
+            &::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 50%;
+                border: 3px solid $mainColor;
+                border-top-color: white;
+                animation: spin .5s linear infinite;
+            }
+        }
+    }
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }

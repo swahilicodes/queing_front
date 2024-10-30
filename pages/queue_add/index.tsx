@@ -1,23 +1,15 @@
 import React, { useRef, useState } from 'react'
 import styles from './queue_add.module.scss'
 import { MdClear, MdOutlineClear } from 'react-icons/md'
-import { IoChevronForwardSharp } from 'react-icons/io5'
 import QRCode from 'qrcode.react'
 import axios from 'axios'
-import Printable from '../../components/printable/printable'
 import { useRouter } from 'next/router'
-import Print from '@/pages/print'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import qrState from '@/store/atoms/qr'
 import { IoMdCheckmark } from 'react-icons/io'
-import jsPDF from 'jspdf'
-import * as htmlToImage from 'html-to-image';
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import cx from 'classnames'
-import useFetchData from '@/custom_hooks/fetch'
 import html2canvas from 'html2canvas'
-import { FiChevronsRight } from 'react-icons/fi'
-import { TiChevronRight, TiChevronRightOutline } from 'react-icons/ti'
+import { TiChevronRight } from 'react-icons/ti'
 import errorState from '@/store/atoms/error'
 
 export default function QueueAdd() {
@@ -65,7 +57,7 @@ export default function QueueAdd() {
     },
  ]
 
- const changeSag = (id:any,data:string) => {
+ const changeSag = (id:number,data:string) => {
     if(index===id){
         setIndex(0)
         setDisabled('')
@@ -75,16 +67,9 @@ export default function QueueAdd() {
     }
  }
 
-  const handleClick = (id:any) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, isActive: true } : { ...item, isActive: false }
-      )
-    );
-  };
   const handleSubmit = () => {
     setSubLoading(true)
-    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then((data)=> {
+    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
         setSubLoading(false)
         setSelected({...seleccted,index:0,type:"",reason: ""})
         setError("Asante kwa Maoni Yako...")
@@ -115,16 +100,12 @@ export default function QueueAdd() {
     }
   };
 
-  const changeColor = (index:number,stata:string) => {
-    setIndex(index)
-    setDisabled(stata)
-  };
 
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
     axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
-    .then((data:any)=> {
+    .then((data)=> {
         setQrState(data.data)
         setClicked(false)
         setSuccess(true)
@@ -159,8 +140,8 @@ export default function QueueAdd() {
     });
   };
 
-function printImage(src: any) {
-    var win: any = window.open('about:blank', '_blank');
+function printImage(src: string) {
+    var win:any = window.open('about:blank', '_blank');
     win.document.open();
     win.document.write([
         '<html>',
@@ -240,7 +221,7 @@ function printImage(src: any) {
                                 <h1>Una Uhitaji Maalumu?</h1>
                                 <div className={styles.suggestions}>
                                     {
-                                        sags.map((item:any,indexa:number)=> (
+                                        sags.map((item,indexa:number)=> (
                                          <div className={cx(styles.suggestion,item.id===index && styles.active)} onClick={()=> changeSag(item.id,item.name)} key={indexa}>#{item.name}</div>  
                                         ))
                                     }

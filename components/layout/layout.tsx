@@ -1,6 +1,6 @@
 import isFull from '@/store/atoms/isFull'
 import React, { useEffect, useState } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import styles from './layout.module.scss'
 import SideBar from '../side_bar/side_bar'
 import { jwtDecode } from 'jwt-decode'
@@ -22,6 +22,8 @@ import LanguageState from '@/store/atoms/language'
 import isMenuState from '@/store/atoms/isMenu'
 import Menu from '../menu/menu'
 import Chakula_Menu from '../menu/menu'
+import deviceState from '@/store/atoms/device'
+import { Url } from 'next/dist/shared/lib/router/router'
 
 
 export default function Layout({children}:any) {
@@ -39,39 +41,30 @@ export default function Layout({children}:any) {
   const accountRoutes = ['/accounts','/','/login','/queue_add']
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
-  const [language, setLanguage] = useRecoilState(LanguageState)
+  const [device, setDeviceState] = useRecoilState(deviceState)
+  let page: Url | null
 
   useEffect(() => {
     checkAuth()
+    getMac()
     const handleStart = () => NProgress.start();
     const handleStop = () => NProgress.done();
-
     router.events.on('routeChangeStart', handleStart);
     router.events.on('routeChangeComplete', handleStop);
     router.events.on('routeChangeError', handleStop);
-    const intervalId = setInterval(()=> {
-      if(language==="English"){
-        setLanguage("Swahili")
-      }else{
-        setLanguage("English")
-      }
-    },5000)
 
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      clearInterval(intervalId);
       router.events.off('routeChangeStart', handleStart);
       router.events.off('routeChangeComplete', handleStop);
       router.events.off('routeChangeError', handleStop);
       window.removeEventListener('keydown', handleKeyDown);
     };
-}, [error,full, isUser]);
+}, [error,full, isUser,currentUser]);
 
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === 'e') {
-    setFull((prevFull) => !prevFull);
-  }else if(event.key === 'p'){
+   if(event.key === '@'){
     setUser((prevFull) => !prevFull);
   }else if(event.key === "<"){
     setMenu((prevFull) => !prevFull)
@@ -82,53 +75,32 @@ const checkAuth = () => {
     const token:any = localStorage.getItem("token")
     if (isTokenExpired(token)) {
         localStorage.removeItem('token')
-        validRoutes()
+        getMac()
     } else {
         const decoded:any = jwtDecode(token)
         getAdmin(decoded.phone)
-        validRoutes()
+        getMac()
     }
 }
 
-const validRoutes = () => {
+const validRoutes = (piga: string) => {
   const path = router.pathname
-  const user = localStorage.getItem('user_role')
   const defaultPage = localStorage.getItem('page')
-   if(!currentUser){
-  //if(Object.keys(currentUser).length < 1){
-    if(defaultPage){
-      router.push(`${defaultPage}`)
-    }else{
-      router.push(`/`)
-    }
-  }else{
-    if(restrictedRoutes.includes(path)){
-      if(user==="admin" && !adminRoutes.includes(path)){
-        if(defaultPage){
-          router.push(defaultPage)
-        }else{
-          router.push('/')
-        }
-      }else if(user ==="medical_recorder" && !medRoutes.includes(path)){
-        router.push('/recorder')
-      }else if(user ==="cashier" && !accountRoutes.includes(path)){
-        router.push('/accounts')
-      }else if(user ==="nurse" && !nurseRoutes.includes(path)){
-        router.push('/clinic')
-      }else if(user ==="doctor" && !doctorRoutes.includes(path)){
-        router.push('/doctor_patient')
+      if(piga){
+          router.push(piga)
       }else{
-        router.push(path)
+        router.push("/")
+          // if(defaultPage !== null || defaultPage !== ""){
+          //     if(path==="/login"){
+          //         page = path
+          //     }else{
+          //         page = defaultPage
+          //     }
+          // }else{
+          //     page = "/"
+          // }
       }
-    }else{
-      router.push(path)
-      // if(defaultPage){
-      //   router.push(`${defaultPage}`)
-      // }else{
-      //   router.push(`/`)
-      // }
-    }
-  }
+      //router.push(`${page}`)
 }
 const getAdmin = (phone: string) => {
   const user = localStorage.getItem('user_service')
@@ -143,6 +115,20 @@ const getAdmin = (phone: string) => {
         localStorage.setItem("user_service",data.data.service)
         localStorage.setItem("user_role",data.data.role)
       }
+  }).catch((error) => {
+      if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`)
+          alert(error.response.data.error);
+      } else {
+          console.log(`there is an error message ${error.message}`)
+          alert(error.message);
+      }
+  })
+}
+const getMac = () => {
+  axios.get('http://localhost:5000/network/get_device_id').then((data) => {
+      setDeviceState(data.data)
+      validRoutes(data.data.default_page)
   }).catch((error) => {
       if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`)
@@ -173,6 +159,9 @@ const clearError = () => {
   setError("")
   setIsError(false)
 }
+
+
+
   return (
     <div className={styles.layout}>
       {
@@ -183,9 +172,9 @@ const clearError = () => {
           <div className={cx(styles.menu, isMenu && styles.active)}>
             <Chakula_Menu/>
           </div>
-      <div className={cx(styles.side,full && styles.full)}>
+      {/* <div className={cx(styles.side,full && styles.full)}>
         <SideBar/>
-      </div>
+      </div> */}
       <div className={cx(styles.children,full && styles.full)}>
         {children}
         {

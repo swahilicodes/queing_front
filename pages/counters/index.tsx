@@ -18,7 +18,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading,error} = useFetchData("http://localhost:5000/clinic/get_clinics")
+const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
 const [fields, setFields] = useState({
     service: "",
     clinic: "",
@@ -31,7 +31,7 @@ useEffect(()=> {
 },[page])
 
 const clinicSeta = (code:string) => {
-   const name =  data.find((coda:any )=> coda.clinicicode   === code)
+   const name =  data.find((coda: { clinicicode: string } )=> coda.clinicicode   === code)
    setFields({...fields,code:code,clinic: name.cliniciname})
 }
  
@@ -40,7 +40,7 @@ const clinicSeta = (code:string) => {
     axios.post("http://localhost:5000/counters/create_counter",{service:fields.service,namba: fields.namba, clinic: fields.clinic,code: fields.code}).then((data:any)=> {
         setAdd(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -50,10 +50,10 @@ const clinicSeta = (code:string) => {
         }
     })
  }
- const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/counters/delete_counter/${id}`).then((data:any)=> {
+ const deleteService  = (id:string) => {
+    axios.put(`http://localhost:5000/counters/delete_counter/${id}`).then(()=> {
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -68,7 +68,7 @@ const clinicSeta = (code:string) => {
     axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
         setEdit(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -81,7 +81,7 @@ const clinicSeta = (code:string) => {
  const handlePageChange = (namba:number) => {
     setPage(namba);
   };
- const handleDelete = (namba:any) => {
+ const handleDelete = (namba:string) => {
     setId(namba);
     setDelete(true)
   };
@@ -92,11 +92,11 @@ const clinicSeta = (code:string) => {
   };
  const getServices  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/counters/get_counters",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/counters/get_counters",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -134,7 +134,7 @@ const clinicSeta = (code:string) => {
                             <select onChange={e=> clinicSeta(e.target.value)} value={fields.code}>
                             <option value="" selected disabled>--Please choose an option--</option>
                                 {
-                                    data.map((data_:any,index:number)=> (
+                                    data.map((data_: { clinicicode: string | number | readonly string[] | undefined; cliniciname: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined },index:number)=> (
                                         <option value={data_.clinicicode}>{data_.cliniciname}</option>
                                     ))
                                 }
@@ -175,8 +175,8 @@ const clinicSeta = (code:string) => {
                             <select onChange={e => setFields({...fields, clinic: e.target.value})} value={fields.clinic}>
                             <option value="" selected disabled>--Please choose an option--</option>
                                 {
-                                    data.map((data_:any,index:number)=> (
-                                        <option value={data_.name}>{data_.name}</option>
+                                    data.map((data_:Counter,index:number)=> (
+                                        <option value={data_.name} key={index}>{data_.name}</option>
                                     ))
                                 }
                             </select>
@@ -240,7 +240,7 @@ const clinicSeta = (code:string) => {
                             </thead>
                             <tbody>
                             {
-                                services.map((data:any,index:number)=> (
+                                services.map((data:Counter,index:number)=> (
                                     <tr key={index} className={cx(index%2===0 && styles.active)}>
                                         <td>{data.id}</td>
                                         <td>{data.service}</td>

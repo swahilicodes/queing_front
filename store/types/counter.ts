@@ -1,0 +1,18 @@
+interface Counter{
+    id: string,
+    namba: string,
+    name: string,
+    service: string,
+    clinic: string,
+    code: string,
+    createdAt: string,
+    updatedAt: string,
+    phone: string,
+    role: string,
+    counter: string,
+    subservice: string,
+    clinicicode: string,
+    room: string,
+    cliniciname: string,
+    clinic_code: string,
+}

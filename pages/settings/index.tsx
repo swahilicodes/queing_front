@@ -5,9 +5,10 @@ import { BsFeather } from 'react-icons/bs'
 import { MdOutlineClear } from 'react-icons/md'
 import { IoSettingsOutline } from 'react-icons/io5'
 import useFetchData from '@/custom_hooks/fetch'
+import axios from 'axios'
 
 export default function Settings() {
- const pages = ["/","/attendants","/counters","/dashboard","/login","/queue_list","/services","/settings","/queue_add"]
+//  const pages = ["/","/attendants","/counters","/dashboard","/login","/queue_list","/services","/settings","/queue_add"]
  const {data:clinics,loading} = useFetchData("http://localhost:5000/clinic/get_clinics")
  const [page,setPage] = useState('')
  const [clinic,setClinic] = useState('')
@@ -16,10 +17,12 @@ export default function Settings() {
  const router = useRouter()
  const [isAddDefaultPage, setAddDefaultPage] = useState(false)
  const [isAddDefaultClinic, setAddDefaultClinic] = useState(false)
+ const [pages, setPages] = useState([])
 
  useEffect(()=> {
     retrievePage(),
     retrieveClinic()
+    getPages()
  },[clinics])
 
  const retrievePage = () => {
@@ -71,6 +74,21 @@ export default function Settings() {
         }
     }
  }
+
+ const getPages = () => {
+    axios.get("http://localhost:3000/api/getPages").then((data)=> {
+      const pags = data.data.pages.map((page: string)=> getFirstPathSegment(page))
+      setPages(pags)
+    }).catch((error)=> {
+      console.log(error)
+    })
+  }
+  
+  function getFirstPathSegment(path: string): string {
+    const cleanedPath = path.replace(/\/[^\/]+$/, '');
+    const segments = cleanedPath.split('/').filter(Boolean);
+    return `/${segments[0] || ''}`;
+  }
   return (
     <div className={styles.settings}>
         <div className={styles.top}>
@@ -85,7 +103,7 @@ export default function Settings() {
                     onChange={e => setPage(e.target.value)}>
                         <option selected disabled defaultValue="Select Service">Select Service</option>
                         {
-                            pages.map((item:any,index:number)=> (
+                            pages.map((item,index:number)=> (
                                 <option value={item} key={index}>{item}</option>
                             ))
                         }
@@ -105,7 +123,7 @@ export default function Settings() {
                     onChange={e => setClinic(e.target.value)}>
                         <option selected disabled defaultValue="Select Service">Select Clinic</option>
                         {
-                            clinics.map((item:any,index:number)=> (
+                            clinics.map((item: Counter,index:number)=> (
                                 <option value={item.clinicicode} key={index}>{item.cliniciname}-{item.clinicicode}</option>
                             ))
                         }

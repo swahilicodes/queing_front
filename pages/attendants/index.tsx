@@ -4,14 +4,9 @@ import axios from 'axios'
 import { MdDelete, MdOutlineClear } from 'react-icons/md'
 import { useRouter } from 'next/router'
 import cx from 'classnames'
-import { FiEdit2 } from 'react-icons/fi'
 import useFetchData from '@/custom_hooks/fetch'
 
 export default function Attendants() {
-const [name,setName] = useState("")
-const [phone,setPhone] = useState("")
-const [service,setService] = useState("")
-const [counter,setCounter] = useState("")
 const [isAdd, setAdd] = useState(false)
 const [isDelete, setDelete] = useState(false)
 const [isEdit, setEdit] = useState(false)
@@ -22,9 +17,8 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/services/get_all_services")
-const {data:counters,loading:cLoading, error: cError} = useFetchData("http://localhost:5000/counters/get_all_counters")
-const [editData, setEditData] = useState<any>({})
+const {data} = useFetchData("http://localhost:5000/services/get_all_services")
+const {data:counters} = useFetchData("http://localhost:5000/counters/get_all_counters")
 const [fields, setFields] = useState({
     name: "",
     role: "",
@@ -44,7 +38,7 @@ useEffect(()=> {
     axios.post("http://localhost:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
         setAdd(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -56,14 +50,14 @@ useEffect(()=> {
  }
 
  const handleCounter = (name:string) => {
-    const code = counters.find((count:any) => count.clinic === name)
+    const code = counters.find((count:Counter) => count.clinic === name)
     setFields({...fields,clinic:name,clinic_code: code.code})
     console.log(name,code.code)
  }
- const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/doctors/delete_doctor/${id}`).then((data:any)=> {
+ const deleteService  = (id:string) => {
+    axios.put(`http://localhost:5000/doctors/delete_doctor/${id}`).then(()=> {
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -78,7 +72,7 @@ useEffect(()=> {
     axios.put(`http://localhost:5000/doctors/edit_doctor/${id}`,{fields}).then((data:any)=> {
         setEdit(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -91,11 +85,11 @@ useEffect(()=> {
  const handlePageChange = (namba:number) => {
     setPage(namba);
   };
- const handleDelete = (namba:any) => {
+ const handleDelete = (namba:string) => {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (namba:string,doctor:any) => {
+ const handleEdit = (namba:string,doctor:Doctor) => {
     setId(namba);
     setEdit(true)
     setFields({
@@ -108,11 +102,11 @@ useEffect(()=> {
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/doctors/get_doctors",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/doctors/get_doctors",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -171,7 +165,7 @@ useEffect(()=> {
                     onChange={e => setFields({...fields,service:e.target.value})}>
                         <option selected disabled defaultValue="Select Service">Select Service</option>
                         {
-                            Array.from(new Set(counters.map((item:any) => item.service))).map(name => counters.find((item:any) => item.service === name)).map((data01:any,index)=> (
+                            Array.from(new Set(counters.map((item:Counter) => item.service))).map(name => counters.find((item:Counter) => item.service === name)).map((data01,index)=> (
                                 <option value={data01.service} key={index}>{data01.service}</option>
                             ))
                         }
@@ -185,7 +179,7 @@ useEffect(()=> {
                             onChange={e => handleCounter(e.target.value)}>
                                 <option selected disabled>Select Clinic</option>
                                 {
-                                    Array.from(new Set(counters.map((item:any) => item.clinic))).map(name => counters.find((item:any) => item.clinic === name)).map((data01:any,index)=> (
+                                    Array.from(new Set(counters.map((item:Counter) => item.clinic))).map(name => counters.find((item:Counter) => item.clinic === name)).map((data01,index)=> (
                                         <option value={data01.clinic} key={index}>{data01.clinic}</option>
                                     ))
                                 }
@@ -204,7 +198,7 @@ useEffect(()=> {
                             onChange={e => setFields({...fields,counter: e.target.value})}>
                                 <option selected>Select Counter</option>
                                 {
-                                    counters.filter((data:any)=> data.clinic === fields.clinic).map((item:any,index:number)=> (
+                                    counters.filter((data:Counter)=> data.clinic === fields.clinic).map((item:Counter,index:number)=> (
                                         <option value={item.namba} key={index}>{item.namba}</option>
                                     ))
                                 }
@@ -221,7 +215,7 @@ useEffect(()=> {
                                     fields.service !== "nurse_station" && (<option selected value={counters[0].namba}>Select Counter</option>)
                                 }
                                 {
-                                    counters.filter((data:any)=> data.service === fields.service).map((item:any,index:number)=> (
+                                    counters.filter((data:Counter)=> data.service === fields.service).map((item:Counter,index:number)=> (
                                         <option value={item.namba} key={index}>{item.namba}</option>
                                     ))
                                 }
@@ -268,7 +262,7 @@ useEffect(()=> {
                     onChange={e => setFields({...fields,service:e.target.value})}>
                         <option selected disabled defaultValue="Select Service">Select Service</option>
                         {
-                            Array.from(new Set(counters.map((item:any) => item.name))).map(name => counters.find((item:any) => item.name === name)).map((data01:any,index)=> (
+                            Array.from(new Set(counters.map((item:Counter) => item.name))).map(name => counters.find((item:Counter) => item.name === name)).map((data01:Counter,index)=> (
                                 <option value={data01.name} key={index}>{data01.name}</option>
                             ))
                         }
@@ -281,7 +275,7 @@ useEffect(()=> {
                             onChange={e => setFields({...fields,counter: e.target.value })}>
                                 <option selected disabled>Select Counter</option>
                                 {
-                                    counters.filter((data:any)=> data.name === fields.service).map((item:any,index:number)=> (
+                                    counters.filter((data:Counter)=> data.name === fields.service).map((item:Counter,index:number)=> (
                                         <option value={item.namba} key={index}>{item.namba}</option>
                                     ))
                                 }
@@ -329,7 +323,7 @@ useEffect(()=> {
                         </thead>
                         <tbody>
                         {
-                            services.map((item:any,index:number)=> (
+                            services.map((item:Counter,index:number)=> (
                                 <tr key={index} className={cx(index%2===0 && styles.active)}>
                                     <td>{item.name}</td>
                                     <td>{item.phone}</td>
@@ -339,7 +333,8 @@ useEffect(()=> {
                                     <td>{item.role}</td>
                                     <td>
                                         <div className={styles.delete} onClick={()=> handleDelete(item.id)}><MdDelete className={styles.icon}/></div> 
-                                        <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div> 
+                                        {/* <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div>  */}
+                                        {/* <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div>  */}
                                     </td>
                                 </tr>
                             ))

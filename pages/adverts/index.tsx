@@ -11,8 +11,6 @@ import { RxEnterFullScreen } from 'react-icons/rx'
 export default function Admins() {
 const [name,setName] = useState("")
 const [description,setDescription] = useState("")
-const [service,setService] = useState("")
-const [counter,setCounter] = useState("")
 const [isAdd, setAdd] = useState(false)
 const [isDelete, setDelete] = useState(false)
 const [isEdit, setEdit] = useState(false)
@@ -23,8 +21,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/services/get_all_services")
-const {data:counters,loading:cLoading, error: cError} = useFetchData("http://localhost:5000/counters/get_all_counters")
+const {data} = useFetchData("http://localhost:5000/services/get_all_services")
 const [isFull,setFull] = useState(false)
 const [desc,setDesc] = useState('')
 
@@ -42,7 +39,7 @@ useEffect(()=> {
     axios.post("http://localhost:5000/adverts/create_advert",{name,description}).then((data:any)=> {
         setAdd(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -52,10 +49,10 @@ useEffect(()=> {
         }
     })
  }
- const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/adverts/delete_advert/${id}`).then((data:any)=> {
+ const deleteService  = (id:string) => {
+    axios.put(`http://localhost:5000/adverts/delete_advert/${id}`).then(()=> {
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -70,7 +67,7 @@ useEffect(()=> {
     axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then((data:any)=> {
         setEdit(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -83,7 +80,7 @@ useEffect(()=> {
  const handlePageChange = (namba:number) => {
     setPage(namba);
   };
- const handleDelete = (namba:any) => {
+ const handleDelete = (namba:string) => {
     setId(namba);
     setDelete(true)
   };
@@ -99,7 +96,7 @@ useEffect(()=> {
  }
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/adverts/get_adverts",{params: {page,pagesize}}).then((data:any)=> {
+    axios.get("http://localhost:5000/adverts/get_adverts",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -213,7 +210,7 @@ useEffect(()=> {
                         </thead>
                         <tbody>
                         {
-                            services.map((data:any,index:number)=> (
+                            services.map((data:Advert,index:number)=> (
                                 <tr key={index} className={cx(index%2===0 && styles.active)}>
                                     <td>{data.id}</td>
                                     <td className={styles.name}>{data.name}</td>

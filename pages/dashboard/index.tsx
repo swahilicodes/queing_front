@@ -13,10 +13,10 @@ import { FcAdvertising } from 'react-icons/fc'
 import { useRouter } from 'next/router'
 
 export default function Dashboard() {
- const {data,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
- const {data:week,loading:weekl,error:weeke} = useFetchData("http://localhost:5000/tickets/getWeekTickets")
- const {data:month,loading:monthl,error:monthe} = useFetchData("http://localhost:5000/tickets/getMonthTickets")
- const {data:services,loading:services1,error:servicesError} = useFetchData("http://localhost:5000/services/get_all_services")
+ const {data} = useFetchData("http://localhost:5000/tickets/getTickets")
+ const {data:week} = useFetchData("http://localhost:5000/tickets/getWeekTickets")
+ const {data:month} = useFetchData("http://localhost:5000/tickets/getMonthTickets")
+ const {data:services} = useFetchData("http://localhost:5000/services/get_all_services")
  const {data:admins} = useFetchData("http://localhost:5000/admins/get_all_admins")
  const {data:attends} = useFetchData("http://localhost:5000/attendants/get_all_attendants")
  const {data:counters} = useFetchData("http://localhost:5000/counters/get_all_counters")

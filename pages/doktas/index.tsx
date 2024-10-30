@@ -8,13 +8,9 @@ import { FiEdit2 } from 'react-icons/fi'
 import useFetchData from '@/custom_hooks/fetch'
 
 export default function Attendants() {
-const [name,setName] = useState("")
-const [phone,setPhone] = useState("")
-const [service,setService] = useState("")
-const [counter,setCounter] = useState("")
 const [isAdd, setAdd] = useState(false)
 const [isDelete, setDelete] = useState(false)
-const [isEdit, setEdit] = useState(false)
+const [, setEdit] = useState(false)
 const [services, setServices] = useState([])
 const [fetchLoading, setFetchLoading] = useState(false)
 const router = useRouter()
@@ -24,7 +20,6 @@ const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
 const {data:clinics,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/clinic/get_clinics")
 const [rooms, setRooms] = useState([])
-const [editData, setEditData] = useState<any>({})
 const [fields, setFields] = useState({
     name: "",
     service: "",
@@ -41,10 +36,10 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/doktas/create_dokta",{name:fields.name,phone:fields.phone,room:fields.room,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
+    axios.post("http://localhost:5000/doktas/create_dokta",{name:fields.name,phone:fields.phone,room:fields.room,clinic: fields.clinic,clinic_code: fields.clinic_code}).then(()=> {
         setAdd(false)
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         console.log(error.response)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -57,13 +52,13 @@ useEffect(()=> {
  }
 
  const handleClinic = (code:string) => {
-    const coder = clinics.find((count:any) => count.clinicicode === code)
+    const coder = clinics.find((count:Counter) => count.clinicicode === code)
     setFields({...fields,clinic:coder.cliniciname,clinic_code: code,room: ""})
  }
- const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5000/doktas/delete_dokta/${id}`).then((data:any)=> {
+ const deleteService  = (id:string) => {
+    axios.put(`http://localhost:5000/doktas/delete_dokta/${id}`).then(()=> {
         router.reload()
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -74,9 +69,9 @@ useEffect(()=> {
     })
  }
  const getRooms  = () => {
-    axios.get(`http://localhost:5000/rooms/get_rooms`,{params: {clinic_code: fields.clinic_code}}).then((data:any)=> {
+    axios.get(`http://localhost:5000/rooms/get_rooms`,{params: {clinic_code: fields.clinic_code}}).then((data)=> {
         setRooms(data.data.data)
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
@@ -86,29 +81,29 @@ useEffect(()=> {
         }
     })
  }
- const editService  = (e:React.FormEvent) => {
-    e.preventDefault()
-    axios.put(`http://localhost:5000/doctors/edit_doctor/${id}`,{fields}).then((data:any)=> {
-        setEdit(false)
-        router.reload()
-    }).catch((error:any)=> {
-        if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
-        } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
-        }
-    })
- }
+//  const editService  = (e:React.FormEvent) => {
+//     e.preventDefault()
+//     axios.put(`http://localhost:5000/doctors/edit_doctor/${id}`,{fields}).then(()=> {
+//         setEdit(false)
+//         router.reload()
+//     }).catch((error:any)=> {
+//         if (error.response && error.response.status === 400) {
+//             console.log(`there is an error ${error.message}`)
+//             alert(error.response.data.error);
+//         } else {
+//             console.log(`there is an error message ${error.message}`)
+//             alert(error.message);
+//         }
+//     })
+//  }
  const handlePageChange = (namba:number) => {
     setPage(namba);
   };
- const handleDelete = (namba:any) => {
+ const handleDelete = (namba:string) => {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (namba:string,doctor:any) => {
+ const handleEdit = (namba:string,doctor:Doctor) => {
     setId(namba);
     setEdit(true)
     setFields({
@@ -121,11 +116,11 @@ useEffect(()=> {
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5000/doktas/get_doktas",{params: {page,pagesize,clinic_code: fields.clinic_code}}).then((data:any)=> {
+    axios.get("http://localhost:5000/doktas/get_doktas",{params: {page,pagesize,clinic_code: fields.clinic_code}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
-    }).catch((error:any)=> {
+    }).catch((error)=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
@@ -153,7 +148,7 @@ useEffect(()=> {
                     <select onChange={e => setFields({...fields,clinic_code: e.target.value})}>
                         <option value="" selected disabled>Select Clinic</option>
                         {
-                            clinics.map((item:any,index:number)=> (
+                            clinics.map((item: { clinicicode: string | number | readonly string[] | undefined; cliniciname: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined },index:number)=> (
                                 <option value={item.clinicicode}>{item.cliniciname}</option>
                             ))
                         }
@@ -197,7 +192,7 @@ useEffect(()=> {
                     >
                         <option value="" selected disabled>Select Clinic</option>
                         {
-                            clinics.map((item:any,index:number)=> (
+                            clinics.map((item: { clinicicode: string | number | readonly string[] | undefined; cliniciname: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined },index:number)=> (
                                 <option value={item.clinicicode}>{item.cliniciname}</option>
                             ))
                         }
@@ -212,8 +207,8 @@ useEffect(()=> {
                             >
                                 <option value="" selected disabled>Select Clinic</option>
                                 {
-                                    rooms.map((item:any,index:number)=> (
-                                        <option value={item.namba}>{item.namba}</option>
+                                    rooms.map((item:Room,index:number)=> (
+                                        <option value={item.namba} key={index}>{item.namba}</option>
                                     ))
                                 }
                             </select>
@@ -261,7 +256,7 @@ useEffect(()=> {
                         </thead>
                         <tbody>
                         {
-                            services.map((item:any,index:number)=> (
+                            services.map((item: Counter,index:number)=> (
                                 <tr key={index} className={cx(index%2===0 && styles.active)}>
                                     <td>{item.name}</td>
                                     <td>{item.phone}</td>
@@ -271,7 +266,7 @@ useEffect(()=> {
                                     <td>{item.role}</td>
                                     <td>
                                         <div className={styles.delete} onClick={()=> handleDelete(item.id)}><MdDelete className={styles.icon}/></div> 
-                                        <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div> 
+                                        {/* <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div>  */}
                                     </td>
                                 </tr>
                             ))

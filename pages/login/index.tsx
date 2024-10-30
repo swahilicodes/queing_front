@@ -5,13 +5,12 @@ import { useRouter } from 'next/router'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import errorState from '@/store/atoms/error'
 import currentUserState from '@/store/atoms/currentUser'
-import { headers } from 'next/headers'
 
 export default function Login() {
  const [phone, setPhone] = useState('')
  const [pass, setPass] = useState('')
  const router = useRouter()
- const [error,setError] = useRecoilState(errorState)
+ const [,setError] = useRecoilState(errorState)
  const currentUser:any = useRecoilValue(currentUserState)
  const headers = {
   'Content-Type': 'application/json',
@@ -19,14 +18,14 @@ export default function Login() {
 };
 
  useEffect(()=> {
-  if(currentUser !== undefined && currentUser.name !== undefined){
+  if(currentUser  && currentUser.name !== undefined){
     router.push('/')
   }
  })
 
  const login = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/users/login",{phone,password:pass},{headers}).then((data:any)=> {
+    axios.post("http://localhost:5000/users/login",{phone,password:pass},{headers}).then((data)=> {
         localStorage.setItem("token",data.data)
         router.push("/")
         router.reload()
@@ -42,6 +41,18 @@ export default function Login() {
  }
   return (
     <div className={styles.login}>
+      <div className={styles.top}>
+        <div className={styles.left}>
+          <img src="/tz.png" alt="" />
+        </div>
+        <div className={styles.title}>
+          <h1>JAMHURI YA MUUNGANO WA TANZANIA</h1>
+          <h3>HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA</h3>
+        </div>
+        <div className={styles.left}>
+          <img src="/mnh.png" alt="" />
+        </div>
+      </div>
         <form className={styles.form} onSubmit={login}>
         <h2 className={styles.title}>Login</h2>
         <div className={styles.inputGroup}>
@@ -70,31 +81,6 @@ export default function Login() {
         </div>
         <button type="submit" className={styles.button}>Login</button>
       </form>
-        {/* <form onSubmit={login}>
-        <div className={styles.add_item}>
-        <label htmlFor="name">Enter name</label>
-        <input 
-        type="text" 
-        value={phone}
-        onChange={e => setPhone(e.target.value)}
-        placeholder='phone*'
-        id="phone" 
-        name="phone"
-        />
-        </div>
-        <div className={styles.add_item}>
-        <label htmlFor="pass">Enter Password</label>
-        <input 
-        type="password" 
-        value={pass}
-        onChange={e => setPass(e.target.value)}
-        placeholder='pass*'
-        id="pass" 
-        name="password"
-        />
-        </div>
-        <button type='submit'>submit</button>
-        </form> */}
     </div>
   )
 }
