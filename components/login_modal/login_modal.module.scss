@@ -1,0 +1,87 @@
+@import '../../global.scss';
+.login_modal{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    form{
+        position: relative;
+        width: 20%;
+        background: white;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .logo{
+            width: 100px;
+            height: 100px;
+            img{
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+        .item{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            margin: 10px 0;
+            label{
+                font-size: 20px;
+                color: black;
+                opacity: .7;
+            }
+            input{
+                width: 100%;
+                padding: 15px;
+                border: 2px solid $divColor;
+                border-radius: 10px;
+                transition: all .5s ease-in-out;
+                &:focus{
+                    border: 2px solid $mainColor;
+                }
+            }
+        }
+        button{
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 15px;
+            color: white;
+            cursor: pointer;
+            background: $mainBold;
+            border-radius: 10px;
+            transition: all .5s ease-in-out;
+            &:hover{
+                background: $mainColor;
+            }
+        }
+        .loader{
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 3px;
+            background: $mainColor;
+            opacity: 0;
+            .inside{
+                background: white;
+                height: 80%;
+                animation: wid .5s infinite;
+            }
+            &.active{
+                opacity: 1;
+            }
+        }
+    }
+}
+@keyframes wid {
+   0%{
+    width: 0;
+   } 
+   100%{
+    width: 100%;
+   } 
+}

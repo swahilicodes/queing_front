@@ -90,7 +90,7 @@ export default function Settings() {
     return `/${segments[0] || ''}`;
   }
   return (
-    <div className={styles.settings}>
+    <div className={styles.settings_}>
         <div className={styles.top}>
             <div className={styles.left}>{router.pathname}</div>
             <div className={styles.right}><IoSettingsOutline className={styles.icon} size={30}/></div>

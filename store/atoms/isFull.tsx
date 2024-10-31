@@ -2,7 +2,7 @@ import { atom } from 'recoil'
 
 const isFull = atom({
     key: 'is-full-state',
-    default: true
+    default: false
 }) 
 
 export default isFull
