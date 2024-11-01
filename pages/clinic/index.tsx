@@ -12,6 +12,7 @@ import Cubes from "@/components/loaders/cubes/cubes";
 import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
 import AudioTest from "@/components/audio_player/audio_test/audio";
+import { GrPowerShutdown } from "react-icons/gr";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -67,7 +68,7 @@ function Recorder() {
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
-        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: currentUser.clinic_code, mr_no: ticket },
+        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: [currentUser.clinic_code,188, 205], mr_no: ticket },
       })
       .then((data) => {
         setTokens(data.data.data);
@@ -145,6 +146,11 @@ function Recorder() {
         }
       });
   };
+
+  const signOut = () => {
+    localStorage.removeItem('token')
+    router.reload()
+  }
   const penalize = (id:number) => {
     setFetchLoading(true);
     axios.put(`http://localhost:5000/tickets/penalt/${id}`)
@@ -169,7 +175,14 @@ function Recorder() {
     <div className={styles.recorder}>
       <div className={styles.meds_top}>
         <div className={styles.left}>
-          {currentUser.name !== undefined && <h4>{currentUser.name}|<span>{currentUser.role}</span> </h4> 
+          {currentUser.name !== undefined && <h4>{currentUser.name}|<span>{currentUser.role}</span>|<span>{currentUser.counter===undefined?currentUser.room:currentUser.counter}</span> </h4> 
+          }
+          {
+            currentUser.name !== undefined && (
+              <div className={styles.out} onClick={signOut}>
+            <GrPowerShutdown/>
+          </div>
+            )
           }
         </div>
         <div className={styles.right}>

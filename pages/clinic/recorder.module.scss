@@ -17,9 +17,26 @@
             color: white;
             font-weight: 500;
             font-size: 20px;
+            display: flex;
+            align-items: center;
             h4{
+                font-weight: 500;
                 span{
                     color: $mainColor;
+                }
+            }
+            .out{
+                margin: 0 15px;
+                border-radius: 50%;
+                background: $mainColor;
+                padding: 5px;
+                cursor: pointer;
+                transition: all .5s ease-in-out;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:hover{
+                    background: red;
                 }
             }
         }

@@ -6,6 +6,7 @@ interface User {
     clinic: string,
     clinic_code: number,
     room: string,
+    counter: string,
     role: string,
     display_photo: string,
     password: string,

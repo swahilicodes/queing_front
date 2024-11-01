@@ -12,6 +12,7 @@ import Cubes from "@/components/loaders/cubes/cubes";
 import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
 import AudioTest from "@/components/audio_player/audio_test/audio";
+import { GrPowerShutdown } from "react-icons/gr";
 
 function Recorder() {
   const currentUser = useRecoilValue(currentUserState);
@@ -175,6 +176,10 @@ function Recorder() {
         }
       });
   };
+  const signOut = () => {
+    localStorage.removeItem('token')
+    router.reload()
+  }
   return (
     <div className={styles.recorder}>
       <div className={cx(styles.overlaya,next && styles.active)}>
@@ -182,7 +187,15 @@ function Recorder() {
       </div>
       <div className={styles.meds_top}>
         <div className={styles.left}>
-          {currentUser.name !== undefined &&  <h4>{currentUser.name}| <span>{currentUser.role}</span> </h4> }
+        {currentUser.name !== undefined && <h4>{currentUser.name}|<span>{currentUser.role}</span>|<span>{currentUser.counter===undefined?currentUser.room:currentUser.counter}</span> </h4> 
+          }
+          {
+            currentUser.name !== undefined && (
+              <div className={styles.out} onClick={signOut}>
+            <GrPowerShutdown/>
+          </div>
+            )
+          }
         </div>
         <div className={styles.right}>
           <div
