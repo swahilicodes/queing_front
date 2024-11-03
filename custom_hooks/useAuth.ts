@@ -22,6 +22,7 @@ const useAuth = () => {
         localStorage.removeItem('token')
         getMac()
     } else {
+      console.log('token is active')
         const decoded:any = jwtDecode(token)
         getAdmin(decoded.phone)
         if(decoded.role==="admin"){
@@ -86,6 +87,7 @@ const getMac = () => {
       setDeviceState(data.data)
       validRoutes(data.data.default_page)
   }).catch((error) => {
+    console.log(error.response)
       if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`)
           alert(error.response.data.error);

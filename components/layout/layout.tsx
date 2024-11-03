@@ -45,9 +45,11 @@ export default function Layout({children}:any) {
   const [isError, setIsError] = useState(false)
   const [device, setDeviceState] = useRecoilState(deviceState)
   let page: Url | null
+  //const token = localStorage.getItem('token')
   useAuth();
 
   useEffect(() => {
+    //getMac()
     // checkAuth()
     // getMac()
     // const handleStart = () => NProgress.start();
@@ -139,20 +141,22 @@ const handleKeyDown = (event: KeyboardEvent) => {
 //       }
 //   })
 // }
-// const getMac = () => {
-//   axios.get('http://localhost:5000/network/get_device_id').then((data) => {
-//       setDeviceState(data.data)
-//       validRoutes(data.data.default_page)
-//   }).catch((error) => {
-//       if (error.response && error.response.status === 400) {
-//           console.log(`there is an error ${error.message}`)
-//           alert(error.response.data.error);
-//       } else {
-//           console.log(`there is an error message ${error.message}`)
-//           alert(error.message);
-//       }
-//   })
-// }
+const getMac = () => {
+  console.log('getting device id')
+  axios.get('http://localhost:5000/network/get_device_id').then((data) => {
+      // setDeviceState(data.data)
+      // validRoutes(data.data.default_page)
+      // console.log(data)
+  }).catch((error) => {
+      if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`)
+          alert(error.response.data.error);
+      } else {
+          console.log(`there is an error message ${error.message}`)
+          alert(error.message);
+      }
+  })
+}
 //   function isTokenExpired(token: any) {
 //     if (!token) {
 //         localStorage.removeItem('token')

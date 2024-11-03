@@ -12,5 +12,6 @@ interface User {
     password: string,
     current_patient: string,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    clinics: []
 }

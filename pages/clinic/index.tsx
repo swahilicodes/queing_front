@@ -3,7 +3,7 @@ import styles from "./recorder.module.scss";
 import { useRecoilState, useRecoilValue } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
-import { MdClear } from "react-icons/md";
+import { MdClear, MdDeleteOutline } from "react-icons/md";
 import { IoArrowRedoOutline, IoSearch } from "react-icons/io5";
 import Ticket_Category_Length from "@/components/ticket_category_length/ticket_category_length";
 import currentConditionState from "@/store/atoms/current";
@@ -13,6 +13,9 @@ import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
 import AudioTest from "@/components/audio_player/audio_test/audio";
 import { GrPowerShutdown } from "react-icons/gr";
+import useFetchData from "@/custom_hooks/fetch";
+import { IoIosAdd, IoMdAdd } from "react-icons/io";
+import { FiMinus } from "react-icons/fi";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -31,10 +34,16 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [doktas, setDoktas] = useState([])
+  const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
+  const [isAddittion, setAddittion] = useState(false)
+  const [isAdd, setAdd] = useState(false)
+  const [attendantClinics, setAttendantClinics] = useState([])
   const [fields, setFields] = useState({
     doctor_id: '',
     patient_id: '',
-    room: ''
+    room: '',
+    clinic: "",
+    clinic_code: ""
   })
   
 
@@ -42,8 +51,56 @@ function Recorder() {
     if(Object.keys(currentUser).length > 0 ){
       getTicks()
       getDoktas()
+      getDocClinics()
     }
   }, [status, disable, ticket,currentUser]);
+
+  const createClinic = () => {
+    axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
+        //setPat(data.data)
+        setAddittion(!isAddittion)
+        getDocClinics()
+        setTimeout(()=> {
+        attendantClinics.map((item)=> item)
+        },2000)
+    }).catch((error)=> {
+        if (error.response && error.response.status === 400) {
+            console.log(`there is an error ${error.message}`)
+            alert(error.response.data.error);
+        } else {
+            console.log(`there is an error message ${error.message}`)
+            alert(error.message);
+        }
+    })
+ }
+ const deleteClinic = (clinic_code:string) => {
+    axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
+        const updatedItems = attendantClinics.filter((item:any) => item.clinic_code !== clinic_code);
+        setAttendantClinics(updatedItems.map((item)=> item));
+    }).catch((error)=> {
+        if (error.response && error.response.status === 400) {
+            console.log(`there is an error ${error.message}`)
+            alert(error.response.data.error);
+        } else {
+            console.log(`there is an error message ${error.message}`)
+            alert(error.message);
+        }
+    })
+ }
+ const getDocClinics = () => {
+    axios.get(`http://localhost:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
+        setAttendantClinics(data.data)
+    }).catch((error)=> {
+        if (error.response && error.response.status === 400) {
+            console.log(`there is an error ${error.message}`)
+            alert(error.response.data.error);
+        } else {
+            console.log(`there is an error message ${error.message}`)
+            alert(error.message);
+        }
+    })
+ }
+
 
   const finishToken = () => {
       setFinLoading(true)
@@ -68,7 +125,7 @@ function Recorder() {
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
-        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: [currentUser.clinic_code,188, 205], mr_no: ticket },
+        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: currentUser.clinics.map((item:any)=> item.clinic_code), mr_no: ticket },
       })
       .then((data) => {
         setTokens(data.data.data);
@@ -147,6 +204,11 @@ function Recorder() {
       });
   };
 
+  const handleClinic = (code:string) => {
+    const clinic = data.find((item: { clinicicode: string })=> item.clinicicode === code)
+    setFields({...fields,clinic: clinic.cliniciname,clinic_code: code})
+ }
+
   const signOut = () => {
     localStorage.removeItem('token')
     router.reload()
@@ -184,6 +246,13 @@ function Recorder() {
           </div>
             )
           }
+          {
+            currentUser.name !== undefined && (
+              <div className={styles.out} onClick={()=> setAdd(!isAdd)}>
+            <IoMdAdd/>
+          </div>
+            )
+          }
         </div>
         <div className={styles.right}>
           <div
@@ -218,6 +287,59 @@ function Recorder() {
           </div>
         </div>
       </div>
+                <div className={cx(styles.overlay01,isAdd && styles.active)}>
+                    <div className={styles.contents}>
+                        <div className={styles.close} onClick={()=> setAdd(false)}>close</div>
+                        <div className={styles.top}>
+                            <div className={styles.left}>
+                                <h1>{currentUser.role}'s clinics</h1>
+                            </div>
+                            <div className={styles.left}>
+                                <div className={styles.act} onClick={()=> setAddittion(!isAddittion)}>
+                                    {
+                                        !isAddittion
+                                        ? <IoIosAdd className={styles.icon____} size={20}/>
+                                        : <FiMinus className={styles.icon____} size={20}/>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        {
+                            isAddittion
+                            ? <div className={styles.addittion}>
+                            <select
+                            value={fields.clinic_code}
+                            onChange={e => handleClinic(e.target.value)}
+                            >
+                                <option value="">--Select an option--</option>
+                                {
+                                    data.map((item: { clinicicode: string | number | readonly string[] | undefined; cliniciname: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined },index:number)=> (
+                                        <option value={item.clinicicode} key={index}>{item.cliniciname}</option>
+                                    ))
+                                }
+                            </select>
+                            <button onClick={()=> createClinic()}>submit</button>
+                            </div>
+                            : <div className={styles.display_clinics}>
+                                {
+                                    attendantClinics.map((item:any,index)=> (
+                                        <div className={styles.display_item} key={index}>
+                                            <div className={styles.name}>{item.clinic}</div>
+                                            <div className={styles.delete} onClick={()=>deleteClinic(item.clinic_code)}>
+                                                <MdDeleteOutline className={styles.icona}/>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                                {
+                                    attendantClinics.length===0 && (
+                                        <h2>No Clinics</h2>
+                                    )
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
       <div className={cx(styles.overlay, next && styles.active)}>
         <div className={styles.next_stage}>
             <div className={styles.close} onClick={()=> setNext(false)}>close</div>
