@@ -12,7 +12,8 @@ interface Token{
         disability: string,
         disabled: boolean,
         createdAt: Date,
-        updatedAt: Date
+        updatedAt: Date,
+        serving: boolean
     },
     counter: {
         id: number,

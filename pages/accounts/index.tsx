@@ -48,7 +48,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number}).then((data:any)=> {
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number}).then((data:any)=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -70,7 +70,7 @@ function Recorder() {
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+    axios.post(`https://qms-back.mloganzila.or.tz/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:"Paid"})
       setInterval(()=> {
         setFinLoading(false)
@@ -91,7 +91,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("https://qms-back.mloganzila.or.tz/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
       })
       .then((data: any) => {
@@ -120,7 +120,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -140,7 +140,7 @@ function Recorder() {
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -160,7 +160,7 @@ function Recorder() {
   };
   const submit = (id:number,bill:string) => {
     setFinLoading(true);
-    axios.put(`http://localhost:5000/tickets/bill/${id}`, {bill: bill})
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/bill/${id}`, {bill: bill})
       .then(() => {
         setFinLoading(false);
         router.reload()

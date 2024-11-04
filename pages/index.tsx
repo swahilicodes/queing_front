@@ -12,7 +12,7 @@ import { BiCurrentLocation } from 'react-icons/bi';
 
 export default function Home() {
     const [isFullScreen, setIsFullScreen] = useState(false);
-    //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+    //const {data:queue,loading,error} = useFetchData("https://qms-back.mloganzila.or.tz/tickets/getTickets")
     const [tickets, setTickets] = useState<any>([])
     const [adverts,setAdverts] = useState([])
     const router = useRouter()
@@ -23,14 +23,26 @@ export default function Home() {
     const [, setLoading] = useState(false)
     const [language,] = useRecoilState(LanguageState)
     const [blink, setBlink] = useState(false)
+    const [active, setActive] = useState(false)
+    //const eventSource = new EventSource('https://qms-back.mloganzila.or.tz/socket/display_tokens_stream');
 
     useEffect(()=> {
       getTickets()
       getAdverts()
+      getActive()
       const intervalId = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
         setBlink(!blink)
+        getActive()
       }, 1000);
+    //   eventSource.onmessage = (event) => {
+    //     const data = JSON.parse(event.data);
+    //     console.log('Received data:', data);
+    // };
+    
+    // eventSource.onerror = (error) => {
+    //     console.error('SSE error:', error);
+    // };
       // setInterval(() => {
       //   getTickets()
       //   //router.reload()
@@ -41,9 +53,26 @@ export default function Home() {
       }
     },[condition,blink])
 
+    const getActive = () => {
+      axios.get(`https://qms-back.mloganzila.or.tz/active/get_active`,{params: {page: "/"}})
+        .then((data) => {
+          setActive(data.data.isActive)
+        })
+        .catch((error) => {
+          console.log(error.response)
+          if (error.response && error.response.status === 400) {
+            //console.log(`there is an error ${error.message}`);
+            alert(error.response.data.error);
+          } else {
+            //console.log(`there is an error message ${error.message}`);
+            alert(error.message);
+          }
+        });
+    };
+
 
     const getAdverts = () => {
-      axios.get('http://localhost:5000/adverts/get_all_adverts').then((data)=> {
+      axios.get('https://qms-back.mloganzila.or.tz/adverts/get_all_adverts').then((data)=> {
         setAdverts(data.data)
       }).catch((error)=> {
         alert(error)
@@ -51,7 +80,7 @@ export default function Home() {
     }
     const getTickets = () => {
       setLoading(true)
-      axios.get('http://localhost:5000/tickets/get_display_tokens',{params:{stage: "meds", clinic_code: ""}}).then((data)=> {
+      axios.get('https://qms-back.mloganzila.or.tz/tickets/get_display_tokens',{params:{stage: "meds", clinic_code: ""}}).then((data)=> {
         setTickets(data.data)
         setLoading(false)
       }).catch((error)=> {
@@ -62,7 +91,18 @@ export default function Home() {
 
   return (
     <div className={styles.index}>
-      <div className={styles.top_bar}>
+      {
+        !active && (
+          <div className={styles.vid}>
+            <video src="/videos/figma.mp4" 
+            autoPlay
+            loop
+            muted
+          />
+          </div>
+        )
+      }
+      <div className={cx(styles.top_bar,active && styles.none)}>
         <h1>{language==="English"?"HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA":"HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA"}</h1>
       </div>
       <div className={styles.new_look}>

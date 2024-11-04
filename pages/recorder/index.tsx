@@ -12,6 +12,7 @@ import Cubes from "@/components/loaders/cubes/cubes";
 import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
 import AudioTest from "@/components/audio_player/audio_test/audio";
+import { GrPowerShutdown } from "react-icons/gr";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -33,17 +34,27 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [, setExpired] = useState<Token[]>([]);
+  const [active, setActive] = useState(false)
+  const [fields, setFields] = useState({
+    finish_id: ""
+  })
   
 
   useEffect(() => {
     getTicks();
+    getActive()
     console.log(currentUser.phone)
-  }, [status, disable, ticket]);
+  }, [status, disable, ticket, active]);
 
-  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string) => {
+  const prepareFinish = (id:number) => {
+    setNext(true)
+    setFields({...fields,finish_id: id.toString()})
+  }
+
+  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id}).then(()=> {
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -66,7 +77,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("https://qms-back.mloganzila.or.tz/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data) => {
@@ -95,7 +106,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -116,7 +127,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -134,10 +145,68 @@ function Recorder() {
         }
       });
   };
+  const priotize = (ticket_no:string, data:string) => {
+    setFetchLoading(true);
+    axios.get(`https://qms-back.mloganzila.or.tz/tickets/priority`,{params: {ticket_no,data}})
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const activate = (page:string) => {
+    setFetchLoading(true);
+    axios.post(`https://qms-back.mloganzila.or.tz/active/activate`,{page: page})
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        console.log(error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          //console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const getActive = () => {
+    axios.get(`https://qms-back.mloganzila.or.tz/active/get_active`,{params: {page: "/"}})
+      .then((data) => {
+        setActive(data.data.isActive)
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        console.log(error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          //console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://localhost:5000/tickets/next_stage", {
+    axios.get("https://qms-back.mloganzila.or.tz/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -157,11 +226,25 @@ function Recorder() {
         }
       });
   };
+  const signOut = () => {
+    localStorage.removeItem('token')
+    router.reload()
+  }
   return (
     <div className={styles.recorder}>
       <div className={styles.meds_top}>
         <div className={styles.left}>
-          {currentUser.name !== undefined && <h4>{currentUser.name}| <span>{currentUser.role}</span> </h4> }
+          {currentUser.name !== undefined && <h4>{currentUser.name}| <span>{currentUser.role} | {currentUser.counter}</span> </h4> }
+          {
+            currentUser.name !== undefined && (
+              <div className={styles.out} onClick={signOut}>
+            <GrPowerShutdown/>
+          </div>
+            )
+          }
+           <div className={styles.out} onClick={()=> activate("/")}>
+            {active?"rest":"activate"}
+          </div>
         </div>
         <div className={styles.right}>
           <div
@@ -214,7 +297,7 @@ function Recorder() {
                 }
                 <div className={styles.buttons}>
                 <div onClick={nextToken} className={styles.button}>Search</div>
-                <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number,sex, currentUser.phone)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
+                <div onClick={()=> found && finishToken(Number(fields.finish_id),"accounts",mr_number,sex, currentUser.phone,patName)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
                 </div>
             </form>
             <div className={cx(styles.fin_loader,finLoading && styles.active)}>
@@ -240,6 +323,7 @@ function Recorder() {
                       <th>Status</th>
                       <th>CreatedAt</th>
                       <th>Challenge</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,6 +335,16 @@ function Recorder() {
                         <td>{item.token.status}</td>
                         <td><TimeAgo isoDate={new Date(item.token.createdAt).toISOString()} /></td>
                         <td>{item.token.disability===""?"N/A":item.token.disability}</td>
+                        <td>
+                          <div className={styles.actions}>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve")}>{item.token.serving===true?"serving":"Serve"}</div>
+                            </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,item.token.disabled && styles.priority)} onClick={()=> priotize(`${item.token.ticket_no}`,"priority")}>{item.token.disabled?"prioritized":"prioritize"}</div>
+                            </div>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -264,7 +358,9 @@ function Recorder() {
           </div>
         )}
       </div>
-      <div
+      {
+        tokens.filter((item)=> item.token.serving===true).map((item:Token,index:number)=> (
+          <div
         className={cx(
           styles.serving,
           tokens.length > 0 && !fetchLoading && styles.active
@@ -273,23 +369,23 @@ function Recorder() {
         <div className={styles.speaker}>
         {
             tokens.length > 0 && (
-              <AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={false}/>
+              <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
             )
-            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`}/>)
+            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
         }
         </div>
         <div className={styles.row}>
-          <div className={styles.row_item} onClick={()=> editTicket(tokens[0].token.id,"pending")}>
+          <div className={styles.row_item} onClick={()=> editTicket(item.token.id,"pending")}>
             <div className={styles.button}>Pend</div>
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
-          <div className={styles.row_item} onClick={()=> setNext(true)}>
+          <div className={styles.row_item} onClick={()=> prepareFinish(item.token.id)}>
             <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>
-            <div className={styles.token}>{tokens.length> 0 && tokens[0].token.ticket_no}</div>
+            <div className={styles.token}>{tokens.length> 0 && item.token.ticket_no}</div>
           </div>
-          <div className={styles.row_item} onClick={()=> penalize(tokens[0].token.id)}>
+          <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
             <div className={styles.button}>Penalize</div>
           </div>
           <div className={styles.row_item} onClick={()=> preparePnF()}>
@@ -297,6 +393,8 @@ function Recorder() {
           </div>
         </div>
       </div>
+        ))
+      }
       {tokens.length > 0 && (
         <div className={styles.chini}>
           <div className={styles.top}>

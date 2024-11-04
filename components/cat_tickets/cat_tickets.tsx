@@ -21,7 +21,7 @@ useEffect(()=> {
     getCounter()
 },[category])
  const getTickets = () => {
-    axios.get('http://localhost:5000/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
+    axios.get('https://qms-back.mloganzila.or.tz/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
         setData(data.data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -34,7 +34,7 @@ useEffect(()=> {
     })
  }
  const getCounter = () => {
-    axios.get('http://localhost:5000/tickets/getTicketCounter',{params: {category:category}}).then((data:any)=> {
+    axios.get('https://qms-back.mloganzila.or.tz/tickets/getTicketCounter',{params: {category:category}}).then((data:any)=> {
         setService(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {

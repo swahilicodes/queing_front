@@ -34,7 +34,7 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [doktas, setDoktas] = useState([])
-  const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
+  const {data} = useFetchData("https://qms-back.mloganzila.or.tz/clinic/get_clinics")
   const [isAddittion, setAddittion] = useState(false)
   const [isAdd, setAdd] = useState(false)
   const [attendantClinics, setAttendantClinics] = useState([])
@@ -56,7 +56,7 @@ function Recorder() {
   }, [status, disable, ticket,currentUser]);
 
   const createClinic = () => {
-    axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
+    axios.post(`https://qms-back.mloganzila.or.tz/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
         //setPat(data.data)
         setAddittion(!isAddittion)
         getDocClinics()
@@ -74,7 +74,7 @@ function Recorder() {
     })
  }
  const deleteClinic = (clinic_code:string) => {
-    axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`https://qms-back.mloganzila.or.tz/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
         const updatedItems = attendantClinics.filter((item:any) => item.clinic_code !== clinic_code);
         setAttendantClinics(updatedItems.map((item)=> item));
     }).catch((error)=> {
@@ -88,7 +88,7 @@ function Recorder() {
     })
  }
  const getDocClinics = () => {
-    axios.get(`http://localhost:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`https://qms-back.mloganzila.or.tz/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
         setAttendantClinics(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -104,7 +104,7 @@ function Recorder() {
 
   const finishToken = () => {
       setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then(()=> {
+    axios.post(`https://qms-back.mloganzila.or.tz/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -124,7 +124,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getClinicTickets", {
+    axios.get("https://qms-back.mloganzila.or.tz/tickets/getClinicTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: currentUser.clinics.map((item:any)=> item.clinic_code), mr_no: ticket },
       })
       .then((data) => {
@@ -148,7 +148,7 @@ function Recorder() {
   };
   const getDoktas = () => {
     setDocLoading(true);
-    axios.get("http://localhost:5000/doktas/get_free_doktas", {
+    axios.get("https://qms-back.mloganzila.or.tz/doktas/get_free_doktas", {
         params: { page, pagesize,clinic_code: currentUser.clinic_code},
       })
       .then((data) => {
@@ -185,7 +185,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -215,7 +215,7 @@ function Recorder() {
   }
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`https://qms-back.mloganzila.or.tz/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);

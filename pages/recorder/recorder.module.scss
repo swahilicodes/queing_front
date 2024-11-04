@@ -17,9 +17,26 @@
             color: white;
             font-weight: 500;
             font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             h4{
                 span{
                     color: $mainColor
+                }
+            }
+            .out{
+                margin: 0 15px;
+                border-radius: 50%;
+                background: $mainColor;
+                padding: 5px;
+                cursor: pointer;
+                transition: all .5s ease-in-out;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:hover{
+                    background: red;
                 }
             }
         }
@@ -236,6 +253,30 @@
                         font-size: 17px;
                         opacity: .6;
                         font-weight: 500;
+                        .actions{
+                            display: flex;
+                            .serve{
+                                width: 85px;
+                                background: $mainColor;
+                                padding: 5px;
+                                cursor: pointer;
+                                color: white;
+                                margin: 0 5px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                transition: all .5s ease-in-out;
+                                &.active{
+                                    background: #2bf72b;
+                                }
+                                &.priority{
+                                    background: red;
+                                }
+                                &:hover{
+                                    background: green;
+                                }
+                            }
+                        }
                     }
                 }
                 .no_data{
