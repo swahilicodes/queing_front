@@ -9,7 +9,7 @@ import axios from 'axios'
 
 export default function Settings() {
 //  const pages = ["/","/attendants","/counters","/dashboard","/login","/queue_list","/services","/settings","/queue_add"]
- const {data:clinics,loading} = useFetchData("https://qms-back.mloganzila.or.tz/clinic/get_clinics")
+ const {data:clinics,loading} = useFetchData("http://localhost:5000/clinic/get_clinics")
  const [page,setPage] = useState('')
  const [clinic,setClinic] = useState('')
  const [defaultPage, setDefaultPage] = useState('')

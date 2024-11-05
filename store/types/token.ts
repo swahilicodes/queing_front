@@ -12,6 +12,8 @@ interface Token{
         disability: string,
         disabled: boolean,
         createdAt: Date,
+        med_time: Date,
+        account_time: Date,
         updatedAt: Date,
         serving: boolean
     },

@@ -54,7 +54,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`https://qms-back.mloganzila.or.tz/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name}).then(()=> {
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -77,7 +77,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("https://qms-back.mloganzila.or.tz/tickets/getMedsTickets", {
+    axios.get("http://localhost:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data) => {
@@ -106,7 +106,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`https://qms-back.mloganzila.or.tz/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -127,7 +127,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`https://qms-back.mloganzila.or.tz/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -147,7 +147,7 @@ function Recorder() {
   };
   const priotize = (ticket_no:string, data:string) => {
     setFetchLoading(true);
-    axios.get(`https://qms-back.mloganzila.or.tz/tickets/priority`,{params: {ticket_no,data}})
+    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -167,7 +167,7 @@ function Recorder() {
   };
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`https://qms-back.mloganzila.or.tz/active/activate`,{page: page})
+    axios.post(`http://localhost:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -187,7 +187,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`https://qms-back.mloganzila.or.tz/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -206,7 +206,7 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("https://qms-back.mloganzila.or.tz/tickets/next_stage", {
+    axios.get("http://localhost:5000/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -242,8 +242,8 @@ function Recorder() {
           </div>
             )
           }
-           <div className={styles.out} onClick={()=> activate("/")}>
-            {active?"rest":"activate"}
+           <div className={styles.rest} onClick={()=> activate("/")}>
+            {!active?"rest":"activate"}
           </div>
         </div>
         <div className={styles.right}>

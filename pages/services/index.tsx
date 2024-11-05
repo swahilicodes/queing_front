@@ -25,7 +25,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("https://qms-back.mloganzila.or.tz/services/create_service",{name}).then(()=> {
+    axios.post("http://localhost:5000/services/create_service",{name}).then(()=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
@@ -39,7 +39,7 @@ useEffect(()=> {
     })
  }
  const deleteService  = (id:string) => {
-    axios.put(`https://qms-back.mloganzila.or.tz/services/delete_service/${id}`).then(()=> {
+    axios.put(`http://localhost:5000/services/delete_service/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -53,7 +53,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`https://qms-back.mloganzila.or.tz/services/edit_service/${id}`,{name}).then(()=> {
+    axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then(()=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
@@ -80,7 +80,7 @@ useEffect(()=> {
   };
  const getServices  = () => {
     setFetchLoading(true)
-    axios.get("https://qms-back.mloganzila.or.tz/services/get_services",{params: {page,pagesize}}).then((data)=> {
+    axios.get("http://localhost:5000/services/get_services",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)

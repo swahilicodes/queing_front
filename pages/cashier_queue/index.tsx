@@ -16,7 +16,7 @@ import { BsMicMute } from "react-icons/bs";
 import { VscUnmute } from "react-icons/vsc";
 import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
 
-export default function Home() {
+export default function CashierQueue() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
@@ -87,7 +87,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/cashier_queue" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -95,7 +95,7 @@ export default function Home() {
         console.log(error.response);
         if (error.response && error.response.status === 400) {
           //console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          //alert(error.response.data.error);
         } else {
           //console.log(`there is an error message ${error.message}`);
           alert(error.message);
@@ -117,7 +117,7 @@ export default function Home() {
     setLoading(true);
     axios
       .get("http://localhost:5000/tickets/get_display_tokens", {
-        params: { stage: "meds", clinic_code: "" },
+        params: { stage: "accounts", clinic_code: "" },
       })
       .then((data) => {
         setTickets(data.data);

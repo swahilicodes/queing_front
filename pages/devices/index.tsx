@@ -23,11 +23,11 @@ export default function Admins() {
     const [pagesize, setPageSize] = useState(10)
     const [totalItems, setTotalItems] = useState(0);
     const [id, setId] = useState("")
-    const { data } = useFetchData("https://qms-back.mloganzila.or.tz/services/get_all_services")
+    const { data } = useFetchData("http://localhost:5000/services/get_all_services")
     const [isFull, setFull] = useState(false)
     const [desc, setDesc] = useState('')
     const [pages, setPages] = useState([])
-    const { data: clinics } = useFetchData("https://qms-back.mloganzila.or.tz/clinic/get_clinics")
+    const { data: clinics } = useFetchData("http://localhost:5000/clinic/get_clinics")
     const [isAddittion, setAddittion] = useState(false)
     const [attendantClinics, setAttendantClinics] = useState([])
     useAuth()
@@ -60,7 +60,7 @@ export default function Admins() {
     }
 
     const createClinic = (deviceId: string) => {
-        axios.post(`https://qms-back.mloganzila.or.tz/attendant_clinics/create_attendant_clinic`, { clinic_code: fields.clinic_code, clinic: fields.clinic, attendant_id: deviceId }).then((data) => {
+        axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`, { clinic_code: fields.clinic_code, clinic: fields.clinic, attendant_id: deviceId }).then((data) => {
             //setPat(data.data)
             setAddittion(!isAddittion)
             getDocClinics(fields.device_id)
@@ -78,7 +78,7 @@ export default function Admins() {
         })
     }
     const deleteClinic = (clinic_code: string, device_id: string) => {
-        axios.get(`https://qms-back.mloganzila.or.tz/attendant_clinics/delete_clinic`, { params: { clinic_code: clinic_code, attendant_id: device_id } }).then((data) => {
+        axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`, { params: { clinic_code: clinic_code, attendant_id: device_id } }).then((data) => {
             const updatedItems = attendantClinics.filter((item: any) => item.clinic_code !== clinic_code);
             setAttendantClinics(updatedItems.map((item) => item));
         }).catch((error) => {
@@ -92,7 +92,7 @@ export default function Admins() {
         })
     }
     const getDocClinics = (device_id: string) => {
-        axios.get(`https://qms-back.mloganzila.or.tz/attendant_clinics/get_clinics`, { params: { attendant_id: device_id } }).then((data) => {
+        axios.get(`http://localhost:5000/attendant_clinics/get_clinics`, { params: { attendant_id: device_id } }).then((data) => {
             setAttendantClinics(data.data)
         }).catch((error) => {
             if (error.response && error.response.status === 400) {
@@ -108,7 +108,7 @@ export default function Admins() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault()
-        axios.post("https://qms-back.mloganzila.or.tz/adverts/create_advert", { name, description }).then((data: any) => {
+        axios.post("http://localhost:5000/adverts/create_advert", { name, description }).then((data: any) => {
             setAdd(false)
             router.reload()
         }).catch((error) => {
@@ -124,7 +124,7 @@ export default function Admins() {
 
     const editService = (e: React.FormEvent) => {
         e.preventDefault()
-        axios.get(`https://qms-back.mloganzila.or.tz/network/edit_device`, { params: { page: fields.page, id: id } }).then(() => {
+        axios.get(`http://localhost:5000/network/edit_device`, { params: { page: fields.page, id: id } }).then(() => {
             setEdit(false)
             router.reload()
         }).catch((error) => {
@@ -138,7 +138,7 @@ export default function Admins() {
         })
     }
     const deleteService = () => {
-        axios.get(`https://qms-back.mloganzila.or.tz/network/delete_device`, { params: { id: id } }).then(() => {
+        axios.get(`http://localhost:5000/network/delete_device`, { params: { id: id } }).then(() => {
             setDelete(false)
             router.reload()
         }).catch((error) => {
@@ -178,7 +178,7 @@ export default function Admins() {
     }
     const getAttendants = () => {
         setFetchLoading(true)
-        axios.get("https://qms-back.mloganzila.or.tz/network/get_devices", { params: { page, pagesize } }).then((data) => {
+        axios.get("http://localhost:5000/network/get_devices", { params: { page, pagesize } }).then((data) => {
             setServices(data.data.data)
             setFetchLoading(false)
             setTotalItems(data.data.totalItems)

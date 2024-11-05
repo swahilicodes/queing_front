@@ -22,7 +22,7 @@ function LoginModal() {
  const login = (e:React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    axios.post("https://qms-back.mloganzila.or.tz/users/login",{phone: fields.phone,password:fields.password},{headers}).then((data)=> {
+    axios.post("http://localhost:5000/users/login",{phone: fields.phone,password:fields.password},{headers}).then((data)=> {
         localStorage.setItem("token",data.data)
         setTimeout(()=> {
             setLoading(false)

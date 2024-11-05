@@ -17,8 +17,8 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data} = useFetchData("https://qms-back.mloganzila.or.tz/services/get_all_services")
-const {data:counters} = useFetchData("https://qms-back.mloganzila.or.tz/counters/get_all_counters")
+const {data} = useFetchData("http://localhost:5000/services/get_all_services")
+const {data:counters} = useFetchData("http://localhost:5000/counters/get_all_counters")
 const [fields, setFields] = useState({
     name: "",
     role: "",
@@ -35,7 +35,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("https://qms-back.mloganzila.or.tz/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
+    axios.post("http://localhost:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
@@ -55,7 +55,7 @@ useEffect(()=> {
     console.log(name,code.code)
  }
  const deleteService  = (id:string) => {
-    axios.put(`https://qms-back.mloganzila.or.tz/doctors/delete_doctor/${id}`).then(()=> {
+    axios.put(`http://localhost:5000/doctors/delete_doctor/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -69,7 +69,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`https://qms-back.mloganzila.or.tz/doctors/edit_doctor/${id}`,{fields}).then((data:any)=> {
+    axios.put(`http://localhost:5000/doctors/edit_doctor/${id}`,{fields}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
@@ -102,7 +102,7 @@ useEffect(()=> {
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("https://qms-back.mloganzila.or.tz/doctors/get_doctors",{params: {page,pagesize}}).then((data)=> {
+    axios.get("http://localhost:5000/doctors/get_doctors",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)

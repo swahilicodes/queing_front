@@ -39,6 +39,13 @@
                     background: red;
                 }
             }
+            .rest{
+                padding: 10px;
+                background: $mainColor;
+                cursor: pointer;
+                color: white;
+                border-radius: 10px;
+            }
         }
         .right{
             display: flex;

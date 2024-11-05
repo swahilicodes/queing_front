@@ -120,7 +120,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 // }
 // const getAdmin = (phone: string) => {
 //   const user = localStorage.getItem('user_service')
-//   axios.get('https://qms-back.mloganzila.or.tz/users/get_user',{params: {phone}}).then((data) => {
+//   axios.get('http://localhost:5000/users/get_user',{params: {phone}}).then((data) => {
 //       setCurrentUser(data.data)
 //       if(user){
 //         localStorage.removeItem('user_service')
@@ -143,7 +143,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 // }
 const getMac = () => {
   console.log('getting device id')
-  axios.get('https://qms-back.mloganzila.or.tz/network/get_device_id').then((data) => {
+  axios.get('http://localhost:5000/network/get_device_id').then((data) => {
       // setDeviceState(data.data)
       // validRoutes(data.data.default_page)
       // console.log(data)

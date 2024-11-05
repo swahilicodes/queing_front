@@ -43,7 +43,7 @@ export default function Home() {
 
     const getTickets = () => {
       setLoading(true)
-      axios.get('https://qms-back.mloganzila.or.tz/tickets/get_display_tokens',{params:{stage: "nurse_station",clinic_code: currentUser.clinic_code}}).then((data)=> {
+      axios.get('http://localhost:5000/tickets/get_display_tokens',{params:{stage: "nurse_station",clinic_code: currentUser.clinic_code}}).then((data)=> {
         setTickets(data.data)
         setLoading(false)
       }).catch((error)=> {

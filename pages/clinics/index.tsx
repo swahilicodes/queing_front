@@ -9,14 +9,14 @@ const Clinics = () => {
   }, []);
 
   // const jeevaClinics = () => {
-  //   axios.get("https://qms-back.mloganzila.or.tz/clinic/jeeva_clinics").then((data)=> {
+  //   axios.get("http://localhost:5000/clinic/jeeva_clinics").then((data)=> {
   //       if(data.status === 200){
   //           data.data.data.forEach((item) => {
   //               console.log(item)
   //               setInterval(()=> {
   //                   if(clinics.length> 0){
   //                       if(!clinics.includes(item.clinicicode)){
-  //                           axios.post("https://qms-back.mloganzila.or.tz/clinic/create_clinic",{cliniciname: item.clinicname,clinicicode: item.clinicode,status: item.status,deptcode: item.deptcode}).then((data)=> {
+  //                           axios.post("http://localhost:5000/clinic/create_clinic",{cliniciname: item.clinicname,clinicicode: item.clinicode,status: item.status,deptcode: item.deptcode}).then((data)=> {
   //                              console.log('new clinic added',data) 
   //                              router.reload()
   //                           }).catch((error)=> {
@@ -25,7 +25,7 @@ const Clinics = () => {
   //                       }
   //                   }else{
   //                       if(!clinics.includes(item.clinicicode)){
-  //                           axios.post("https://qms-back.mloganzila.or.tz/clinic/create_clinic",{cliniciname: item.clinicname,clinicicode: item.clinicode,status: item.status,deptcode: item.deptcode}).then((data)=> {
+  //                           axios.post("http://localhost:5000/clinic/create_clinic",{cliniciname: item.clinicname,clinicicode: item.clinicode,status: item.status,deptcode: item.deptcode}).then((data)=> {
   //                              console.log('new clinic added',data) 
   //                              router.reload()
   //                           }).catch((error)=> {
@@ -42,7 +42,7 @@ const Clinics = () => {
   // }
 
   const getClinics = () => {
-    axios.get("https://qms-back.mloganzila.or.tz/clinic/get_clinics").then((data)=> {
+    axios.get("http://localhost:5000/clinic/get_clinics").then((data)=> {
         console.log(data.data)
     }).catch((error)=> {
         console.log(error)

@@ -84,7 +84,7 @@ export default function Print() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("https://qms-back.mloganzila.or.tz/tickets/create_ticket",{disability: null,phone:fields.numberString})
+    axios.post("http://localhost:5000/tickets/create_ticket",{disability: null,phone:fields.numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)

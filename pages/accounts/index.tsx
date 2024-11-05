@@ -30,6 +30,7 @@ function Recorder() {
   const [found, setFound] = useState(false)
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
+  const [active, setActive] = useState(false)
   const [fields, setFields] = useState({
     mr_no: "",
     status: ""
@@ -38,39 +39,42 @@ function Recorder() {
 
   useEffect(() => {
     getTicks();
-  }, [status, disable, ticket]);
+    getActive()
+    setInterval(()=> {
+      setTokens((item)=> item.map((itema)=> itema))
+    },1000)
+  }, [status, disable, ticket,active]);
 
   const handleNext = (token: any) => {
     setNext(true)
     setFields({...fields,mr_no: token.mr_no})
   }
 
-  const finishToken = (id:number,stage:string,mr_number:string) => {
-    if(found){
-      setFinLoading(true)
-    axios.put(`https://qms-back.mloganzila.or.tz/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number}).then((data:any)=> {
-      setInterval(()=> {
-        setFinLoading(false)
-        router.reload()
-      },3000)
-    }).catch((error)=> {
-      setFinLoading(false)
-      if (error.response && error.response.status === 400) {
-        console.log(`there is an error ${error.message}`)
-        alert(error.response.data.error);
-    } else {
-        console.log(`there is an error message ${error.message}`)
-        alert(error.message);
-    }
-    })
-    }else{
-      alert('Patient not found')
-    }
-  }
+  const activate = (page:string) => {
+    setFetchLoading(true);
+    axios.post(`http://localhost:5000/active/activate`,{page: page})
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        console.log(error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          //console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`https://qms-back.mloganzila.or.tz/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:"Paid"})
       setInterval(()=> {
         setFinLoading(false)
@@ -91,7 +95,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("https://qms-back.mloganzila.or.tz/tickets/getMedsTickets", {
+    axios.get("http://localhost:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
       })
       .then((data: any) => {
@@ -120,7 +124,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`https://qms-back.mloganzila.or.tz/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -140,7 +144,7 @@ function Recorder() {
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`https://qms-back.mloganzila.or.tz/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -158,15 +162,38 @@ function Recorder() {
         }
       });
   };
-  const submit = (id:number,bill:string) => {
-    setFinLoading(true);
-    axios.put(`https://qms-back.mloganzila.or.tz/tickets/bill/${id}`, {bill: bill})
-      .then(() => {
-        setFinLoading(false);
-        router.reload()
+  const getActive = () => {
+    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/cashier_queue"}})
+      .then((data) => {
+        setActive(data.data.isActive)
       })
-      .catch((error: any) => {
-        setFinLoading(false);
+      .catch((error) => {
+        setFetchLoading(false);
+        console.log(error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          //console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const signOut = () => {
+    localStorage.removeItem('token')
+    router.reload()
+  }
+  const priotize = (ticket_no:string, data:string) => {
+    setFetchLoading(true);
+    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data}})
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
           alert(error.response.data.error);
@@ -176,10 +203,6 @@ function Recorder() {
         }
       });
   };
-  const signOut = () => {
-    localStorage.removeItem('token')
-    router.reload()
-  }
   return (
     <div className={styles.recorder}>
       <div className={cx(styles.overlaya,next && styles.active)}>
@@ -196,6 +219,9 @@ function Recorder() {
           </div>
             )
           }
+          <div className={styles.rest} onClick={()=> activate("/cashier_queue")}>
+            {!active?"rest":"activate"}
+          </div>
         </div>
         <div className={styles.right}>
           <div
@@ -265,6 +291,7 @@ function Recorder() {
                       <th>Status</th>
                       <th>CreatedAt</th>
                       <th>Challenge</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -275,8 +302,18 @@ function Recorder() {
                         <td>{item.token.mr_no}</td>
                         <td>{item.token.gender}</td>
                         <td>{item.token.status}</td>
-                        <td><TimeAgo isoDate={new Date(item.token.createdAt).toISOString()} /></td>
+                        <td><TimeAgo isoDate={new Date(item.token.med_time).toISOString()} /></td>
                         <td>{item.token.disability===""?"N/A":item.token.disability}</td>
+                        <td>
+                          <div className={styles.actions}>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve")}>{item.token.serving===true?"serving":"Serve"}</div>
+                            </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,item.token.disabled && styles.priority)} onClick={()=> priotize(`${item.token.ticket_no}`,"priority")}>{item.token.disabled?"prioritized":"prioritize"}</div>
+                            </div>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

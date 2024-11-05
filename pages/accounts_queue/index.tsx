@@ -39,7 +39,7 @@ export default function Home() {
 
 
     const getAdverts = () => {
-      axios.get('https://qms-back.mloganzila.or.tz/adverts/get_all_adverts').then((data)=> {
+      axios.get('http://localhost:5000/adverts/get_all_adverts').then((data)=> {
         setAdverts(data.data)
       }).catch((error)=> {
         alert(error)
@@ -47,7 +47,7 @@ export default function Home() {
     }
     const getTickets = () => {
       setLoading(true)
-      axios.get('https://qms-back.mloganzila.or.tz/tickets/get_display_tokens',{params:{stage: "accounts",clinic_code: ""}}).then((data)=> {
+      axios.get('http://localhost:5000/tickets/get_display_tokens',{params:{stage: "accounts",clinic_code: ""}}).then((data)=> {
         setTickets(data.data)
         setLoading(false)
       }).catch((error)=> {
