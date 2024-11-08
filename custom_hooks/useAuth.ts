@@ -1,20 +1,24 @@
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useSetRecoilState } from 'recoil';
 import currentUserState from '@/store/atoms/currentUser';
 import deviceState from '@/store/atoms/device';
+import { getLocalDeviceIP } from './deviceInfo';
 
 const useAuth = () => {
   const router = useRouter();
   const setCurrentUser = useSetRecoilState(currentUserState)
   const setDeviceState =  useSetRecoilState(deviceState)
   const path = router.pathname
+  const [ipAddress, setIpAddress] = useState(null);
+  const id = getLocalDeviceIP()
 
   useEffect(() => {
     checkAuth();
   }, []);
+
 
   const checkAuth = () => {
     const token:any = localStorage.getItem("token")
@@ -42,7 +46,6 @@ const useAuth = () => {
 }
 
 const validRoutes = (piga: string) => {
-  const path = router.pathname
       if(piga){
         router.replace(piga)
       }else{
@@ -61,7 +64,7 @@ const validRoutes = (piga: string) => {
 }
 const getAdmin = (phone: string) => {
   const user = localStorage.getItem('user_service')
-  axios.get('http://localhost:5000/users/get_user',{params: {phone}}).then((data) => {
+  axios.get('http://192.168.30.245:5000/users/get_user',{params: {phone}}).then((data) => {
       setCurrentUser(data.data)
       if(user){
         localStorage.removeItem('user_service')
@@ -82,21 +85,17 @@ const getAdmin = (phone: string) => {
       }
   })
 }
-const getMac = () => {
-  axios.get('http://localhost:5000/network/get_device_id').then((data) => {
-      setDeviceState(data.data)
-      validRoutes(data.data.default_page)
-  }).catch((error) => {
-    console.log(error.response)
-      if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`)
-          alert(error.response.data.error);
-      } else {
-          console.log(`there is an error message ${error.message}`)
-          alert(error.message);
-      }
-  })
+const getMac = async () => {
+  if(id){
+    await axios.post("http://192.168.30.245:5000/network/create_update",{macAddress: `${id.id}`,deviceName:"Null",deviceModel:id.type,manufacturer: "Null"}).then((dita)=> {
+      setDeviceState(dita.data)
+      validRoutes(dita.data.default_page)
+    }).catch((error)=> {
+      console.log(error)
+    })
+  }
 }
+
   function isTokenExpired(token: any) {
     if (!token) {
         localStorage.removeItem('token')

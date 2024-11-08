@@ -29,14 +29,16 @@ function Recorder() {
   const [next, setNext] = useState(false)
   const [mr_number, setMrNumber] = useState("")
   const [found, setFound] = useState(false)
-  const [patName, setPatName] = useState("")
-  const [sex, setSex] = useState("")
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [, setExpired] = useState<Token[]>([]);
   const [active, setActive] = useState(false)
   const [fields, setFields] = useState({
-    finish_id: ""
+    finish_id: "",
+    patName: "",
+    sex: "",
+    category: "",
+    age: ""
   })
   
 
@@ -51,21 +53,22 @@ function Recorder() {
     setFields({...fields,finish_id: id.toString()})
   }
 
-  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string) => {
+  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name}).then(()=> {
+    axios.put(`http://192.168.30.245:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
       },3000)
     }).catch((error)=> {
       setFinLoading(false)
+      console.log('accounts error ',error.response)
       if (error.response && error.response.status === 400) {
-        console.log(`there is an error ${error.message}`)
+        //console.log(`there is an error ${error.message}`)
         alert(error.response.data.error);
     } else {
-        console.log(`there is an error message ${error.message}`)
+        //console.log(`there is an error message ${error.message}`)
         alert(error.message);
     }
     })
@@ -77,7 +80,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("http://192.168.30.245:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data) => {
@@ -106,7 +109,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -127,7 +130,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -147,7 +150,7 @@ function Recorder() {
   };
   const priotize = (ticket_no:string, data:string) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data}})
+    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -167,7 +170,7 @@ function Recorder() {
   };
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page})
+    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -187,7 +190,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -206,13 +209,13 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://localhost:5000/tickets/next_stage", {
+    axios.get("http://192.168.30.245:5000/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
+        console.log('age is ',data.data[0].age)
         setFound(true)
-        setPatName(data.data[0].fullname.toUpperCase())
-        setSex(data.data[0].sex)
+        setFields({...fields,patName:data.data[0].fullname.toUpperCase(),sex: data.data[0].sex, age: data.data[0].age})
         setFinLoading(false);
       })
       .catch((error) => {
@@ -291,13 +294,13 @@ function Recorder() {
                 onChange={e => setMrNumber(e.target.value.toUpperCase())}
                 />
                 {
-                    !patName
+                    !fields.patName
                     ? <p>Patient: -----</p>
-                    : <p>Patient: <span>{patName}</span></p>
+                    : <p>Patient: <span>{fields.patName}</span></p>
                 }
                 <div className={styles.buttons}>
                 <div onClick={nextToken} className={styles.button}>Search</div>
-                <div onClick={()=> found && finishToken(Number(fields.finish_id),"accounts",mr_number,sex, currentUser.phone,patName)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
+                <div onClick={()=> found && finishToken(Number(fields.finish_id),"accounts",mr_number,fields.sex, currentUser.phone,fields.patName,fields.age)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
                 </div>
             </form>
             <div className={cx(styles.fin_loader,finLoading && styles.active)}>

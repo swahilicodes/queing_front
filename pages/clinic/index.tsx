@@ -34,10 +34,11 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [doktas, setDoktas] = useState([])
-  const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
+  const {data} = useFetchData("http://192.168.30.245:5000/clinic/get_clinics")
   const [isAddittion, setAddittion] = useState(false)
   const [isAdd, setAdd] = useState(false)
   const [attendantClinics, setAttendantClinics] = useState([])
+  const [active, setActive] = useState(false)
   const [fields, setFields] = useState({
     doctor_id: '',
     patient_id: '',
@@ -52,11 +53,31 @@ function Recorder() {
       getTicks()
       getDoktas()
       getDocClinics()
+      getActive()
     }
-  }, [status, disable, ticket,currentUser]);
+    console.log(currentUser.clinics)
+  }, [status, disable, ticket,currentUser,active]);
+
+  const getActive = () => {
+    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/nurse_station"}})
+      .then((data) => {
+        setActive(data.data.isActive)
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        console.log(error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          //console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
 
   const createClinic = () => {
-    axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://192.168.30.245:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
         //setPat(data.data)
         setAddittion(!isAddittion)
         getDocClinics()
@@ -74,7 +95,7 @@ function Recorder() {
     })
  }
  const deleteClinic = (clinic_code:string) => {
-    axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://192.168.30.245:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
         const updatedItems = attendantClinics.filter((item:any) => item.clinic_code !== clinic_code);
         setAttendantClinics(updatedItems.map((item)=> item));
     }).catch((error)=> {
@@ -88,7 +109,7 @@ function Recorder() {
     })
  }
  const getDocClinics = () => {
-    axios.get(`http://localhost:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://192.168.30.245:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
         setAttendantClinics(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -104,7 +125,7 @@ function Recorder() {
 
   const finishToken = () => {
       setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then(()=> {
+    axios.post(`http://192.168.30.245:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -124,7 +145,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getClinicTickets", {
+    axios.get("http://192.168.30.245:5000/tickets/getClinicTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: currentUser.clinics.map((item:any)=> item.clinic_code), mr_no: ticket },
       })
       .then((data) => {
@@ -148,7 +169,7 @@ function Recorder() {
   };
   const getDoktas = () => {
     setDocLoading(true);
-    axios.get("http://localhost:5000/doktas/get_free_doktas", {
+    axios.get("http://192.168.30.245:5000/doktas/get_free_doktas", {
         params: { page, pagesize,clinic_code: currentUser.clinic_code},
       })
       .then((data) => {
@@ -185,7 +206,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -215,7 +236,48 @@ function Recorder() {
   }
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const activate = (page:string) => {
+    setFetchLoading(true);
+    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        console.log(error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`);
+          alert(error.response.data.error);
+        } else {
+          //console.log(`there is an error message ${error.message}`);
+          alert(error.message);
+        }
+      });
+  };
+  const priotize = (ticket_no:string, data:string) => {
+    setFetchLoading(true);
+    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -253,6 +315,9 @@ function Recorder() {
           </div>
             )
           }
+          <div className={styles.rest} onClick={()=> activate("/nurse_station")}>
+            {!active?"rest":"activate"}
+          </div>
         </div>
         <div className={styles.right}>
           <div
@@ -404,9 +469,10 @@ function Recorder() {
                       <th>Mr-Number</th>
                       <th>Gender</th>
                       <th>Status</th>
-                      <th>CreatedAt</th>
-                      <th>Challenge</th>
+                      <th>Billing Time</th>
+                      <th>Category</th>
                       <th>Clinic</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -417,9 +483,19 @@ function Recorder() {
                         <td>{item.token.mr_no}</td>
                         <td>{item.token.gender}</td>
                         <td>{item.token.status}</td>
-                        <td><TimeAgo isoDate={new Date(item.token.createdAt).toISOString()} /></td>
-                        <td>{item.token.disability===""?"N/A":item.token.disability}</td>
-                        <td>{item.token.clinic_code}</td>
+                        <td><TimeAgo isoDate={new Date(item.token.account_time).toISOString()} /></td>
+                        <td>{item.token !== undefined?item.token.category !==null?item.token.category:"N/A":item.token}</td>
+                        <td>{item.token.clinic}</td>
+                        <td>
+                          <div className={styles.actions}>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve")}>{item.token.serving===true?"serving":"Serve"}</div>
+                            </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,item.token.disabled && styles.priority)} onClick={()=> priotize(`${item.token.ticket_no}`,"priority")}>{item.token.disabled?"prioritized":"prioritize"}</div>
+                            </div>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -433,7 +509,9 @@ function Recorder() {
           </div>
         )}
       </div>
-      <div
+        {
+        tokens.filter((item)=> item.token.serving===true).map((item:Token,index:number)=> (
+          <div
         className={cx(
           styles.serving,
           tokens.length > 0 && !fetchLoading && styles.active
@@ -441,6 +519,34 @@ function Recorder() {
       >
         <div className={styles.speaker}>
         {
+            tokens.length > 0 && (
+              <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
+            )
+            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
+        }
+        </div>
+        <div className={styles.row}>
+          <div className={styles.row_item} onClick={()=> editTicket(item.token.id,"pending")}>
+            <div className={styles.button}>Pend</div>
+          </div>
+          {/* <div className={styles.row_item} onClick={nextToken}> */}
+          <div className={styles.row_item} onClick={()=> setNext(true)}>
+            <div className={styles.button}>Finish</div>
+          </div>
+          <div className={styles.row_item}>
+            <div className={styles.token}>{tokens.length> 0 && item.token.ticket_no}</div>
+          </div>
+          <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
+            <div className={styles.button}>Penalize</div>
+          </div>
+          <div className={styles.row_item} onClick={()=> preparePnF()}>
+            <div className={styles.button}>Finish & Penalize</div>
+          </div>
+        </div>
+      </div>
+        ))
+      }
+        {/* {
             tokens.length > 0 && (<AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={false}/>)
         }
         </div>
@@ -450,10 +556,10 @@ function Recorder() {
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
           {/* <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}> */}
-          <div className={styles.row_item} onClick={()=> setNext(true)}>
+          {/* <div className={styles.row_item} onClick={()=> setNext(true)}>
             <div className={styles.button}>Finish</div>
-          </div>
-          <div className={styles.row_item}>
+          </div> */}
+          {/* <div className={styles.row_item}>
             <div className={styles.token}>{tokens.length> 0 && tokens[0].token.ticket_no}</div>
           </div>
           <div className={styles.row_item} onClick={()=> penalize(tokens[0].token.id)}>
@@ -461,9 +567,7 @@ function Recorder() {
           </div>
           <div className={styles.row_item} onClick={()=> preparePnF()}>
             <div className={styles.button}>Finish & Penalize</div>
-          </div>
-        </div>
-      </div>
+          </div> */}
       {tokens.length > 0 && (
         <div className={styles.chini}>
           <div className={styles.top}>

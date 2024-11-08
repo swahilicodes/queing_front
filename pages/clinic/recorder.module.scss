@@ -206,6 +206,13 @@
                     background: red;
                 }
             }
+            .rest{
+                padding: 10px;
+                background: $mainColor;
+                cursor: pointer;
+                color: white;
+                border-radius: 10px;
+            }
         }
         .right{
             display: flex;
@@ -546,6 +553,30 @@
                         font-size: 17px;
                         opacity: .6;
                         font-weight: 500;
+                        .actions{
+                            display: flex;
+                            .serve{
+                                width: 85px;
+                                background: $mainColor;
+                                padding: 5px;
+                                cursor: pointer;
+                                color: white;
+                                margin: 0 5px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                transition: all .5s ease-in-out;
+                                &.active{
+                                    background: #2bf72b;
+                                }
+                                &.priority{
+                                    background: red;
+                                }
+                                &:hover{
+                                    background: green;
+                                }
+                            }
+                        }
                     }
                 }
                 .no_data{

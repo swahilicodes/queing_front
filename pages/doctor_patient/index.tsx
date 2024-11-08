@@ -23,7 +23,7 @@ export default function DoctorPatient() {
  const [isAdd, setAdd] = useState(false)
  const [jeevaClinics, setJeevaClinics] = useState([])
  const [attendantClinics, setAttendantClinics] = useState([])
- const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
+ const {data} = useFetchData("http://192.168.30.245:5000/clinic/get_clinics")
  const [fields, setFields] = useState({
     clinic: "",
     clinic_code: ""
@@ -36,7 +36,7 @@ export default function DoctorPatient() {
  },[currentUser])
 
  const getDocPat = () => {
-    axios.get(`http://localhost:5000/tickets/clinic_patient`,{params: {clinic_code: currentUser.clinic_code}}).then((data)=> {
+    axios.get(`http://192.168.30.245:5000/tickets/clinic_patient`,{params: {clinic_code: currentUser.clinic_code}}).then((data)=> {
         setPat(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -49,7 +49,7 @@ export default function DoctorPatient() {
     })
  }
  const createClinic = () => {
-    axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://192.168.30.245:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
         //setPat(data.data)
         setAddittion(!isAddittion)
         getDocClinics()
@@ -67,7 +67,7 @@ export default function DoctorPatient() {
     })
  }
  const deleteClinic = (clinic_code:string) => {
-    axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://192.168.30.245:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
         const updatedItems = attendantClinics.filter((item:any) => item.clinic_code !== clinic_code);
         setAttendantClinics(updatedItems.map((item)=> item));
     }).catch((error)=> {
@@ -81,7 +81,7 @@ export default function DoctorPatient() {
     })
  }
  const getDocClinics = () => {
-    axios.get(`http://localhost:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://192.168.30.245:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
         setAttendantClinics(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -101,7 +101,7 @@ export default function DoctorPatient() {
 
  const finishToken = () => {
     setFinLoading(true)
-    axios.post("http://localhost:5000/doktas/finish_patient",{doctor_id: currentUser.phone,patient_id: pat.mr_no}).then((data)=> {
+    axios.post("http://192.168.30.245:5000/doktas/finish_patient",{doctor_id: currentUser.phone,patient_id: pat.mr_no}).then((data)=> {
         console.log(data)
         setInterval(()=> {
             setFinLoading(false)
@@ -220,6 +220,9 @@ export default function DoctorPatient() {
                         <th>mr_no</th>
                         <th>sex</th>
                         <th>Token</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Category</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -227,7 +230,9 @@ export default function DoctorPatient() {
                             <td>1</td>
                             <td>{pat.mr_no}</td>
                             <td>{pat.gender}</td>
-                            <td>{pat.ticket_no}</td>
+                            <td>{pat.name}</td>
+                            <td>{pat.age}</td>
+                            <td>{pat.category}</td>
                         </tr>
                     </tbody>
                 </table>

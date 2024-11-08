@@ -5,7 +5,7 @@ import AdvertScroller from "@/components/adverts/advert";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { FaArrowTrendUp } from "react-icons/fa6";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import currentConditionState from "@/store/atoms/current";
 import LanguageState from "@/store/atoms/language";
 import { BiCurrentLocation } from "react-icons/bi";
@@ -15,6 +15,7 @@ import { FaArrowsAltH } from "react-icons/fa";
 import { BsMicMute } from "react-icons/bs";
 import { VscUnmute } from "react-icons/vsc";
 import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
+import deviceState from "@/store/atoms/device";
 
 export default function CashierQueue() {
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -36,9 +37,12 @@ export default function CashierQueue() {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(true)
+  const device = useRecoilValue(deviceState)
 
   useEffect(() => {
-    getTickets();
+    if(Object.keys(device).length > 0 && (device.clinics !== undefined && Object.keys(device.clinics).length > 0)){
+      getTickets();
+    }
     getAdverts();
     getActive();
     const intervalId = setInterval(() => {
@@ -46,19 +50,6 @@ export default function CashierQueue() {
       setBlink(!blink);
       getActive();
     }, 1000);
-    //   eventSource.onmessage = (event) => {
-    //     const data = JSON.parse(event.data);
-    //     console.log('Received data:', data);
-    // };
-
-    // eventSource.onerror = (error) => {
-    //     console.error('SSE error:', error);
-    // };
-    // setInterval(() => {
-    //   getTickets()
-    //   //router.reload()
-    // // }, 30000);
-    // }, 30000);
     const timer = setInterval(() => {
       setSeconds((prevSeconds) => {
         if (prevSeconds === 59) {
@@ -79,7 +70,7 @@ export default function CashierQueue() {
       clearInterval(intervalId);
       clearInterval(timer)
     };
-  }, [condition, blink]);
+  }, [condition, blink, device]);
 
   const formatTime = (unit:string) => {
     return String(unit).padStart(2, '0')
@@ -87,7 +78,7 @@ export default function CashierQueue() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/cashier_queue" } })
+      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/nurse_station" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -116,8 +107,8 @@ export default function CashierQueue() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
-        params: { stage: "accounts", clinic_code: "" },
+      .get("http://192.168.30.245:5000/tickets/get_clinic_tokens", {
+        params: { selected_clinic: "", clinics: device.clinics.map((item:any)=> item.clinic_code) },
       })
       .then((data) => {
         setTickets(data.data);

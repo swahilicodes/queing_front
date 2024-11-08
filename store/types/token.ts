@@ -2,7 +2,11 @@ interface Token{
     token: {
         id: number,
         status: string,
+        name: string,
+        age: string,
         stage: string,
+        clinic: string,
+        category: string,
         dateTime: Date,
         clinic_code: string,
         phone: string,

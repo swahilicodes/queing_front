@@ -52,7 +52,7 @@ function Recorder() {
 
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page})
+    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -74,20 +74,27 @@ function Recorder() {
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
-      setFields({...fields,status:"Paid"})
-      setInterval(()=> {
-        setFinLoading(false)
-        router.reload()
-      },2000)
+    axios.post(`http://192.168.30.245:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+      setFields({...fields,status:data.data})
+      setTokens((tokens)=> tokens.map((item)=> item))
+      router.reload()
+      // setInterval(()=> {
+      //   setFinLoading(false)
+      //   router.reload()
+      // },2000)
     }).catch((error)=> {
-      setFinLoading(false)
       if(error.response && error.response.status === 400){
-        setFields({...fields,status:error.response.data.error})
+        setTokens((tokens)=> tokens.map((item)=> item))
+        setInterval(()=> {
+          setFinLoading(false)
+          router.reload()
+        },2000)
+        //setFields({...fields,status:error.response.data.error})
         //alert(error.response.data.error)
       }else{
-        setFields({...fields,status:error.message})
-        //alert(error.message)
+        setFinLoading(false)
+        //setFields({...fields,status:error.message})
+        alert(error.message)
       }
     })
   }
@@ -95,7 +102,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("http://192.168.30.245:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
       })
       .then((data: any) => {
@@ -124,7 +131,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -144,7 +151,7 @@ function Recorder() {
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -163,7 +170,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/cashier_queue"}})
+    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/cashier_queue"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -185,7 +192,7 @@ function Recorder() {
   }
   const priotize = (ticket_no:string, data:string) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data}})
+    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -284,26 +291,28 @@ function Recorder() {
                 <table>
                   <thead>
                     <tr>
-                      <th>#</th>
                       <th>Token</th>
+                      <th>Name</th>
+                      <th>Age</th>
                       <th>Mr-Number</th>
                       <th>Gender</th>
                       <th>Status</th>
-                      <th>CreatedAt</th>
-                      <th>Challenge</th>
+                      <th>Medical Time</th>
+                      <th>Category</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tokens.map((item:Token, index: number) => (
                       <tr key={index} className={cx(index%2 === 0 && styles.even)}>
-                        <td>{index+1}</td>
                         <td>{item.token.ticket_no}</td>
+                        <td>{item.token.name}</td>
+                        <td>{item.token.age}</td>
                         <td>{item.token.mr_no}</td>
                         <td>{item.token.gender}</td>
                         <td>{item.token.status}</td>
                         <td><TimeAgo isoDate={new Date(item.token.med_time).toISOString()} /></td>
-                        <td>{item.token.disability===""?"N/A":item.token.disability}</td>
+                        <td>{item.token.category===null?"N/A":item.token.category}</td>
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
@@ -327,7 +336,9 @@ function Recorder() {
           </div>
         )}
       </div>
-      <div
+      {
+        tokens.filter((item)=> item.token.serving===true).map((item:Token,index:number)=> (
+          <div
         className={cx(
           styles.serving,
           tokens.length > 0 && !fetchLoading && styles.active
@@ -335,22 +346,24 @@ function Recorder() {
       >
         <div className={styles.speaker}>
         {
-            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`}/>)
-            tokens.length > 0 && (<AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={false}/>)
+            tokens.length > 0 && (
+              <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
+            )
+            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
         }
         </div>
         <div className={styles.row}>
-          <div className={styles.row_item} onClick={()=> editTicket(tokens[0].token.id,"pending")}>
+          <div className={styles.row_item} onClick={()=> editTicket(item.token.id,"pending")}>
             <div className={styles.button}>Pend</div>
           </div>
-          {/* <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}> */}
-          <div className={styles.row_item} onClick={()=> handleNext(tokens[0].token)}>
+          {/* <div className={styles.row_item} onClick={nextToken}> */}
+          <div className={styles.row_item} onClick={()=> handleNext(item.token)}>
             <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>
-            <div className={styles.token}>{tokens.length> 0 && tokens[0].token.ticket_no}</div>
+            <div className={styles.token}>{tokens.length> 0 && item.token.ticket_no}</div>
           </div>
-          <div className={styles.row_item} onClick={()=> penalize(tokens[0].token.id)}>
+          <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
             <div className={styles.button}>Penalize</div>
           </div>
           <div className={styles.row_item} onClick={()=> preparePnF()}>
@@ -358,6 +371,8 @@ function Recorder() {
           </div>
         </div>
       </div>
+        ))
+      }
       {tokens.length > 0 && (
         <div className={styles.chini}>
           <div className={styles.top}>

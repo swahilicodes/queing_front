@@ -40,6 +40,7 @@
                 border: 2px solid $divColor;
                 border-radius: 10px;
                 transition: all .5s ease-in-out;
+                outline: none;
                 &:focus{
                     border: 2px solid $mainColor;
                 }

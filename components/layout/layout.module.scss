@@ -7,6 +7,28 @@
     align-items: center;
     margin: 0;
     //justify-content: space-between;
+    .message{
+        position: fixed;
+        width: 100%;
+        background: $mainColor;
+        padding: 15px;
+        color: white;
+        z-index: 100;
+        opacity: 0;
+        top: -100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .5s ease-in-out;
+        font-size: 25px;
+        &.active{
+            opacity: 1;
+            top: 0;
+        }
+        &.danger{
+            background: red;
+        }
+    }
     .profile_page{
         position: fixed;
         // left: 50%;

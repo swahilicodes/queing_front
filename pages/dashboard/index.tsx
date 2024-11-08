@@ -13,14 +13,14 @@ import { FcAdvertising } from 'react-icons/fc'
 import { useRouter } from 'next/router'
 
 export default function Dashboard() {
- const {data} = useFetchData("http://localhost:5000/tickets/getTickets")
- const {data:week} = useFetchData("http://localhost:5000/tickets/getWeekTickets")
- const {data:month} = useFetchData("http://localhost:5000/tickets/getMonthTickets")
- const {data:services} = useFetchData("http://localhost:5000/services/get_all_services")
- const {data:admins} = useFetchData("http://localhost:5000/admins/get_all_admins")
- const {data:attends} = useFetchData("http://localhost:5000/attendants/get_all_attendants")
- const {data:counters} = useFetchData("http://localhost:5000/counters/get_all_counters")
- const {data:ads} = useFetchData("http://localhost:5000/adverts/get_all_adverts")
+ const {data} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
+ const {data:week} = useFetchData("http://192.168.30.245:5000/tickets/getWeekTickets")
+ const {data:month} = useFetchData("http://192.168.30.245:5000/tickets/getMonthTickets")
+ const {data:services} = useFetchData("http://192.168.30.245:5000/services/get_all_services")
+ const {data:admins} = useFetchData("http://192.168.30.245:5000/admins/get_all_admins")
+ const {data:attends} = useFetchData("http://192.168.30.245:5000/attendants/get_all_attendants")
+ const {data:counters} = useFetchData("http://192.168.30.245:5000/counters/get_all_counters")
+ const {data:ads} = useFetchData("http://192.168.30.245:5000/adverts/get_all_adverts")
  const router = useRouter()
   return (
     <div className={styles.dashboard}>
