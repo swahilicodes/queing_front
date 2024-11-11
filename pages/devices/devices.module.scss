@@ -267,6 +267,79 @@
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
         position: fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .total_wrap{
+            width: 30%;
+            position: inherit;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            animation: move .5s ease-in-out;
+        .wrap{
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            .item{
+                width: 45%;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: center;
+                label{
+                    margin: 10px 0;
+                    color: $mainColor;
+                    font-size: 18px;
+                    opacity: .7;
+                }
+                select,input{
+                    width: 100%;
+                    border: 2px solid $divColor;
+                    border-radius: 10px;
+                    padding: 15px;
+                    outline: none;
+                    &:focus{
+                        border: 2px solid $mainColor;
+                    }
+                }
+            }
+        }
+        .action{
+            width: 100%;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            button{
+                background: $mainColor;
+                padding: 15px;
+                color: white;
+                outline: none;
+                border: none;
+                text-align: center;
+                cursor: pointer;
+            }
+            .clear{
+                padding: 15px;
+                background-color: $mainColor;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                .icon{
+                    color: white;
+                }
+            }
+        }
+    }
         form{
             width: 30%;
             position: inherit;
@@ -435,6 +508,11 @@
                         }
                         .name{
                             width: 35%;
+                            &.active{
+                                color: green;
+                                opacity: .7;
+                                font-weight: 600;
+                            }
                         }
                     }
                     }

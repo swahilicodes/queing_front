@@ -155,8 +155,8 @@ function Chakula_Menu() {
   const signOut = () => {
     localStorage.removeItem("token");
     setCurrentUser({});
-    router.push("/login");
     setMenu(false)
+    router.reload()
   };
   return (
     <div className={styles.menu_bottom}>
@@ -190,7 +190,7 @@ function Chakula_Menu() {
           ))}
         </div>
       )}
-      {(currentUser !== undefined  && restricted.length > 0) && (
+      {/* {(currentUser !== undefined  && restricted.length > 0) && (
         <div className={styles.links}>
           {restricted.map((item: any, index: number) => (
             <Link
@@ -214,7 +214,7 @@ function Chakula_Menu() {
             </Link>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 }

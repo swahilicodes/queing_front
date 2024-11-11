@@ -15,6 +15,8 @@ import Chakula_Menu from '../menu/menu'
 import useAuth from '@/custom_hooks/useAuth'
 import LoginModal from '../login_modal/login_modal'
 import messageState from '@/store/atoms/message'
+import { getLocalDeviceIP } from '@/custom_hooks/deviceInfo'
+import axios from 'axios'
 
 
 export default function Layout({children}:any) {
@@ -35,7 +37,6 @@ export default function Layout({children}:any) {
   useAuth();
 
   useEffect(() => {
-
     window.addEventListener('keydown', handleKeyDown);
 }, [error,full, isUser,currentUser,message]);
 
