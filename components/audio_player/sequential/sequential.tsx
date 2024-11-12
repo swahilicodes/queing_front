@@ -1,7 +1,15 @@
 import AudioTest from '@/components/audio_player/audio_test/audio'
 import React, { useEffect, useState } from 'react'
 
-function AudioPage() {
+interface SequentialAudioPlayerProps {
+    token: string,
+    counter: string,
+    stage: string,
+    isButton: boolean
+  }
+
+const SequentialAudio: React.FC<SequentialAudioPlayerProps> = ({ token, counter, stage, isButton }) => {
+//function AudioPage() {
   const [nambaz, setNambaz] = useState<string[]>([])
   //const nambaz: string[] = []
   const [fields, setFields] = useState({
@@ -11,14 +19,14 @@ function AudioPage() {
   })
 
   useEffect(()=> {
-
-  },[])
+    play()
+  },[token])
   function getNumberLength(num: number): number {
     return num.toString().length;
   }
   const play = async () => {
-    if(getNumberLength(Number(fields.number))===4){
-      const nambas = fields.number.toString().split('').map(String)
+    if(getNumberLength(Number(token))===4){
+      const nambas = token.toString().split('').map(String)
       nambaz.push('/audio/before.mp3')
       nambaz.push('/Edited/tiketi.mp3')
       for (let i = 0; i < nambas.length; i++){
@@ -52,8 +60,8 @@ function AudioPage() {
       if(nambaz.length>= nambas.length){
         playAudioSequentially(nambaz)
       }
-    }else if(getNumberLength(Number(fields.number))===3){
-      const nambas = fields.number.toString().split('').map(String)
+    }else if(getNumberLength(Number(token))===3){
+      const nambas = token.toString().split('').map(String)
       nambaz.push('/audio/before.mp3')
       nambaz.push('/Edited/tiketi.mp3')
       for (let i = 0; i < nambas.length; i++){
@@ -83,8 +91,8 @@ function AudioPage() {
       if(nambaz.length>= nambas.length){
         playAudioSequentially(nambaz)
       }
-    }else if(getNumberLength(Number(fields.number))===2){
-      const nambas = fields.number.toString().split('').map(String)
+    }else if(getNumberLength(Number(token))===2){
+      const nambas = token.toString().split('').map(String)
       for (let i = 0; i < nambas.length; i++){
         if(i===0){
           if(nambas[i]==="0"){
@@ -104,8 +112,8 @@ function AudioPage() {
       if(nambaz.length>= nambas.length){
         playAudioSequentially(nambaz)
       }
-    }else if(getNumberLength(Number(fields.number))===1){
-      const nambas = fields.number.toString().split('').map(String)
+    }else if(getNumberLength(Number(token))===1){
+      const nambas = token.toString().split('').map(String)
       for (let i = 0; i < nambas.length; i++){
         if(i===0){
           nambaz.push(`/Edited/${nambas[i]}.mp3`)
@@ -131,17 +139,8 @@ function AudioPage() {
     }
   };
   return (
-    <div id='player'>
-      <input 
-      type="text" 
-      value={fields.number}
-      onChange={e => setFields({...fields,number: e.target.value})}
-      />
-      <h1>Number Length: {getNumberLength(Number(fields.number))}</h1>
-      <button onClick={play}>Play It</button>
-      {/* <AudioTest token='037' counter='100' stage='meds' isButton={false}/> */}
-    </div>
+    <div id='player'>play</div>
   )
 }
 
-export default AudioPage
+export default SequentialAudio

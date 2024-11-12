@@ -16,6 +16,7 @@ const useFetchData = (url:string) => {
             setData(data.data)
             setLoading(false)
         }).catch((error) => {
+            console.log(error.response)
             setLoading(false)
             if (error.response && error.response.status === 400) {
                 console.log(`there is an error ${error.message}`)

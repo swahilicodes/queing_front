@@ -1,0 +1,67 @@
+@import '../../global.scss';
+.speaker{
+    width: 100vw;
+    height: 100vh;
+    .speaker_top{
+        width: 100%;
+        height: 7%;
+        background: $mainBold;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 15px;
+        .left{
+            .item{
+                label{
+                    color: $secondColor;
+                }
+                select{
+                    outline: none;
+                    padding: 7px;
+                    border: 2px solid $divColor;
+                    color: black;
+                    opacity: .7;
+                    font-weight: 600;
+                    &:focus{
+                        border: 2px solid $mainColor;  
+                    }
+                }
+            }
+        }
+        .right{
+            .item{
+                background: $mainColor;
+                padding: 15px;
+                color: white;
+                font-weight: 600;
+            }
+        }
+    }
+    .items{
+        width: 100%;
+        table{
+            width: 100%;
+            border-collapse: collapse;
+            th,td{
+                text-align: left;
+                padding: 10px 0;
+            }
+            thead{
+                width: 100%;
+                background: $mainColor;
+                color: white;
+                tr{
+                    padding: 10px 0;
+                }
+            }
+            tbody{
+                width: 100%;
+                tr{
+                    &.even{
+                        background: $divColor;
+                    }
+                }
+            }
+        }
+    }
+}

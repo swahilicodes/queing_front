@@ -43,7 +43,6 @@ export default function Print() {
 
   const handlePrint = () => {
     if (formRef.current) {
-      console.log('printing please wait')
       const printWindow = window.open('', '', 'width=600,height=400');
       if (printWindow) {
         printWindow.document.write(`
@@ -94,6 +93,7 @@ export default function Print() {
           setPrintable(false)
         },5000)
     }).catch((error)=> {
+        console.log(error.response.data)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
