@@ -35,7 +35,9 @@ export default function Home() {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [serveId, setServeId] = useState(0)
   const [muted, setMuted] = useState(true)
+  const [token,setToken] = useState("")
 
   useEffect(() => {
     getTickets();
@@ -79,10 +81,24 @@ export default function Home() {
       clearInterval(intervalId);
       clearInterval(timer)
     };
-  }, [condition, blink]);
+  }, [condition, blink,token, serveId]);
 
   const formatTime = (unit:string) => {
     return String(unit).padStart(2, '0')
+  }
+
+  const handleToken = (data:string,item:any) => {
+    if(token !== data){
+      setMinutes(0)
+      setSeconds(0)
+      setHours(0)
+    }
+    setToken(item.ticket.ticket_no)
+    // setInterval(()=> {
+    //   setMinutes(0)
+    //   setSeconds(0)
+    //   setHours(0)
+    // },2000)
   }
 
   const getActive = () => {
@@ -154,23 +170,23 @@ export default function Home() {
             </div>
           )}
             <div className={cx(styles.left_wrap,active && styles.none)}>
-            <div className={styles.hudumiwa}>
-            <div className={styles.wrap}>
-            <div className={styles.tatatata}>
+            <div className={cx(styles.hudumiwa)}>
+            <div className={cx(styles.wrap,serveId===0 && styles.none)}>
+            <div className={cx(styles.tatatata,serveId===0 && styles.none)}>
               <h1>Anae Hudumiwa</h1>
             </div>
             <div className={styles.sepera}>
             </div>
             {tickets.length > 0 ? (
-              <div className={styles.round}>
+              <div className={cx(styles.round,serveId===0 && styles.none)}>
                 {tickets
                   .filter(
                     (item: { ticket: { serving: boolean } }) =>
                       item.ticket.serving
                   )
                   .map((item: any, index: number) => (
-                    <div className={styles.sava}>
-                      <div key={index} className={styles.logo}>
+                    <div className={styles.sava} onLoad={()=> setServeId(index+1)}>
+                      <div key={index} className={styles.logo} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>
                         <img src="/mnh.png" alt="" />
                       </div>
                       <div className={styles.tokeni}>

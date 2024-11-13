@@ -16,6 +16,8 @@ import { GrPowerShutdown } from "react-icons/gr";
 import useFetchData from "@/custom_hooks/fetch";
 import { IoIosAdd, IoMdAdd } from "react-icons/io";
 import { FiMinus } from "react-icons/fi";
+import SequentialAudio from "@/components/audio_player/sequential/sequential";
+import isSpeakerState from "@/store/atoms/isSpeaker";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -39,6 +41,12 @@ function Recorder() {
   const [isAdd, setAdd] = useState(false)
   const [attendantClinics, setAttendantClinics] = useState([])
   const [active, setActive] = useState(false)
+  const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
+  const [currentToken, setCurrentToken] = useState({
+    ticket_no: "",
+    stage: "",
+    counter: ""
+  })
   const [fields, setFields] = useState({
     doctor_id: '',
     patient_id: '',
@@ -50,12 +58,14 @@ function Recorder() {
 
   useEffect(() => {
     if(Object.keys(currentUser).length > 0 ){
-      getTicks()
+      if(Object.keys(attendantClinics).length > 0 ){
+        getTicks()
+      }
       getDoktas()
       getDocClinics()
       getActive()
     }
-  }, [status, disable, ticket,currentUser,active,fields.clinic_code]);
+  }, [status, disable, ticket,currentUser,active,fields.clinic_code,currentToken]);
 
   const handleCurrentClinic = (code:string) => {
     if(code==="all"){
@@ -110,6 +120,11 @@ function Recorder() {
       });
   };
 
+  const handleNext = (item:any) => {
+    setNext(true)
+    setCurrentToken({...currentToken,ticket_no: item.token.ticket_no,stage: item.token.stage,counter: item.counter.namba})
+  }
+
   const createClinic = () => {
     axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
         //setPat(data.data)
@@ -158,8 +173,9 @@ function Recorder() {
 
 
   const finishToken = () => {
-      setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then(()=> {
+    setFinLoading(true)
+    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then((data)=> {
+      console.log(data)
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -180,7 +196,7 @@ function Recorder() {
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
-        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: currentUser.clinics.map((item:any)=> item.clinic_code), mr_no: ticket,current_clinic:fields.clinic_code },
+        params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: attendantClinics.map((item:any)=> item.clinic_code), mr_no: ticket,current_clinic:fields.clinic_code },
       })
       .then((data) => {
         setTokens(data.data.data);
@@ -190,7 +206,7 @@ function Recorder() {
         }, 2000);
       })
       .catch((error) => {
-        console.log('get tickets error ',error.response.status)
+        console.log('get tickets error ',error.response)
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
@@ -204,7 +220,7 @@ function Recorder() {
   const getDoktas = () => {
     setDocLoading(true);
     axios.get("http://localhost:5000/doktas/get_free_doktas", {
-        params: { page, pagesize,clinic_code: currentUser.clinic_code},
+        params: { page, pagesize,clinic_code: currentUser.clinic_code,clinics: currentUser.clinics.map((item:any)=> item.clinic_code),selected_clinic: fields.clinic_code},
       })
       .then((data) => {
         setDoktas(data.data.data);
@@ -484,10 +500,13 @@ function Recorder() {
                 <div onClick={()=> finishToken()} className={styles.button}>Submit</div>
                   {
                     (fields.room !== '' && tokens.length > 0 ) &&(
-                      <div className={styles.button}>
-                        <AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={true}/>
-                        {/* <SequentialAudioPlayerFinish  token={`${tokens[0].token.ticket_no}`} counter={fields.room}/> */}
-                      </div>
+                      <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
+                      <SequentialAudio token={`${currentToken.ticket_no}`} counter={`${fields.room}`} stage={currentToken.stage} isButton={true} talking={isSpeaker}/>
+                    </div>
+                      // <div className={styles.button}>
+                      //   <AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={true}/>
+                      //   {/* <SequentialAudioPlayerFinish  token={`${tokens[0].token.ticket_no}`} counter={fields.room}/> */}
+                      // </div>
                     )
                   }
                 {/* <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div> */}
@@ -564,19 +583,22 @@ function Recorder() {
         )}
       >
         <div className={styles.speaker}>
-        {
+        {/* {
             tokens.length > 0 && (
-              <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
-            )
+            //   <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
+            //     <SequentialAudio token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/>
+            //   </div>
+            //   // <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
+            // )
             // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
-        }
+        } */}
         </div>
         <div className={styles.row}>
           <div className={styles.row_item} onClick={()=> editTicket(item.token.id,"pending")}>
             <div className={styles.button}>Pend</div>
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
-          <div className={styles.row_item} onClick={()=> setNext(true)}>
+          <div className={styles.row_item} onClick={()=> handleNext(item)}>
             <div className={styles.button}>Finish</div>
           </div>
           <div className={styles.row_item}>

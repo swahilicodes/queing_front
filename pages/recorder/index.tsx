@@ -13,6 +13,8 @@ import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
 import AudioTest from "@/components/audio_player/audio_test/audio";
 import { GrPowerShutdown } from "react-icons/gr";
+import SequentialAudio from "@/components/audio_player/sequential/sequential";
+import isSpeakerState from "@/store/atoms/isSpeaker";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -33,6 +35,7 @@ function Recorder() {
   const [penalized, setPenalized] = useState(false)
   const [, setExpired] = useState<Token[]>([]);
   const [active, setActive] = useState(false)
+  const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
   const [fields, setFields] = useState({
     finish_id: "",
     patName: "",
@@ -45,7 +48,7 @@ function Recorder() {
   useEffect(() => {
     getTicks();
     getActive()
-    console.log(currentUser.phone)
+    console.log(currentUser)
   }, [status, disable, ticket, active]);
 
   const prepareFinish = (id:number) => {
@@ -372,7 +375,9 @@ function Recorder() {
         <div className={styles.speaker}>
         {
             tokens.length > 0 && (
-              <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
+              <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
+                <SequentialAudio token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/>
+              </div>
             )
             // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
         }

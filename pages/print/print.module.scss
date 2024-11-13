@@ -141,6 +141,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        .loader{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .content{
             position: fixed;
             background: white;

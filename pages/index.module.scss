@@ -97,18 +97,24 @@
                             align-items: center;
                             justify-content: center;
                             position: relative;
+                            &.none{
+                                display: none;
+                            }
                             .tatatata{
                                 position: absolute;
                                 top: 0;
                                 width: 80%;
-                                height: 90px;
+                                height: 80px;
                                 background: $mainColor;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
                                 h1{
                                     color: white;
-                                    font-size: 50px;
+                                    font-size: 40px;
+                                }
+                                &.none{
+                                    display: none;
                                 }
                             }
                             .sepera{
@@ -118,7 +124,7 @@
                                 width: 80%;
                                 height: 4px;
                                 background: $mainColor;
-                                display: flex;
+                                display: none;
                                 align-items: center;
                                 justify-content: center;
                                 opacity: .6;

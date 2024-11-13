@@ -8,6 +8,8 @@ import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import qrState from '@/store/atoms/qr';
 import { BsEmojiAngry, BsEmojiSmile, BsEmojiWink } from 'react-icons/bs';
+import Cubes from '@/components/loaders/cubes/cubes';
+import messageState from '@/store/atoms/message';
 
 export default function Print() {
   const [fields, setFields] = useState({
@@ -21,6 +23,8 @@ export default function Print() {
   const keys = [1,2,3,4,5,6,7,8,9,0];
   const [qr,setQrState] = useRecoilState<any>(qrState)
   const [printable, setPrintable] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [message, setMessage] = useRecoilState(messageState)
   const [seleccted, setSelected] = useState({
     index: 0,
     reason: "",
@@ -41,9 +45,27 @@ export default function Print() {
     }
   },[printable])
 
+  const handleSubmit = (type:string) => {
+    //setSubLoading(true)
+    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: type, reason: ''}).then(()=> {
+        //setSubLoading(false)
+        setSelected({...seleccted,index:0,type:"",reason: ""})
+        setMessage({...message,title: "Asante Kwa Maoni Yake",category: "success"})
+        setTimeout(()=> {
+          setMessage({...message,title: "",category: ""})
+        },3000)
+    }).catch((error)=> {
+        //setSubLoading(false)
+        console.log(error.response)
+    })
+    setTimeout(()=> {
+        //setSubLoading(false)
+    },3000)
+  };
+
   const handlePrint = () => {
     if (formRef.current) {
-      const printWindow = window.open('', '', 'width=600,height=400');
+      const printWindow = window.open('', '', 'width=1000,height=1000');
       if (printWindow) {
         printWindow.document.write(`
           <html>
@@ -70,6 +92,42 @@ export default function Print() {
       setVisible(false);
     }
   };
+
+  function printImage(src: string) {
+    if(formRef.current){
+      var win:any = window.open('about:blank', '_blank');
+    win.document.open();
+    win.document.write([
+        '<html>',
+        '   <head>',
+        '       <style>',
+        '           @media print {',
+        '               body, html {',
+        '                   width: 100%;',
+        '                   height: 20%;',
+        '                   margin: 0;',
+        '                   padding: 0;',
+        '                   display: flex;',
+        '                   align-items: center;',
+        '                   justify-content: center;',
+        '               }',
+        '               img {',
+        '                   width: 100%;',
+        '                   max-width: 300px;', // Adjust width to match thermal printer
+        '                   height: auto;',
+        '                   object-fit: cover;', // Ensure the image fits properly
+        '               }',
+        '           }',
+        '       </style>',
+        '   </head>',
+        '   <body onload="window.print()" onafterprint="window.close()">',
+        '       <img src="' + src + '" alt="Printed Image" />',
+        '   </body>',
+        '</html>'
+    ].join(''));
+    win.document.close();
+    }
+}
   const handleClearClick = () => {
     if (fields.numberString.length > 0) {
       setFields({...fields,numberString: fields.numberString.slice(0, -1)})
@@ -83,14 +141,19 @@ export default function Print() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/tickets/create_ticket",{disability: null,phone:fields.numberString})
+    axios.post("http://localhost:5000/tickets/create_ticket",{disability: '',phone:fields.numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
-        setPrintable(true)
+        //setPrintable(true)
         setFields({...fields,phone:"",numberString:""})
+        setSuccess(true)
         setTimeout(()=> {
-          setPrintable(false)
+          setPrintable(true)
+          setSuccess(false)
+          setTimeout(()=> {
+            setPrintable(false)
+          },2000)
         },5000)
     }).catch((error)=> {
         console.log(error.response.data)
@@ -106,6 +169,13 @@ export default function Print() {
 
   return (
     <div className={styles.form_print}>
+      {
+        success && <div className={styles.overlay}>
+          <div className={styles.loader}>
+            <Cubes/>
+          </div>
+        </div>
+      }
         {
           printable && (
             <form ref={formRef} style={{opacity:"0"}} className={styles.printer}>
@@ -130,13 +200,13 @@ export default function Print() {
                     <h3>Unaonaje Huduma Zetu?</h3>
                 </div>
                 <div className={styles.emojis}>
-                  <div className={styles.emoti}>
+                  <div className={styles.emoti} onClick={()=> handleSubmit("mbaya")}>
                   <BsEmojiAngry size={60} className={styles.icon___}/>
                   </div>
-                  <div className={styles.emoti}>
+                  <div className={styles.emoti} onClick={()=> handleSubmit("kawaida")}>
                   <BsEmojiSmile size={60} className={styles.icon___}/>
                   </div>
-                  <div className={styles.emoti}>
+                  <div className={styles.emoti} onClick={()=> handleSubmit("good")}>
                   <BsEmojiWink size={60} className={styles.icon___}/>
                   </div>
                 </div>

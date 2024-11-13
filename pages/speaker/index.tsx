@@ -6,11 +6,15 @@ import axios from 'axios'
 import cx from 'classnames'
 import SequentialAudio from '@/components/audio_player/sequential/sequential'
 import { useRouter } from 'next/router'
+import { useRecoilState } from 'recoil'
+import isSpeakerState from '@/store/atoms/isSpeaker'
+import { CiMicrophoneOff, CiMicrophoneOn } from 'react-icons/ci'
 
 function Speaker() {
  const {createItem,loading} = useCreateItem()
  const [plays, setPlays] = useState([])
  const [isLoading,setLoading] = useState(false)
+ const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
  const router = useRouter()
  const [fields, setFields] = useState({
     station: ""
@@ -33,6 +37,10 @@ function Speaker() {
         setFields({...fields,station: station}) 
     }  
  }
+
+ function removeLeadingZeros(input: string): string {
+    return input.replace(/^0+/, '') || '0';
+  }
 
  const handleStation = (value:string) => {
     const station = localStorage.getItem('station')
@@ -62,6 +70,13 @@ function Speaker() {
  }
   return (
     <div className={styles.speaker}>
+        <div className={styles.enable} onClick={()=> setSpeaker(!isSpeaker)}>
+            {
+                isSpeaker
+                ? <CiMicrophoneOff className={styles.icon} size={40}/>
+                : <CiMicrophoneOn className={styles.icon} size={40}/>
+            }
+        </div>
         <div className={styles.speaker_top}>
             <div className={styles.left}>
                 <div className={styles.item}>
@@ -105,7 +120,8 @@ function Speaker() {
                                 <td>{item.stage}</td>
                                 <td>{item.counter}</td>
                                 <td>{item.station}</td>
-                                <td>{item.talking===true?<SequentialAudio token={"1"} counter={"09"} stage='meds' isButton={false}/>:"False"}</td>
+                                {/* <td>{item.talking===true?<SequentialAudio token={removeLeadingZeros(item.ticket_no)} counter={"09"} stage='meds' isButton={false}/>:"False"}</td> */}
+                                <td><SequentialAudio token={item.ticket_no} counter={"005"} stage='meds' isButton={false} talking={item.talking}/></td>
                             </tr>
                         ))
                     }

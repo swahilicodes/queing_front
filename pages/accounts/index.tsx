@@ -13,6 +13,8 @@ import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
 import AudioTest from "@/components/audio_player/audio_test/audio";
 import { GrPowerShutdown } from "react-icons/gr";
+import SequentialAudio from "@/components/audio_player/sequential/sequential";
+import isSpeakerState from "@/store/atoms/isSpeaker";
 
 function Recorder() {
   const currentUser = useRecoilValue(currentUserState);
@@ -31,6 +33,7 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [active, setActive] = useState(false)
+  const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
   const [fields, setFields] = useState({
     mr_no: "",
     status: ""
@@ -77,11 +80,10 @@ function Recorder() {
     axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:data.data})
       setTokens((tokens)=> tokens.map((item)=> item))
-      router.reload()
-      // setInterval(()=> {
-      //   setFinLoading(false)
-      //   router.reload()
-      // },2000)
+      setFinLoading(false)
+      setInterval(()=> {
+        router.reload()
+      },2000)
     }).catch((error)=> {
       if(error.response && error.response.status === 400){
         setTokens((tokens)=> tokens.map((item)=> item))
@@ -347,7 +349,10 @@ function Recorder() {
         <div className={styles.speaker}>
         {
             tokens.length > 0 && (
-              <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
+              <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
+                <SequentialAudio token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/>
+              </div>
+              // <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
             )
             // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
         }

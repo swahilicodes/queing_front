@@ -32,6 +32,7 @@ export default function DoctorPatient() {
     if(Object.keys(currentUser).length > 0 ){
         getDocPat()
         getDocClinics()
+        console.log(currentUser)
     }
  },[currentUser])
 

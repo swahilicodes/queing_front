@@ -2,6 +2,17 @@
 .speaker{
     width: 100vw;
     height: 100vh;
+    position: relative;
+    .enable{
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
+        background: $mainBold;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        padding: 10px;
+    }
     .speaker_top{
         width: 100%;
         height: 7%;
