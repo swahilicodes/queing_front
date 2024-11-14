@@ -44,7 +44,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
    if(event.key === 'p'){
     setUser((prevFull) => !prevFull);
   }else if(event.key === "<"){
-    setMenu((prevFull) => !prevFull)
+    //setMenu((isMenu) => !isMenu)
+    setMenu(true)
+  }else if(event.key === ")"){
+    setMenu(false)
   }else if(event.key===">"){
     if(full){
       localStorage.removeItem('token')

@@ -50,7 +50,7 @@ export default function Print() {
     axios.post("http://localhost:5000/suggestion/create_suggestion",{type: type, reason: ''}).then(()=> {
         //setSubLoading(false)
         setSelected({...seleccted,index:0,type:"",reason: ""})
-        setMessage({...message,title: "Asante Kwa Maoni Yake",category: "success"})
+        setMessage({...message,title: "Asante Kwa Maoni Yako",category: "success"})
         setTimeout(()=> {
           setMessage({...message,title: "",category: ""})
         },3000)
@@ -169,6 +169,9 @@ export default function Print() {
 
   return (
     <div className={styles.form_print}>
+      <div className={styles.form_top}>
+        <h1>HOSPITALI YA TAIFA MUHIMBILI - MLOGANZILA</h1>
+      </div>
       {
         success && <div className={styles.overlay}>
           <div className={styles.loader}>
@@ -193,7 +196,7 @@ export default function Print() {
                 <img src="/mnh.png" alt="" />
             </div>
             <div className={styles.item} onClick={()=> setClicked(true)}>
-                <p>Chukua Tokeni</p>
+                <p>Chukua Tiketi</p>
             </div>
             <div className={styles.suggestions}>
                 <div className={styles.title}>
@@ -241,7 +244,7 @@ export default function Print() {
                                 }
                             </div>
                             <div className={styles.action}>
-                                <button onClick={submit} type='submit'>Submit</button>
+                                <button onClick={submit} type='submit'>Wasilisha/Submit</button>
                                 <div className={styles.cleara} onClick={()=> setClicked(false)}><MdClear className={styles.icona}/></div>
                             </div>
                         </div>

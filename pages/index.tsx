@@ -142,6 +142,7 @@ export default function Home() {
       .catch((error) => {
         setLoading(false);
         alert(error);
+        console.log(error.response)
       });
   };
 

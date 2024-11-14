@@ -23,8 +23,15 @@ function Chakula_Menu() {
       users: ["admin", "doctor", "nurse", "accountant"],
     },
     {
+      id: 654,
+      path: "/nurse_station",
+      name: "Nurse Queue",
+      icon: "fa fa-share-square-o",
+      users: ["admin","nurse"],
+    },
+    {
       id: 1,
-      path: "/queue_add",
+      path: "/print",
       name: "Queue",
       icon: "fa fa-users",
       users: ["admin", "doctor", "nurse", "accountant"],
@@ -108,30 +115,30 @@ function Chakula_Menu() {
     },
     {
       id: 12,
-      path: "/login",
-      name: "Login",
-      icon: "fa fa-plug",
-      users: ["admin", "doctor", "nurse", "accountant"],
-    },
-    {
-      id: 13,
       path: "/recorder",
       name: "Medical Records",
       icon: "fa fa-registered",
       users: ["admin", "medical_recorder"],
     },
     {
-      id: 14,
+      id: 13,
       path: "/rooms",
       name: "Rooms",
       icon: "fa fa-braille",
       users: ["admin"],
     },
     {
-      id: 15,
+      id: 14,
       path: "/settings",
       name: "Settings",
       icon: "fa fa-cog",
+      users: ["admin"],
+    },
+    {
+      id: 15,
+      path: "/cashier_queue",
+      name: "Cashier Queue",
+      icon: "fa fa-money",
       users: ["admin"],
     },
   ];
@@ -168,6 +175,7 @@ function Chakula_Menu() {
               className={cx(
                 styles.link,
                 index + 1 === currentIndex && styles.active,
+                item.path===router.pathname && styles.active,
                 item.path === "/login" && styles.remove
               )}
               onClick={()=> item.id===16 && signOut()}
