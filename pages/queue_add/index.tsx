@@ -1,110 +1,119 @@
-import React, { useRef, useState } from 'react'
-import styles from './queue_add.module.scss'
-import { MdClear, MdOutlineClear } from 'react-icons/md'
-import QRCode from 'qrcode.react'
-import axios from 'axios'
-import { useRouter } from 'next/router'
-import { useRecoilState, useSetRecoilState } from 'recoil'
-import qrState from '@/store/atoms/qr'
-import { IoMdCheckmark } from 'react-icons/io'
+import Printable from '@/components/printable/printable'
+import React, { useEffect, useRef, useState } from 'react'
+import styles from './print.module.scss'
+import QRCode from 'qrcode.react';
+import { MdArrowBackIos, MdClear, MdOutlineClear } from 'react-icons/md';
 import cx from 'classnames'
-import html2canvas from 'html2canvas'
-import { TiChevronRight } from 'react-icons/ti'
-import errorState from '@/store/atoms/error'
+import axios from 'axios';
+import { useRecoilState } from 'recoil';
+import qrState from '@/store/atoms/qr';
+import { BsEmojiAngry, BsEmojiSmile, BsEmojiWink } from 'react-icons/bs';
+import Cubes from '@/components/loaders/cubes/cubes';
+import messageState from '@/store/atoms/message';
+import html2canvas from 'html2canvas';
+import { useRouter } from 'next/router';
 
-export default function QueueAdd() {
-  const [cat,setcat] = useState("")
+export default function Print() {
+  const [fields, setFields] = useState({
+    phone: "",
+    numberString: ''
+  })
+  const date = new Date();
+  const month = date.getMonth()+1
+  const qrData = `phone:${fields.phone},website: www.mloganzila.or.tz`
   const [clicked,setClicked] = useState(false)
-  const [isQr,setQr] = useState(false)
   const keys = [1,2,3,4,5,6,7,8,9,0];
-  const [numberString, setNumberString] = useState('');
   const [qr,setQrState] = useRecoilState<any>(qrState)
-  const [isSuccess, setSuccess] = useState(false)
+  const [printable, setPrintable] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [message, setMessage] = useRecoilState(messageState)
+  const [isQr,setQr] = useState(false)
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null);
-  const date = new Date(qr.createdAt);
-  const month = date.getMonth()+1
- const qrData = `phone:${qr.phone},clinic:${qr.category}`
- const [disabled, setDisabled] = useState('')
- const [index,setIndex] = useState(0)
- const [subLoading, setSubLoading] = useState(false)
- const [error, setError] = useRecoilState(errorState)
- const [seleccted, setSelected] = useState({
+  const [seleccted, setSelected] = useState({
     index: 0,
     reason: "",
     type: "",
  })
- const suggestions = [
-    "Kawaida","Mbaya","Nzuri"
- ]
- const [items, setItems] = useState([
-    { id: 1, name: 'mzee', isActive: false },
-    { id: 2, name: 'mjamzito', isActive: false },
-    { id: 3, name: 'mlemavu', isActive: false },
-  ]);
- const sags = [
-    {
-        id: 1,
-        name: 'Mzee'
-    },
-    {
-        id: 2,
-        name: 'Mjamzito'
-    },
-    {
-        id: 3,
-        name: 'Mlemavu'
-    },
- ]
+  // return (
+  //   <div className={styles.print}>
+  //     this is print
+  //       {/* <Printable/> */}
+  //   </div>
+  // )
+  //const formRef = useRef<HTMLFormElement | null>(null);
+  const [visible, setVisible] = useState(false);
 
- const changeSag = (id:number,data:string) => {
-    if(index===id){
-        setIndex(0)
-        setDisabled('')
-    }else{
-        setIndex(id)
-        setDisabled(data)
+  useEffect(()=> {
+    if(printable){
+      handlePrint()
     }
- }
+  },[printable])
 
-  const handleSubmit = () => {
-    setSubLoading(true)
-    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
-        setSubLoading(false)
+  const handleSubmit = (type:string) => {
+    //setSubLoading(true)
+    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: type, reason: ''}).then(()=> {
+        //setSubLoading(false)
         setSelected({...seleccted,index:0,type:"",reason: ""})
-        setError("Asante kwa Maoni Yako...")
+        setMessage({...message,title: "Asante Kwa Maoni Yako",category: "success"})
         setTimeout(()=> {
-            setError("")
+          setMessage({...message,title: "",category: ""})
         },3000)
     }).catch((error)=> {
-        setSubLoading(false)
+        //setSubLoading(false)
         console.log(error.response)
     })
     setTimeout(()=> {
-        setSubLoading(false)
+        //setSubLoading(false)
     },3000)
   };
 
-  const enterNumber = () => {
-    setcat(cat)
-    setClicked(true)
-  }
-
-  const handleNumberClick = (num:number) => {
-    setNumberString(numberString + num);
-  };
-
-  const handleClearClick = () => {
-    if (numberString.length > 0) {
-      setNumberString(numberString.slice(0, -1));
+  const handlePrint = () => {
+    if (formRef.current) {
+      const printWindow = window.open('', '', 'width=1000,height=1000');
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Print Form</title>
+              <style>
+                /* Add any styles you need for printing */
+              </style>
+            </head>
+            <body>
+              ${formRef.current.outerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.onafterprint = () => {
+          console.log('document printed successfully');
+          setVisible(false); // Optionally, reset visibility here
+        };
+        printWindow.close();
+      }
+      // Optionally, reset visibility
+      setVisible(false);
     }
   };
 
-
+  const handleCapture = () => {
+    const form:any = document.getElementById('myFrame');
+    html2canvas(form).then((canvas) => {
+      var a  = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+    //   a.download = 'image.png';
+    //   a.click();
+      setQr(false)
+      printImage(a.href)
+      router.reload()
+    });
+  };
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
+    axios.post("http://localhost:5000/tickets/create_ticket",{disability: '',phone:fields.numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
@@ -127,19 +136,6 @@ export default function QueueAdd() {
         }
     })
   }
-
-  const handleCapture = () => {
-    const form:any = document.getElementById('myFrame');
-    html2canvas(form).then((canvas) => {
-      var a  = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-    //   a.download = 'image.png';
-    //   a.click();
-      setQr(false)
-      printImage(a.href)
-      router.reload()
-    });
-  };
 
 function printImage(src: string) {
     var win:any = window.open('about:blank', '_blank');
@@ -174,31 +170,93 @@ function printImage(src: string) {
     ].join(''));
     win.document.close();
 }
+  const handleClearClick = () => {
+    if (fields.numberString.length > 0) {
+      setFields({...fields,numberString: fields.numberString.slice(0, -1)})
+      //setFields({...fields,numberString: fields.numberString.slice(0, -1)})
+    }
+  };
+  const handleNumberClick = (num:number) => {
+    //setFields({...fields,numberString: num+fields.numberString})
+    setFields({...fields,numberString: fields.numberString+num})
+  };
 
+  // // const submit = (e:React.FormEvent) => {
+  // //   e.preventDefault()
+  // //   axios.post("http://localhost:5000/tickets/create_ticket",{disability: '',phone:fields.numberString})
+  // //   .then((data)=> {
+  // //       setQrState(data.data)
+  // //       setClicked(false)
+  // //       //setPrintable(true)
+  // //       setFields({...fields,phone:"",numberString:""})
+  // //       setSuccess(true)
+  // //       setTimeout(()=> {
+  // //         setPrintable(true)
+  // //         setSuccess(false)
+  // //         setTimeout(()=> {
+  // //           setPrintable(false)
+  // //         },2000)
+  // //       },5000)
+  // //   }).catch((error)=> {
+  // //       console.log(error.response.data)
+  // //       if (error.response && error.response.status === 400) {
+  // //           console.log(`there is an error ${error.message}`)
+  // //           alert(error.response.data.error);
+  // //       } else {
+  // //           console.log(`there is an error message ${error.message}`)
+  // //           //alert(error.message);
+  // //       }
+  // //   })
+  // // }
 
   return (
-    <div className={styles.queue_add}>
-        <div className={cx(styles.note,error && styles.display)}>
-            {error}
+    <div className={styles.form_print}>
+      <div className={styles.form_top}>
+        <h1>HOSPITALI YA TAIFA MUHIMBILI - MLOGANZILA</h1>
+      </div>
+      {
+        success && <div className={styles.overlay}>
+          <div className={styles.loader}>
+            <Cubes/>
+          </div>
         </div>
-        <div className={styles.top_notch}>
-            <div className={styles.title}>
-                <h1>HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA</h1>
-            </div>
-        </div>
+      }
         {
-         <div className={cx(styles.printable, isQr && styles.active)} style={{background:"white"}}>
-                <form id='myFrame' ref={formRef}>
-                    <div className={styles.contents}>
-                    <h2 style={{fontSize: "60px"}}>{qr.ticket_no}</h2>
-                    <div className={styles.qr}><QRCode value={qrData} /></div>
-                    {/* <p style={{fontWeight: "600", fontSize: "18px"}}>Karibu Hospitali ya Taifa Muhimbili Mloganzila</p> */}
-                    </div>
-                    <p style={{fontWeight: "600", fontSize: "18px"}} className={styles.date}>{date.getDate().toString().padStart(2, '0') }/{month.toString().padStart(2, '0')}/{date.getUTCFullYear()}   <span>{date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}</span></p>
-                    <h6 style={{fontWeight: "600", fontSize: "20px", color:"blue"}}>www.mloganzila.or.tz</h6>
-                </form>
-            </div>
+          printable && (
+            <form ref={formRef} style={{opacity:"0"}} className={styles.printer} id='myFrame'>
+          <h1>{qr.ticket_no}</h1>
+          <div className={styles.qr}>
+            <QRCode value={qrData}/>
+          </div>
+          <p className={styles.date}>{date.getDate().toString().padStart(2, '0') }/{month.toString().padStart(2, '0')}/{date.getUTCFullYear()}   <span>{date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}</span></p>
+          <h6 style={{fontWeight: "600", fontSize: "20px", color:"blue"}}>www.mloganzila.or.tz</h6>
+        </form>
+          )
         }
+        <div className={styles.items}>
+            <div className={styles.icon}>
+                <img src="/mnh.png" alt="" />
+            </div>
+            <div className={styles.item} onClick={()=> setClicked(true)}>
+                <p>Chukua Tiketi</p>
+            </div>
+            <div className={styles.suggestions}>
+                <div className={styles.title}>
+                    <h3>Unaonaje Huduma Zetu?</h3>
+                </div>
+                <div className={styles.emojis}>
+                  <div className={styles.emoti} onClick={()=> handleSubmit("mbaya")}>
+                  <BsEmojiAngry size={60} className={styles.icon___}/>
+                  </div>
+                  <div className={styles.emoti} onClick={()=> handleSubmit("kawaida")}>
+                  <BsEmojiSmile size={60} className={styles.icon___}/>
+                  </div>
+                  <div className={styles.emoti} onClick={()=> handleSubmit("good")}>
+                  <BsEmojiWink size={60} className={styles.icon___}/>
+                  </div>
+                </div>
+            </div>
+        </div>
         {
             clicked && (
                 <div className={styles.overlay}>
@@ -208,8 +266,17 @@ function printImage(src: string) {
                         </div>
                         <div className={styles.contents}>
                             <div className={styles.bar}>
-                                <div className={styles.left}>{numberString.trim()===''?0:numberString}</div>
-                                <div className={styles.right} onClick={()=> handleClearClick()}><MdOutlineClear className={styles.icon}/></div>
+                                <div className={styles.left}>
+                                <input
+                                  type="text"
+                                  value={fields.numberString}
+                                  placeholder="0"
+                                />
+                                </div>
+                                <div className={styles.right}>
+                                <div className={styles.clear} onClick={()=> handleClearClick()}><MdArrowBackIos className={styles.icon} size={30}/></div>
+                                <div className={styles.clear} onClick={()=> setFields({...fields,numberString: ""})}><MdOutlineClear className={styles.icon} size={30}/></div>
+                                </div>
                             </div>
                             <div className={styles.keyBoard}>
                                 {
@@ -218,19 +285,8 @@ function printImage(src: string) {
                                     ))
                                 }
                             </div>
-                            <div className={styles.exceptions}>
-                                <h1>Una Uhitaji Maalumu?</h1>
-                                <div className={styles.suggestions}>
-                                    {
-                                        sags.map((item,indexa:number)=> (
-                                         <div className={cx(styles.suggestion,item.id===index && styles.active)} onClick={()=> changeSag(item.id,item.name)} key={indexa}>#{item.name}</div>  
-                                        ))
-                                    }
-                                </div>
-                            </div>
                             <div className={styles.action}>
-                                <button onClick={submit} type='submit'>Submit</button>
-                                {/* <button onClick={convert} type='submit'>Submit</button> */}
+                                <button onClick={submit} type='submit'>Wasilisha/Submit</button>
                                 <div className={styles.cleara} onClick={()=> setClicked(false)}><MdClear className={styles.icona}/></div>
                             </div>
                         </div>
@@ -238,57 +294,6 @@ function printImage(src: string) {
                 </div>
             )
         }
-        {
-            isSuccess && (
-                <div className={styles.overlay}>
-                    <div className={styles.content}>
-                        <div className={styles.conts}>
-                        <div className={styles.topa}><IoMdCheckmark size={40} className={styles.icon}/></div>
-                        <h1>Success</h1>
-                        </div>
-                    </div>
-                </div>
-            )
-        }
-        <div className={styles.items}>
-            <div className={styles.icon}>
-                <img src="/mnh.png" alt="" />
-            </div>
-            <div className={styles.item} onClick={()=> enterNumber()}>
-                <p>Chukua Tokeni</p>
-            </div>
-            <div className={styles.suggestions}>
-                <div className={styles.title}>
-                    <h3>Unaonaje Huduma Zetu?</h3>
-                </div>
-                <div className={styles.sugs}>
-                    {
-                        suggestions.map((item,index:number)=> (
-                            <div className={cx(styles.sug,seleccted.index===index+1 && styles.active)} key={index} onClick={()=> setSelected({...seleccted,index:index+1,type: item})}>{item}</div>
-                        ))
-                    }
-                </div>
-                {
-                    seleccted.index !== 0 && (
-                        <div className={styles.sug_action}>
-                            {
-                                seleccted.type =="Mbaya" && (
-                                    <input 
-                                    type="text"
-                                    placeholder='Tuambie Kwanini' 
-                                    value={seleccted.reason}
-                                    onChange={e => setSelected({...seleccted,reason: e.target.value})}
-                                    />
-                                )
-                            }
-                            <div className={cx(styles.buttona,subLoading && styles.loading)} onClick={handleSubmit}>
-                                <TiChevronRight className={styles.icon} size={20}/>
-                            </div>
-                        </div>
-                    )
-                }
-            </div>
-        </div>
     </div>
-  )
+  );
 }

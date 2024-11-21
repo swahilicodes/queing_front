@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
 import cx from "classnames";
 import AdvertScroller from "@/components/adverts/advert";
@@ -12,9 +12,12 @@ import { BiCurrentLocation } from "react-icons/bi";
 import { IoMdStopwatch } from "react-icons/io";
 import { TfiDirectionAlt } from "react-icons/tfi";
 import { FaArrowsAltH } from "react-icons/fa";
-import { BsMicMute } from "react-icons/bs";
+import { BsMicMute, BsStopwatch } from "react-icons/bs";
 import { VscUnmute } from "react-icons/vsc";
 import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
+import { TiArrowRepeat } from "react-icons/ti";
+import { TbHeartHandshake } from "react-icons/tb";
+import Cubes from "@/components/loaders/cubes/cubes";
 
 export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -38,6 +41,14 @@ export default function Home() {
   const [serveId, setServeId] = useState(0)
   const [muted, setMuted] = useState(true)
   const [token,setToken] = useState("")
+  const now = new Date();
+  const hour = String(now.getHours()).padStart(2, "0");
+  const minute = String(now.getMinutes()).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+  const year = now.getFullYear();
+  const amPm = hours >= 12 ? "PM" : "AM";
+  const [isRest, setRest] = useState<boolean>(true)
 
   useEffect(() => {
     getTickets();
@@ -77,17 +88,29 @@ export default function Home() {
       });
     }, 1000);
 
+    const restId = setInterval(() => {
+      if(isRest){
+        setRest(false)
+      }else{
+        setRest(true)
+      }
+    }, 10000);
+
     return () => {
       clearInterval(intervalId);
-      clearInterval(timer)
+      clearInterval(timer);
+      setTimeout(()=> {
+        clearInterval(restId);
+      },10000)
     };
-  }, [condition, blink,token, serveId]);
+  }, [condition, blink,token, serveId,isRest, language]);
 
   const formatTime = (unit:string) => {
     return String(unit).padStart(2, '0')
   }
 
   const handleToken = (data:string,item:any) => {
+    console.log('token new & old ',data,token)
     if(token !== data){
       setMinutes(0)
       setSeconds(0)
@@ -151,9 +174,9 @@ export default function Home() {
       <div className={cx(styles.queue_wrap, active && styles.nota)}>
         <div className={cx(styles.top_bar, active && styles.none)}>
           <h1>
-            {language === "English"
+            {language === "Swahili"
               ? "HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA"
-              : "HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA"}
+              : "MUHIMBILI NATIONAL HOSPITAL - MLOGANZILA"}
           </h1>
         </div>
         <div className={styles.new_look}>
@@ -171,7 +194,62 @@ export default function Home() {
             </div>
           )}
             <div className={cx(styles.left_wrap,active && styles.none)}>
-            <div className={cx(styles.hudumiwa)}>
+              <div className={styles.servicer}>
+                <div className={styles.title}>
+                <h3>{language==="English"?"SERVING NOW":"ANAYE HUDUMIWA SASA"}</h3>
+                </div>
+                <div className={styles.namba}>
+                  {
+                    tickets.filter((item:any)=> item.ticket.serving).map((item:any,index:number)=> (
+                      <h1>{item.ticket.ticket_no}</h1>
+                    ))
+                  }
+                {/* {tickets
+                  .filter(
+                    (item: { ticket: { serving: boolean } }) =>
+                      item.ticket.serving
+                  ) */}
+                </div>
+                <div className={styles.counter}>
+                  <div className={styles.stop}>
+                    <div className={styles.stopa_wrap}>
+                    <BsStopwatch size={45} className={styles.stop_watch}/>
+                    </div>
+                  </div>
+                  <div className={styles.stopa_time}>
+                  {`${formatTime(hours.toString())}:${formatTime(minutes.toString())}:${formatTime(seconds.toString())}`}
+                  </div>
+                </div>
+              </div>
+              <div className={styles.nexting}>
+                <div className={cx(styles.nextang,isRest && styles.rest)}>
+                  {
+                    !isRest
+                    ? <div className={styles.video}>
+                      <video src="/videos/stomach.mp4" autoPlay muted/>
+                    </div>
+                    : <div className={styles.tiketi}>
+                      <p>001</p>
+                      <TbHeartHandshake className={styles.icon} size={50}/>
+                      <p>5</p>
+                    </div>
+                  }
+                </div>
+                <div className={cx(styles.signage,isRest && styles.rest)}>
+                  <div className={cx(styles.wrapper_sig,isRest && styles.rest)}>
+                    {
+                      isRest
+                      ? <p>{language==="English"?"NEXT":"ANAYE FUATA"}</p>
+                      : <div className={styles.indicators}>
+                        <div className={`${styles.divAnimation} ${styles.divDelay1}`}></div>
+                        <div className={`${styles.divAnimation} ${styles.divDelay2}`}></div>
+                        <div className={`${styles.divAnimation} ${styles.divDelay3}`}></div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            {/* <div className={cx(styles.hudumiwa)}>
             <div className={cx(styles.wrap,serveId===0 && styles.none)}>
             <div className={cx(styles.tatatata,serveId===0 && styles.none)}>
               <h1>Anae Hudumiwa</h1>
@@ -186,7 +264,7 @@ export default function Home() {
                       item.ticket.serving
                   )
                   .map((item: any, index: number) => (
-                    <div className={styles.sava} onLoad={()=> setServeId(index+1)}>
+                    <div className={styles.sava} onLoad={()=> setServeId(index+1)} key={index}>
                       <div key={index} className={styles.logo} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>
                         <img src="/mnh.png" alt="" />
                       </div>
@@ -209,7 +287,7 @@ export default function Home() {
               <div className={styles.round}></div>
             )}
             </div>
-            </div>
+            </div> */}
             <div className={styles.nexta}>
               <div className={styles.tita}>
                 <div className={styles.title}>Anae Fata</div>
@@ -229,6 +307,70 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.new_right}>
+            <div className={styles.new_queue}>
+              <div className={styles.top}>
+                <div className={styles.namba}>{language==="Swahili"?"TIKETI":"TICKET"}</div>
+                <div className={styles.namba}>{language==="Swahili"?"DIRISHA":"WINDOW"}</div>
+              </div>
+              <div className={styles.body}>
+                {
+                  tickets.map((item:any,index:number)=> (
+                    <div className={styles.item} key={index} onLoad={()=> setServeId(index+1)}>
+                      <div className={cx(styles.absa,item.ticket.serving===true && styles.serving, index===1 && styles.next)} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>{index+1}</div>
+                      <div className={styles.left}>
+                      <p>{item.ticket.ticket_no}</p>
+                      </div>
+                      <div className={styles.middle}>
+                      {
+                        item.ticket.serving===false
+                        ? <FaArrowTrendUp className={styles.con} size={40} />
+                        :<FaArrowsAltH
+                        className={cx(styles.cona, blink && styles.blink)}
+                        size={40}
+                        />
+                      }
+                      </div>
+                      <div className={styles.right}>
+                      {item.counter === undefined
+                              ? "000"
+                              : item.counter.namba
+                      }
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+              <div className={styles.color_description}>
+                  <div className={styles.color_item}>
+                    <div
+                      className={styles.item}
+                      style={{ backgroundColor: "red" }}
+                    ></div>
+                    <p>UHITAJI</p>
+                  </div>
+                  <div className={styles.color_item}>
+                    <div
+                      className={styles.item}
+                      style={{ backgroundColor: "#34E734" }}
+                    ></div>
+                    <p>ANAYE HUDUMIWA</p>
+                  </div>
+                  <div className={styles.color_item}>
+                    <div
+                      className={styles.item}
+                      style={{ backgroundColor: "#FFFF00" }}
+                    ></div>
+                    <p>ANAYE FUATA</p>
+                  </div>
+                  <div className={styles.color_item}>
+                    <div
+                      className={styles.item}
+                      style={{ backgroundColor: "#FF5D00" }}
+                    ></div>
+                    <p>TOKENI</p>
+                  </div>
+                </div>
+            </div>
             {tickets.length > 0 ? (
               <div className={styles.queue_div}>
                 {tickets.map(
@@ -361,10 +503,20 @@ export default function Home() {
           </div>
         </div>
         <div className={styles.ads}>
+          <div className={styles.logo}>
+            <div className={styles.wrapper}>
+            <img src="/loga.png" alt="" />
+            <div className={styles.line}></div>
+            </div>
+          </div>
           <div className={styles.ad}>
             {adverts.length > 0 && <AdvertScroller adverts={adverts} />}
           </div>
-          <div className={styles.time}>MATANGAZO</div>
+          {/* <div className={styles.time}>MATANGAZO</div> */}
+          <div className={styles.time}>
+            <div className={styles.timer}>{hour}:{minute} {amPm}</div>
+            <div className={styles.date}>{day}/{month}/{year}</div>
+          </div>
         </div>
       </div>
     </div>

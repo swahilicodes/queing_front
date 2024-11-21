@@ -17,6 +17,7 @@ import LoginModal from '../login_modal/login_modal'
 import messageState from '@/store/atoms/message'
 import { getLocalDeviceIP } from '@/custom_hooks/deviceInfo'
 import axios from 'axios'
+import LanguageState from '@/store/atoms/language'
 
 
 export default function Layout({children}:any) {
@@ -34,11 +35,24 @@ export default function Layout({children}:any) {
   const [error,setError] = useRecoilState(errorState)
   const [isError, setIsError] = useState(false)
   const message = useRecoilValue(messageState)
+  const [language,setLanguage] = useRecoilState(LanguageState)
   useAuth();
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-}, [error,full, isUser,currentUser,message]);
+
+    const languageId = setInterval(()=> {
+      if(language==="English"){
+        setLanguage("Swahili")
+      }else{
+        setLanguage("English")
+      }
+    },5000)
+
+    return () => {
+      clearInterval(languageId);
+    };
+}, [error,full, isUser,currentUser,message,language]);
 
 const handleKeyDown = (event: KeyboardEvent) => {
    if(event.key === 'p'){
@@ -60,11 +74,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
     setFull(false)
   }
 };
-
-const clearError = () => {
-  setError("")
-  setIsError(false)
-}
 
 
 
@@ -99,7 +108,6 @@ const clearError = () => {
                 <h1>Ooooh Sorry!</h1>
                 <p>{error??"there is an error"}</p>
               </div>
-              <div className={styles.close} onClick={()=> clearError()}>ok</div>
             </div>
           </div>
         )

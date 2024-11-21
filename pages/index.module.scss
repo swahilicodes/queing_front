@@ -12,7 +12,7 @@
         width: 100%;
         height: 100%;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
         background: $divColor;
         position: relative;
@@ -20,7 +20,7 @@
         .top_bar{
             width: 100%;
             background: $mainBold;
-            height: 70px;
+            height: 8%;
             position: absolute;
             top: 0;
             display: flex;
@@ -45,11 +45,11 @@
         .new_look{
             width: 100%;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
-            padding: 15px;
-            margin-top: 70px;
-            height: 80%;
+            padding: 0 5px;
+            // margin-top: 70px;
+            height: 82%;
             .new_left{
                 width: 60%;
                 height: 100%;
@@ -79,15 +79,195 @@
                 width: 100%;
                 height: 100%;
                 display: flex;
-                align-items: flex-start;
-                justify-content:center;
+                flex-direction: column;
+                align-items: center;
+                justify-content:space-between;
                 position: relative;
+                .servicer{
+                    width: 100%;
+                    height: 89%;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                    background: white;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    .title{
+                        position: absolute;
+                        width: 50%;
+                        height: 10%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        top: 0;
+                        background: $mainBold;
+                        h3{
+                            color: $secondColor;
+                            text-align: center;
+                            font-size: 25px;
+                        }
+                    }
+                    .namba{
+                        h1{
+                            color: $secondColor;
+                            font-size: 250px;
+                        }
+                    }
+                    .counter{
+                        position: absolute;
+                        bottom: 0;
+                        width: 25%;
+                        height: 80px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                        .stop{
+                            height: 100%;
+                            width: 20%;
+                            position: inherit;
+                            right: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            .stopa_wrap{
+                                width: 90%;
+                                height: 90%;
+                                background: $secondColor;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                .stop_watch{
+                                    color: white;
+                                }
+                            }
+                        }
+                        .stopa_time{
+                            width: 100%;
+                            height: 100%;
+                            font-size: 35px;
+                            background: $mainBold;
+                            color: white;
+                            font-weight: 600;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                    }
+                }
+                .nexting{
+                    width: 100%;
+                    height: 10%;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                    background: white;
+                    position: relative;
+                    display: flex;
+                    .nextang{
+                        width: 80%;
+                        height: 100%;
+                        .tiketi{
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-around;
+                            transition: all .5s ease-in-out;
+                            animation: bounceIn 1s both;
+                            .icon{
+                                color: $secondColor;
+                            }
+                            p{
+                                color: $mainColor;
+                                font-size: 40px;
+                                font-weight: 600;
+                            }
+                        }
+                        .video{
+                            width: 100%;
+                            height: 100%;
+                            video{
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                            }
+                        }
+                        &.rest{
+                            .icon{
+                                color: $mainColor;
+                                scale: 1.5;
+                            }
+                            p{
+                                color: $secondColor;
+                                font-weight: 800;
+                            }
+                        }
+                    }
+                    .signage{
+                        position: absolute;
+                        right: 0;
+                        width: 20%;
+                        height: 100%;
+                        background: $mainBold;
+                        //background: linear-gradient(to left, $secondColor,$mainColor);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 30px;
+                        font-weight: 600;
+                        transition: all .5s ease-in-out;
+                        &.rest{
+                            background: $secondColor;
+                            color: white;
+                        }
+                        .wrapper_sig{
+                            width: 95%;
+                            height: 90%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            //background: $mainColor;
+                            color: $secondColor;
+                            transition: all .5s ease-in-out;
+                            //background: linear-gradient(to left, $mainColor,$secondColor);
+                            &.rest{
+                                color: white;
+                            }
+                            p{
+                                animation: flyIn 1s both;
+                                font-weight: 500;
+                            }
+                            .indicators{
+                                display: flex;
+                                .divAnimation{
+                                    width: 20px;
+                                    height: 20px;
+                                    background: $secondColor;
+                                    animation: fadeIn 2s ease-in-out infinite;
+                                    opacity: 0;
+                                    margin: 5px;
+                                    &:nth-child(1){
+                                        animation-delay: 0s;  
+                                    }
+                                    &:nth-child(2){
+                                        animation-delay: .5s; 
+                                        background: #01d401; 
+                                    }
+                                    &:nth-child(3){
+                                        animation-delay: 1s;  
+                                        background: #f1f519;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 &.none{
                     display: none;
                 }
                     .hudumiwa{
                         width: 100%;
-                        height: 85%;
+                        height: 100%;
                         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
                         background: white;
                         .wrap{
@@ -199,7 +379,8 @@
                         background: $mainColor;
                         position: absolute;
                         bottom: 0;
-                        height: 12%;
+                        display: none;
+                        //height: 12%;
                         .tita{
                             width: 100%;
                             height: 100%;
@@ -258,16 +439,132 @@
                 
             }
             .new_right{
-                width: 36%;
+                width: 39.5%;
                 height: 100%;
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: flex-start;
+                .new_queue{
+                    width: 100%;
+                    position: relative;
+                    height: 100%;
+                    //background: white;
+                    box-shadow: rgba(0, 0, 0, 0.5);
+                    .top{
+                        position: absolute;
+                        top: 0;
+                        width: 100%;
+                        height: 9%;
+                        background: $mainBold;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-around;
+                        margin-bottom: 5px;
+                        .namba{
+                            width: 49%;
+                            height: 95%;
+                            //background: $secondColor;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 30px;
+                            color: white;
+                            font-weight: 600;
+                            box-shadow: rgba(0, 0, 0, 0.5);
+                            &:nth-child(1){
+                                border-right: 4px solid $secondColor;
+                            }
+                        }
+                    }
+                    .body{
+                        width: 100%;
+                        margin-top: 10%;
+                        height: calc(100% - 10%);
+                        .item{
+                            background: $mainColor;
+                            width: 100%;
+                            height: 8%;
+                            margin: 5px 0;
+                            box-shadow: rgba(0, 0, 0, 0.5);
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            padding: 0 10px;
+                            position: relative;
+                            padding: 0 20%;
+                            .left{
+                                font-size: 30px;
+                                font-weight: 600;
+                                color: white;
+                            }
+                            .right{
+                                font-size: 30px;
+                                font-weight: 600;
+                                color: white;
+                            }
+                            .middle{
+                                .con{
+                                    color: $secondColor;
+                                }
+                                .cona{
+                                    color: $secondColor;
+                                    transition: all .5s ease-in-out;
+                                    opacity: 0;
+                                    &.blink{
+                                        opacity: 1;
+                                    }
+                                }
+                            }
+                            .absa{
+                                position: absolute;
+                                background: $mainBold;
+                                width: 7%;
+                                height: 90%;
+                                left: 5px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: white;
+                                font-weight: 600;
+                                font-size: 30px;
+                                &.serving{
+                                    background: #01d401;
+                                }
+                                &.next{
+                                    background: #fae103;
+                                }
+                            }
+                        }
+                    }
+                    .color_description{
+                        width: 100%;
+                        position: absolute;
+                        bottom: 0;
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: flex-start;
+                        .color_item{
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            .item{
+                                width: 20px;
+                                height: 20px;
+                            }
+                            p{
+                                color: $mainColor;
+                                margin: 5px;
+                                font-weight: 500;
+                                font-size: 20px;
+                            }
+                        }
+                    }
+                }
                 .queue_div{
                     width: 100%;
                     height: 100%;
-                    display: flex;
+                    display: none;
                     flex-direction: column;
                     align-items: flex-start;
                     justify-content: flex-start;
@@ -573,7 +870,7 @@
         }
         .ads{
             background: $mainBold;
-            height: 70px;
+            height: 8%;
             width: 100%;
             display: flex;
             align-items: center;
@@ -586,6 +883,33 @@
                 color: white;
                 animation: scroll 20s linear infinite;
                 font-size: 30px;
+            }
+            .logo{
+                height: 100%;
+                position: inherit;
+                left: 0;
+                width: 5%;
+                z-index: 10;
+                border-right: 3px solid $secondColor;
+                //background: linear-gradient(to left, $mainBold, $secondColor);
+                .wrapper{
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    background: white;
+                    // background: linear-gradient(to right, white, $secondColor);
+                    img{
+                        width: 95%;
+                        height: 95%;
+                        object-fit: contain;
+                    }
+                    .line{
+                        width: 100%;
+                        height: 100%;
+                        background: $secondColor;
+                        position: absolute;
+                    }
+                }
             }
             .time{
                 position: inherit;
@@ -601,6 +925,10 @@
                 justify-content: center;
                 font-weight: 600;
                 font-family: "Roboto";
+                .date{
+                    font-size: 18px;
+                    font-weight: 500;
+                }
             }
         }
     }
@@ -619,5 +947,50 @@
     }
     100% {
       transform: translateX(100%);
+    }
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes bounceIn {
+    0%, 20%, 40%, 60%, 80%, 100% {
+      animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    }
+    0% {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    20% {
+      transform: scale3d(1.1, 1.1, 1.1);
+    }
+    40% {
+      transform: scale3d(0.9, 0.9, 0.9);
+    }
+    60% {
+      opacity: 1;
+      transform: scale3d(1.03, 1.03, 1.03);
+    }
+    80% {
+      transform: scale3d(0.97, 0.97, 0.97);
+    }
+    100% {
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+  @keyframes flyIn {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
     }
   }
