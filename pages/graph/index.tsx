@@ -3,10 +3,15 @@ import BarGraphOne from '@/components/graph/barOne/BarOne'
 import React, { useEffect, useState } from 'react'
 import styles from './bar.module.scss'
 import axios from 'axios'
+import cx from 'classnames'
 
 function Graph() {
   const [tokens, setTokens] = useState([])
   const [token, setToken] = useState<any>({})
+  const [fields, setFields] = useState({
+    idadi: 0,
+    index: 0
+  })
   useEffect(()=> {
     getTicks()
   },[])
@@ -29,16 +34,29 @@ function Graph() {
         }
       });
   };
+
+  const createArray = (max:number) => {
+    const step = max / 10;
+    return Array.from({ length: 10 }, (_, index) => Math.round(step * (index + 1)));
+  };
   return (
     <div className={styles.bar}>
       <div className={styles.graph}>
+      <div className={styles.x_axis}>
+        {
+          createArray(Math.max(...tokens.map((item:any)=> item.total))).reverse().map((item,index)=> (
+            <h1 key={index}>{item}</h1>
+          ))
+        }
+      </div>
         {
           tokens.map((item:any,index:number)=> (
             <div className={styles.graph_wrap}>
+              <div className={cx(styles.idadi,fields.idadi !== 0 && fields.index===index && styles.active)}>{fields.idadi}</div>
               <div className={styles.bar}>
-              <div className={styles.completed} style={{height: `${item.completed+1 * 10}%`}}></div>
-              <div className={styles.total} style={{height: `${item.total+1 * 10}%`}}></div>
-              <div className={styles.uncompleted} style={{height: `${item.uncompleted+1 * 3}%`}}></div>
+              <div className={styles.completed} style={{height: `${(item.completed/11) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.completed,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.total} style={{height: `${item.total/11 * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.uncompleted} style={{height: `${item.uncompleted/11 * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.uncompleted,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
             </div>
             <div className={styles.label}>{item.day}</div>
             </div>
