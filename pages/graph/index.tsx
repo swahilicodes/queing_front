@@ -54,9 +54,9 @@ function Graph() {
             <div className={styles.graph_wrap}>
               <div className={cx(styles.idadi,fields.idadi !== 0 && fields.index===index && styles.active)}>{fields.idadi}</div>
               <div className={styles.bar}>
-              <div className={styles.completed} style={{height: `${(item.completed/11) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.completed,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
-              <div className={styles.total} style={{height: `${item.total/11 * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
-              <div className={styles.uncompleted} style={{height: `${item.uncompleted/11 * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.uncompleted,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.completed} style={{height: `${(item.completed/Math.max(...tokens.map((item:any)=> item.total))) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.completed,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.total} style={{height: `${item.total/Math.max(...tokens.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.uncompleted} style={{height: `${item.uncompleted/Math.max(...tokens.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.uncompleted,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
             </div>
             <div className={styles.label}>{item.day}</div>
             </div>

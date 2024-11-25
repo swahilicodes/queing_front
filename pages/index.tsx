@@ -49,16 +49,24 @@ export default function Home() {
   const year = now.getFullYear();
   const amPm = hours >= 12 ? "PM" : "AM";
   const [isRest, setRest] = useState<boolean>(true)
+  const [serving, setServing] = useState<any>({})
+  const [nextServe, setNextServe] = useState({
+    id: 0,
+    window: 0
+  })
 
   useEffect(() => {
     getTickets();
     getAdverts();
     getActive();
+    getServing()
     const intervalId = setInterval(() => {
       setTime((prevTime) => prevTime + 1);
       setBlink(!blink);
       getActive();
+      getServing()
     }, 1000);
+
     //   eventSource.onmessage = (event) => {
     //     const data = JSON.parse(event.data);
     //     console.log('Received data:', data);
@@ -105,12 +113,27 @@ export default function Home() {
     };
   }, [condition, blink,token, serveId,isRest, language]);
 
+  const getServing = () => {
+    if(tickets.length > 0){
+      const sava = tickets.find((item:any)=> item.ticket.serving===true)
+      if(sava){
+        setServing(sava)
+        handleToken(sava.ticket.ticket_no,sava)
+        const selectedIndex = tickets.findIndex((item:any) => item.id === sava.id);
+        if(selectedIndex !== -1 && selectedIndex < tickets.length - 1){
+          setNextServe({...nextServe,id:tickets[selectedIndex + 1].ticket.id,window: tickets[selectedIndex + 1].counter.namba})
+        }
+      }else{
+        setServing({})
+      }
+    }
+  }
+
   const formatTime = (unit:string) => {
     return String(unit).padStart(2, '0')
   }
 
   const handleToken = (data:string,item:any) => {
-    console.log('token new & old ',data,token)
     if(token !== data){
       setMinutes(0)
       setSeconds(0)
@@ -194,21 +217,14 @@ export default function Home() {
             </div>
           )}
             <div className={cx(styles.left_wrap,active && styles.none)}>
-              <div className={styles.servicer}>
+              {
+                Object.keys(serving).length> 0 
+                ? <div className={styles.servicer}>
                 <div className={styles.title}>
                 <h3>{language==="English"?"SERVING NOW":"ANAYE HUDUMIWA SASA"}</h3>
                 </div>
                 <div className={styles.namba}>
-                  {
-                    tickets.filter((item:any)=> item.ticket.serving).map((item:any,index:number)=> (
-                      <h1>{item.ticket.ticket_no}</h1>
-                    ))
-                  }
-                {/* {tickets
-                  .filter(
-                    (item: { ticket: { serving: boolean } }) =>
-                      item.ticket.serving
-                  ) */}
+                  <h1>{serving.ticket.ticket_no}</h1>
                 </div>
                 <div className={styles.counter}>
                   <div className={styles.stop}>
@@ -221,6 +237,12 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+                : <div className={styles.servicer}>
+                  <div className={styles.video}>
+                      <video src="/videos/stomach.mp4" autoPlay muted/>
+                    </div>
+                </div>
+              }
               <div className={styles.nexting}>
                 <div className={cx(styles.nextang,isRest && styles.rest)}>
                   {
@@ -229,9 +251,9 @@ export default function Home() {
                       <video src="/videos/stomach.mp4" autoPlay muted/>
                     </div>
                     : <div className={styles.tiketi}>
-                      <p>001</p>
+                      <p>{nextServe.id}</p>
                       <TbHeartHandshake className={styles.icon} size={50}/>
-                      <p>5</p>
+                      <p>{nextServe.window}</p>
                     </div>
                   }
                 </div>
@@ -307,7 +329,9 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.new_right}>
-            <div className={styles.new_queue}>
+            {
+              tickets.length > 0 
+              ? <div className={styles.new_queue}>
               <div className={styles.top}>
                 <div className={styles.namba}>{language==="Swahili"?"TIKETI":"TICKET"}</div>
                 <div className={styles.namba}>{language==="Swahili"?"DIRISHA":"WINDOW"}</div>
@@ -315,8 +339,8 @@ export default function Home() {
               <div className={styles.body}>
                 {
                   tickets.map((item:any,index:number)=> (
-                    <div className={styles.item} key={index} onLoad={()=> setServeId(index+1)}>
-                      <div className={cx(styles.absa,item.ticket.serving===true && styles.serving, index===1 && styles.next)} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>{index+1}</div>
+                    <div className={cx(styles.item,item.ticket.disabled===true && styles.disabled)} key={index} onLoad={()=> setServeId(index+1)}>
+                      <div className={cx(styles.absa,item.ticket.serving===true && styles.serving, (nextServe.id !==0 && nextServe.id===Number(item.ticket.id)) && styles.next)} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>{index+1}</div>
                       <div className={styles.left}>
                       <p>{item.ticket.ticket_no}</p>
                       </div>
@@ -346,31 +370,41 @@ export default function Home() {
                       className={styles.item}
                       style={{ backgroundColor: "red" }}
                     ></div>
-                    <p>UHITAJI</p>
+                    <p>{language==="English"?"SPECIAL NEEDS":"UHITAJI"}</p>
                   </div>
                   <div className={styles.color_item}>
                     <div
                       className={styles.item}
                       style={{ backgroundColor: "#34E734" }}
                     ></div>
-                    <p>ANAYE HUDUMIWA</p>
+                    <p>{language==="English"?"SERVING":"ANAYE HUDUMIWA"}</p>
                   </div>
                   <div className={styles.color_item}>
                     <div
                       className={styles.item}
                       style={{ backgroundColor: "#FFFF00" }}
                     ></div>
-                    <p>ANAYE FUATA</p>
+                    <p>{language==="English"?"NEXT":"ANAYE FUATA"}</p>
                   </div>
                   <div className={styles.color_item}>
                     <div
                       className={styles.item}
                       style={{ backgroundColor: "#FF5D00" }}
                     ></div>
-                    <p>TOKENI</p>
+                    <p>{language==="English"?"TOKEN":"TOKENI"}</p>
                   </div>
                 </div>
             </div>
+              : <div className={styles.loader}>
+                {
+                  Array.from({length: 10}).map((_,index:number)=> (
+                    <div className={styles.div}>
+                      <div className={styles.shimmer}></div>
+                    </div>
+                  ))
+                }
+              </div>
+            }
             {tickets.length > 0 ? (
               <div className={styles.queue_div}>
                 {tickets.map(
