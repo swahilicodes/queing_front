@@ -15,6 +15,7 @@ import AudioTest from "@/components/audio_player/audio_test/audio";
 import { GrPowerShutdown } from "react-icons/gr";
 import SequentialAudio from "@/components/audio_player/sequential/sequential";
 import isSpeakerState from "@/store/atoms/isSpeaker";
+import GptPlayer from "@/components/audio_player/gpt/gpt";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -376,7 +377,8 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
-                <SequentialAudio token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/>
+                <GptPlayer token={370} counter={4}/>
+                {/* <SequentialAudio token={`1005`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/> */}
               </div>
             )
             // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
