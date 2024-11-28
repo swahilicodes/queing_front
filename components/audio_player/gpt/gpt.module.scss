@@ -1,0 +1,43 @@
+@import '../../../global.scss';
+.gpt{
+    width: 100%;
+    button{
+        background: $secondColor;
+        outline: none;
+        border: none;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 50%;
+        .icon{
+            color: white;
+        }
+        &.talking{
+            opacity: .5;
+            border: 2px solid $mainColor;
+            animation: rotate 3s linear infinite;
+            position: relative;
+            &::before {
+                content: '';
+                position: absolute;
+                top: 10px;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                //background: white;
+                border-radius: 50%;
+                z-index: 1;
+              }
+        }
+    }
+}
+@keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }

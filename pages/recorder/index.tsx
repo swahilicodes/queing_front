@@ -377,7 +377,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
-                <GptPlayer token={370} counter={4}/>
+                <GptPlayer token={542} counter={4}/>
                 {/* <SequentialAudio token={`1005`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/> */}
               </div>
             )
