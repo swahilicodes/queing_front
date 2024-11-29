@@ -6,10 +6,39 @@ import cx from 'classnames'
 interface NumberAudioPlayerProps {
   token: number;
   counter: number;
+  isPlaying: boolean;
+  stage: string
 }
 
-const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter }) => {
+const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying }) => {
   const [talking, setTalking] = useState(false)
+  const [serving, setServing] = useState(0)
+  const [counting, setCounting] = useState({
+    namba: 0,
+    token: 0
+  })
+
+  useEffect(()=> {
+    console.log(counting)
+    setCounting({...counting,namba: counting.namba+1, token: token})
+    setServing(token)
+    setInterval(()=> {
+      refresh()
+    },2000)
+    const button = document.getElementById('play-button')
+    if(isPlaying && button && !talking && serving !==0 && (counting.namba > 0 && counting.namba < 2)){
+      setCounting({...counting,namba: counting.namba+1, token: token})
+      button.click()
+    }
+  },[isPlaying,talking,serving,counting.namba])
+
+  const refresh = () => {
+    if(counting.namba > 0){
+      if(counting.token !== token){
+        setCounting({...counting,namba: 0, token: token})
+      }
+    }
+  }
 
   const getAudioSequence = (number: number): string[] => {
     setTalking(true)
@@ -264,13 +293,22 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter }) => {
     await playAudioSequence(getAudioSequenceEnglish(token))
     await playAudioSequence(getCounterEnglish(counter))
     setTalking(false)
+    setServing(0)
   }
 
   return <div className={styles.gpt}>
-    <button onClick={PlayThem} className={cx(talking && styles.talking)}>{talking
+    {/* <button onClick={PlayThem} className={cx(talking && styles.talking)}>{talking
     ?<FaPause className={styles.icon} size={30}/>
     :<FaPlay className={styles.icon} size={30}/>}
-    </button>
+    </button> */}
+    {
+      isPlaying
+      ?<button onClick={PlayThem} className={cx(talking && styles.talking)} id="play-button">{talking
+        ?<FaPause className={styles.icon} size={30}/>
+        :<FaPlay className={styles.icon} size={30}/>}
+        </button>
+      : <p>waiting..</p>
+    }
   </div>;
 };
 

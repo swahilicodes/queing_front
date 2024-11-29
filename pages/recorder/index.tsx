@@ -16,6 +16,8 @@ import { GrPowerShutdown } from "react-icons/gr";
 import SequentialAudio from "@/components/audio_player/sequential/sequential";
 import isSpeakerState from "@/store/atoms/isSpeaker";
 import GptPlayer from "@/components/audio_player/gpt/gpt";
+import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
+import useCreateItem from "@/custom_hooks/useCreateItem";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -37,6 +39,7 @@ function Recorder() {
   const [, setExpired] = useState<Token[]>([]);
   const [active, setActive] = useState(false)
   const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
+  const {createItem,loading} = useCreateItem()
   const [fields, setFields] = useState({
     finish_id: "",
     patName: "",
@@ -56,6 +59,7 @@ function Recorder() {
     setNext(true)
     setFields({...fields,finish_id: id.toString()})
   }
+  
 
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string) => {
     if(found){
@@ -377,7 +381,14 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
-                <GptPlayer token={542} counter={4}/>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
+                  {
+                    loading
+                    ? <HiOutlineSpeakerWave/>
+                    : <HiOutlineSpeakerXMark/>
+                  }
+                </div>
+                {/* <GptPlayer token={542} counter={4}/> */}
                 {/* <SequentialAudio token={`1005`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/> */}
               </div>
             )

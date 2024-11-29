@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import { useRecoilState } from 'recoil'
 import isSpeakerState from '@/store/atoms/isSpeaker'
 import { CiMicrophoneOff, CiMicrophoneOn } from 'react-icons/ci'
+import GptPlayer from '@/components/audio_player/gpt/gpt'
 
 function Speaker() {
  const {createItem,loading} = useCreateItem()
@@ -21,14 +22,16 @@ function Speaker() {
  })
 
  useEffect(()=> {
-    getPlays()
     stationa()
-    setInterval(()=> {
+    if(fields.station.trim() !== ""){
         getPlays()
-    },2000)
-    setInterval(()=> {
-        router.reload()
-    },60000)
+        setInterval(()=> {
+            getPlays()
+        },2000)
+    }
+    // setInterval(()=> {
+    //     router.reload()
+    // },60000)
  },[fields.station])
 
  const stationa = () => {
@@ -120,8 +123,8 @@ function Speaker() {
                                 <td>{item.stage}</td>
                                 <td>{item.counter}</td>
                                 <td>{item.station}</td>
-                                {/* <td>{item.talking===true?<SequentialAudio token={removeLeadingZeros(item.ticket_no)} counter={"09"} stage='meds' isButton={false}/>:"False"}</td> */}
-                                <td><SequentialAudio token={item.ticket_no} counter={"005"} stage='meds' isButton={false} talking={item.talking}/></td>
+                                <td><GptPlayer token={Number(removeLeadingZeros(item.ticket_no))} counter={Number(removeLeadingZeros(item.counter))} stage='meds' isPlaying={item.talking===true?true:false}/></td>
+                                {/* <td>{item.talking===true?<GptPlayer token={Number(removeLeadingZeros(item.ticket_no))} counter={Number(removeLeadingZeros(item.counter))} stage='meds' isPlaying={item.talking===true?true:false}/>:"False"}</td>  */}
                             </tr>
                         ))
                     }
@@ -129,7 +132,7 @@ function Speaker() {
             </table>
             }
         </div>
-        <button onClick={()=> createItem("001","meds","m02","http://localhost:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button>
+        <button onClick={()=> createItem("013","meds","m02","http://localhost:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button>
     </div>
   )
 }
