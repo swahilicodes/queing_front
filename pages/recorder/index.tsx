@@ -61,10 +61,10 @@ function Recorder() {
   }
   
 
-  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string) => {
+  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age}).then(()=> {
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -221,10 +221,10 @@ function Recorder() {
         params: { mr_number: mr_number },
       })
       .then((data) => {
-        console.log('age is ',data.data[0].age)
         setFound(true)
-        setFields({...fields,patName:data.data[0].fullname.toUpperCase(),sex: data.data[0].sex, age: data.data[0].age})
+        setFields({...fields,patName:data.data.fullName.toUpperCase(),sex: data.data.gender, age: data.data.age,category: data.data.patgName})
         setFinLoading(false);
+        console.log(fields)
       })
       .catch((error) => {
         setFinLoading(false);
@@ -308,7 +308,7 @@ function Recorder() {
                 }
                 <div className={styles.buttons}>
                 <div onClick={nextToken} className={styles.button}>Search</div>
-                <div onClick={()=> found && finishToken(Number(fields.finish_id),"accounts",mr_number,fields.sex, currentUser.phone,fields.patName,fields.age)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
+                <div onClick={()=> found && finishToken(Number(fields.finish_id),"accounts",mr_number,fields.sex, currentUser.phone,fields.patName,fields.age, fields.category)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
                 </div>
             </form>
             <div className={cx(styles.fin_loader,finLoading && styles.active)}>
@@ -380,12 +380,12 @@ function Recorder() {
         <div className={styles.speaker}>
         {
             tokens.length > 0 && (
-              <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
+              <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
                 <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
                   {
-                    loading
-                    ? <HiOutlineSpeakerWave/>
-                    : <HiOutlineSpeakerXMark/>
+                    !loading
+                    ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
+                    : <HiOutlineSpeakerXMark className={styles.icon} size={30}/>
                   }
                 </div>
                 {/* <GptPlayer token={542} counter={4}/> */}

@@ -17,7 +17,6 @@ const useCreateItem = () => {
             setTimeout(()=> {
                 setLoading(false)
             },4000)
-            console.log(data)
             //router.reload()
         }).catch((error)=> {
             setLoading(false)
@@ -34,10 +33,9 @@ const useCreateItem = () => {
                 },4000)
             }
         }).finally(()=> {
-            setLoading(false)
-            // setTimeout(()=> {
-            //     setLoading(false)
-            // },4000)
+            setTimeout(()=> {
+                setLoading(false)
+            },4000)
         })
     }catch(error){
         console.log(error)

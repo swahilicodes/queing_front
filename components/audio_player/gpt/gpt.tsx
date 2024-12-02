@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaPause, FaPlay } from "react-icons/fa6";
 import styles from './gpt.module.scss'
 import cx from 'classnames'
@@ -13,29 +13,34 @@ interface NumberAudioPlayerProps {
 const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying }) => {
   const [talking, setTalking] = useState(false)
   const [serving, setServing] = useState(0)
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const button = document.getElementById('play-button')
   const [counting, setCounting] = useState({
     namba: 0,
     token: 0
   })
 
   useEffect(()=> {
-    console.log(counting)
-    setCounting({...counting,namba: counting.namba+1, token: token})
-    setServing(token)
-    setInterval(()=> {
-      refresh()
-    },2000)
-    const button = document.getElementById('play-button')
-    if(isPlaying && button && !talking && serving !==0 && (counting.namba > 0 && counting.namba < 2)){
-      setCounting({...counting,namba: counting.namba+1, token: token})
-      button.click()
+    if(isPlaying){
+      if(counting.namba <= 1){
+        PlayThem()
+        setCounting({...counting,namba: counting.namba + 1, token: token})
+      }else{
+        console.log(`token ${token}, serving ${serving}`)
+        if(token !== serving){
+          setCounting({...counting,namba: 0, token: token}) 
+        }
+      }
     }
-  },[isPlaying,talking,serving,counting.namba])
+  },[isPlaying,talking, token,counting.namba])
 
   const refresh = () => {
     if(counting.namba > 0){
       if(counting.token !== token){
         setCounting({...counting,namba: 0, token: token})
+        audioRef.current?.pause()
+      }else{
+        audioRef.current?.pause()
       }
     }
   }
@@ -163,13 +168,18 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     } else if (length === 2) {
         audioSequence.push('/English/beep.mp3')
         audioSequence.push('/English/ticket.mp3')
-        audioSequence.push(`/English/${numString[0]}0.mp3`);
-        if (numString[1] !== "0") {
-          //audioSequence.push(`/English/na.mp3`);
-          audioSequence.push(`/English/${numString[1]}.mp3`);
+        if(numString[0] === "1"){
+          audioSequence.push(`/English/${numString}.mp3`);
           audioSequence.push(`/English/counter.mp3`);
         }else{
+          audioSequence.push(`/English/${numString[0]}0.mp3`);
+          if (numString[1] !== "0") {
+            //audioSequence.push(`/English/na.mp3`);
+            audioSequence.push(`/English/${numString[1]}.mp3`);
             audioSequence.push(`/English/counter.mp3`);
+          }else{
+              audioSequence.push(`/English/counter.mp3`);
+          }
         }
     } else if (length === 1) {
       audioSequence.push('/English/beep.mp3')
@@ -288,12 +298,13 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
   }, [token, counter]);
 
   const PlayThem = async () => {
+    setServing(token)
     await playAudioSequence(getAudioSequence(token))
     await playAudioSequence(getCounterSwahili(counter))
     await playAudioSequence(getAudioSequenceEnglish(token))
     await playAudioSequence(getCounterEnglish(counter))
     setTalking(false)
-    setServing(0)
+    console.log('serving token is ',token)
   }
 
   return <div className={styles.gpt}>
@@ -303,7 +314,7 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     </button> */}
     {
       isPlaying
-      ?<button onClick={PlayThem} className={cx(talking && styles.talking)} id="play-button">{talking
+      ?<button onClick={PlayThem} className={cx((talking && isPlaying) && styles.talking)} id="play-button">{talking
         ?<FaPause className={styles.icon} size={30}/>
         :<FaPlay className={styles.icon} size={30}/>}
         </button>
