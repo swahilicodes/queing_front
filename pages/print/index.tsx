@@ -4,13 +4,15 @@ import { MdClear, MdOutlineClear } from 'react-icons/md'
 import QRCode from 'qrcode.react'
 import axios from 'axios'
 import { useRouter } from 'next/router'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import qrState from '@/store/atoms/qr'
 import { IoMdCheckmark } from 'react-icons/io'
 import cx from 'classnames'
 import html2canvas from 'html2canvas'
 import { TiChevronRight } from 'react-icons/ti'
 import errorState from '@/store/atoms/error'
+import LanguageState from '@/store/atoms/language'
+import { IoArrowUndoOutline } from 'react-icons/io5'
 
 export default function QueueAdd() {
   const [cat,setcat] = useState("")
@@ -29,13 +31,25 @@ export default function QueueAdd() {
  const [index,setIndex] = useState(0)
  const [subLoading, setSubLoading] = useState(false)
  const [error, setError] = useRecoilState(errorState)
+ const language = useRecoilValue(LanguageState)
  const [seleccted, setSelected] = useState({
     index: 0,
     reason: "",
     type: "",
  })
  const suggestions = [
-    "Kawaida","Mbaya","Nzuri"
+    {
+        swahili: "Nzuri",
+        english: "Good"
+    },
+    {
+        swahili: "Kawaida",
+        english: "Normal"
+    },
+    {
+        swahili: "Mbaya",
+        english: "Bad"
+    },
  ]
  const [items, setItems] = useState([
     { id: 1, name: 'mzee', isActive: false },
@@ -57,22 +71,13 @@ export default function QueueAdd() {
     },
  ]
 
- const changeSag = (id:number,data:string) => {
-    if(index===id){
-        setIndex(0)
-        setDisabled('')
-    }else{
-        setIndex(id)
-        setDisabled(data)
-    }
- }
 
   const handleSubmit = () => {
     setSubLoading(true)
-    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
+    axios.post("http://192.168.30.245:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
         setSubLoading(false)
         setSelected({...seleccted,index:0,type:"",reason: ""})
-        setError("Asante kwa Maoni Yako...")
+        setError(language==="English"?"Thank you for your feedback..":"Asante kwa Maoni Yako..")
         setTimeout(()=> {
             setError("")
         },3000)
@@ -99,12 +104,15 @@ export default function QueueAdd() {
       setNumberString(numberString.slice(0, -1));
     }
   };
+  const clear = () => {
+    setNumberString("")
+  };
 
 
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
+    axios.post("http://192.168.30.245:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
@@ -183,7 +191,7 @@ function printImage(src: string) {
         </div>
         <div className={styles.top_notch}>
             <div className={styles.title}>
-                <h1>HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA</h1>
+                <h1>{language==="English"?"MUHIMBILI NATIONAL HOSPITAL - MLOGANZILA":"HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA"}</h1>
             </div>
         </div>
         {
@@ -204,12 +212,26 @@ function printImage(src: string) {
                 <div className={styles.overlay}>
                     <div className={cx(styles.content,clicked && styles.active)}>
                         <div className={styles.top}>
-                            <h1>Ingiza Namba Ya Simu / Enter Phone Number</h1>
+                            <h1>{language==="English"?"Enter Phone Number":"Ingiza Namba Ya Simu"}</h1>
                         </div>
                         <div className={styles.contents}>
                             <div className={styles.bar}>
-                                <div className={styles.left}>{numberString.trim()===''?0:numberString}</div>
-                                <div className={styles.right} onClick={()=> handleClearClick()}><MdOutlineClear className={styles.icon}/></div>
+                                {/* <div className={styles.left}>{numberString.trim()===''?0:numberString}</div> */}
+                                <div className={styles.left}>
+                                <input
+                                  type="text"
+                                  value={numberString}
+                                  placeholder="0"
+                                />
+                                </div>
+                                <div className={styles.right}>
+                                    <div className={styles.baa} onClick={()=> handleClearClick()}>
+                                    <IoArrowUndoOutline className={styles.icon} size={30}/>
+                                    </div>
+                                    <div className={styles.baa} onClick={()=> clear()}>
+                                    <MdOutlineClear className={styles.icon} size={30}/>
+                                    </div>
+                                </div>
                             </div>
                             <div className={styles.keyBoard}>
                                 {
@@ -218,20 +240,11 @@ function printImage(src: string) {
                                     ))
                                 }
                             </div>
-                            {/* <div className={styles.exceptions}>
-                                <h1>Una Uhitaji Maalumu?</h1>
-                                <div className={styles.suggestions}>
-                                    {
-                                        sags.map((item,indexa:number)=> (
-                                         <div className={cx(styles.suggestion,item.id===index && styles.active)} onClick={()=> changeSag(item.id,item.name)} key={indexa}>#{item.name}</div>  
-                                        ))
-                                    }
-                                </div>
-                            </div> */}
                             <div className={styles.action}>
-                                <button onClick={submit} type='submit'>Wasilisha/Submit</button>
-                                {/* <button onClick={convert} type='submit'>Submit</button> */}
-                                <div className={styles.cleara} onClick={()=> setClicked(false)}><MdClear className={styles.icona}/></div>
+                                <button onClick={submit} type='submit' className={styles.tapa}>
+                                    <p>{language==="English"?"Submit":"Wasilisha"}</p>
+                                </button>
+                                <div className={styles.cleara} onClick={()=> setClicked(false)}><MdClear className={styles.icona} size={30}/></div>
                             </div>
                         </div>
                     </div>
@@ -255,23 +268,23 @@ function printImage(src: string) {
                 <img src="/mnh.png" alt="" />
             </div>
             <div className={styles.item} onClick={()=> enterNumber()}>
-                <p>Chukua Tokeni</p>
+                <p>{language==="English"?"Take Ticket":"Chukua Tiketi"}</p>
             </div>
             <div className={styles.suggestions}>
                 <div className={styles.title}>
-                    <h3>Unaonaje Huduma Zetu?</h3>
+                    <h3>{language==="English"?"How do you see our services?":"Unaonaje Huduma Zetu?"}</h3>
                 </div>
                 <div className={styles.sugs}>
                     {
                         suggestions.map((item,index:number)=> (
-                            <div className={cx(styles.sug,seleccted.index===index+1 && styles.active)} key={index} onClick={()=> setSelected({...seleccted,index:index+1,type: item})}>{item}</div>
+                            <div className={cx(styles.sug,seleccted.index===index+1 && styles.active)} key={index} onClick={()=> setSelected({...seleccted,index:index+1,type: language==="English"?item.english:item.swahili})}>{language==="English"?item.english:item.swahili}</div>
                         ))
                     }
                 </div>
                 {
                     seleccted.index !== 0 && (
                         <div className={styles.sug_action}>
-                            {
+                            {/* {
                                 seleccted.type =="Mbaya" && (
                                     <input 
                                     type="text"
@@ -280,7 +293,7 @@ function printImage(src: string) {
                                     onChange={e => setSelected({...seleccted,reason: e.target.value})}
                                     />
                                 )
-                            }
+                            } */}
                             <div className={cx(styles.buttona,subLoading && styles.loading)} onClick={handleSubmit}>
                                 <TiChevronRight className={styles.icon} size={20}/>
                             </div>

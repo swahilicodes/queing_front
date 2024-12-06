@@ -52,7 +52,7 @@ export default function Print() {
 
   const handleSubmit = (type:string) => {
     //setSubLoading(true)
-    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: type, reason: ''}).then(()=> {
+    axios.post("http://192.168.30.245:5000/suggestion/create_suggestion",{type: type, reason: ''}).then(()=> {
         //setSubLoading(false)
         setSelected({...seleccted,index:0,type:"",reason: ""})
         setMessage({...message,title: "Asante Kwa Maoni Yako",category: "success"})
@@ -113,7 +113,7 @@ export default function Print() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/tickets/create_ticket",{disability: '',phone:fields.numberString})
+    axios.post("http://192.168.30.245:5000/tickets/create_ticket",{disability: '',phone:fields.numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
@@ -183,7 +183,7 @@ function printImage(src: string) {
 
   // // const submit = (e:React.FormEvent) => {
   // //   e.preventDefault()
-  // //   axios.post("http://localhost:5000/tickets/create_ticket",{disability: '',phone:fields.numberString})
+  // //   axios.post("http://192.168.30.245:5000/tickets/create_ticket",{disability: '',phone:fields.numberString})
   // //   .then((data)=> {
   // //       setQrState(data.data)
   // //       setClicked(false)

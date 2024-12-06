@@ -191,6 +191,7 @@
                     color: white;
                     font-weight: 400;
                     font-family: "roboto";
+                    font-size: 40px;
                 }
             }
             .conts{
@@ -306,44 +307,7 @@
                                 color: white;
                             }
                         }
-                    }
-                    .actiona{
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        display: none;
-                        .acta{
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            label{
-                                margin-right: 10px;
-                            }
-                            .duara_nje{
-                                width: 60px;
-                                height: 30px;
-                                border-radius: 100px;
-                                background: grey;
-                                cursor: pointer;
-                                display: flex;
-                                align-items: center;
-                                &.active{
-                                    background: $mainColor;
-                                }
-                                .duara_ndani{
-                                    width: 40px;
-                                    height: 20px;
-                                    border-radius: 100px;
-                                    background: white;
-                                    margin: 10px;
-                                    transition: all .2s ease-in-out;
-                                    &.active{
-                                        transform: translateX(20%);
-                                    }
-                                }
-                            }
-                        }
-                    }  
+                    } 
                 }
                 .action{
                     width: 100%;
@@ -352,15 +316,18 @@
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    button{
-                        width: 70%;
-                        background: $mainBold;
-                        outline: none;
-                        border: none;
-                        color: white;
-                        padding: 20px;
-                        cursor: pointer;
+                    .tapa{
+                        color: red;
                     }
+                    // button{
+                    //     width: 70%;
+                    //     background: $mainBold;
+                    //     outline: none;
+                    //     border: none;
+                    //     color: white;
+                    //     padding: 20px;
+                    //     cursor: pointer;
+                    // }
                     .cleara{
                         width: 20%;
                         background: $mainBold;

@@ -21,7 +21,7 @@ import Cubes from "@/components/loaders/cubes/cubes";
 
 export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+  //const {data:queue,loading,error} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function Home() {
   const [language] = useRecoilState(LanguageState);
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://localhost:5000/socket/display_tokens_stream');
+  //const eventSource = new EventSource('http://192.168.30.245:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -149,7 +149,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -167,7 +167,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -178,7 +178,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/get_display_tokens", {
+      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "" },
       })
       .then((data) => {
@@ -239,7 +239,7 @@ export default function Home() {
               </div>
                 : <div className={styles.servicer}>
                   <div className={styles.video}>
-                      <video src="/videos/stomach.mp4" autoPlay muted/>
+                      <video src="/videos/stomach.mp4" autoPlay muted loop/>
                     </div>
                 </div>
               }
@@ -248,7 +248,7 @@ export default function Home() {
                   {
                     !isRest
                     ? <div className={styles.video}>
-                      <video src="/videos/stomach.mp4" autoPlay muted/>
+                      <video src="/videos/stomach.mp4" autoPlay muted loop/>
                     </div>
                     : <div className={styles.tiketi}>
                       <p>{nextServe.id}</p>
@@ -271,45 +271,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            {/* <div className={cx(styles.hudumiwa)}>
-            <div className={cx(styles.wrap,serveId===0 && styles.none)}>
-            <div className={cx(styles.tatatata,serveId===0 && styles.none)}>
-              <h1>Anae Hudumiwa</h1>
-            </div>
-            <div className={styles.sepera}>
-            </div>
-            {tickets.length > 0 ? (
-              <div className={cx(styles.round,serveId===0 && styles.none)}>
-                {tickets
-                  .filter(
-                    (item: { ticket: { serving: boolean } }) =>
-                      item.ticket.serving
-                  )
-                  .map((item: any, index: number) => (
-                    <div className={styles.sava} onLoad={()=> setServeId(index+1)} key={index}>
-                      <div key={index} className={styles.logo} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>
-                        <img src="/mnh.png" alt="" />
-                      </div>
-                      <div className={styles.tokeni}>
-                        <div className={styles.title}>Tokeni Namba</div>
-                        <div className={styles.token}>
-                        {item.ticket.ticket_no}
-                        </div>
-                      </div>
-                      <div className={styles.waiting_time}>
-                        <IoMdStopwatch className={styles.icon} size={50}/>
-                        <span>
-                        {`${formatTime(hours.toString())}:${formatTime(minutes.toString())}:${formatTime(seconds.toString())}`}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            ) : (
-              <div className={styles.round}></div>
-            )}
-            </div>
-            </div> */}
             <div className={styles.nexta}>
               <div className={styles.tita}>
                 <div className={styles.title}>Anae Fata</div>

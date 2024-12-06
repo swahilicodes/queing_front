@@ -17,7 +17,7 @@ function Graph() {
   },[])
 
   const getTicks = () => {
-    axios.get("http://localhost:5000/analytics/token_analytics")
+    axios.get("http://192.168.30.245:5000/analytics/token_analytics")
       .then((data: any) => {
         setToken(data.data)
         console.log(data)

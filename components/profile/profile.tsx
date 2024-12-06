@@ -22,7 +22,7 @@ export default function Profile() {
   const changePassword = (e: React.FormEvent) => {
     e.preventDefault()
     if(isEditable){
-        axios.put(`http://localhost:5000/users/edit_user/${currentUser.id}`,{oldPass,newPass}).then((data)=> {
+        axios.put(`http://192.168.30.245:5000/users/edit_user/${currentUser.id}`,{oldPass,newPass}).then((data)=> {
             setEditable(false)
             router.reload()
         }).catch((error)=> {

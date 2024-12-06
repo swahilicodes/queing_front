@@ -15,6 +15,8 @@ import AudioTest from "@/components/audio_player/audio_test/audio";
 import { GrPowerShutdown } from "react-icons/gr";
 import SequentialAudio from "@/components/audio_player/sequential/sequential";
 import isSpeakerState from "@/store/atoms/isSpeaker";
+import useCreateItem from "@/custom_hooks/useCreateItem";
+import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 
 function Recorder() {
   const currentUser = useRecoilValue(currentUserState);
@@ -34,6 +36,7 @@ function Recorder() {
   const [penalized, setPenalized] = useState(false)
   const [active, setActive] = useState(false)
   const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
+  const {createItem,loading} = useCreateItem()
   const [fields, setFields] = useState({
     mr_no: "",
     status: ""
@@ -55,7 +58,7 @@ function Recorder() {
 
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page})
+    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -77,7 +80,7 @@ function Recorder() {
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://192.168.30.245:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:data.data})
       setTokens((tokens)=> tokens.map((item)=> item))
       setFinLoading(false)
@@ -104,7 +107,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("http://192.168.30.245:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
       })
       .then((data: any) => {
@@ -133,7 +136,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -153,7 +156,7 @@ function Recorder() {
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -172,7 +175,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/cashier_queue"}})
+    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/accounts_queue"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -194,7 +197,7 @@ function Recorder() {
   }
   const priotize = (ticket_no:string, data:string) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data}})
+    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts"}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -228,7 +231,7 @@ function Recorder() {
           </div>
             )
           }
-          <div className={styles.rest} onClick={()=> activate("/cashier_queue")}>
+          <div className={styles.rest} onClick={()=> activate("/accounts_queue")}>
             {!active?"rest":"activate"}
           </div>
         </div>
@@ -349,12 +352,16 @@ function Recorder() {
         <div className={styles.speaker}>
         {
             tokens.length > 0 && (
-              <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
-                <SequentialAudio token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/>
+              <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://192.168.30.245:5000/speaker/create_speaker",item.counter.namba)}>
+                  {
+                    !loading
+                    ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
+                    : <HiOutlineSpeakerXMark className={styles.icon} size={30}/>
+                  }
+                </div>
               </div>
-              // <AudioTest token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={false}/>
             )
-            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
         }
         </div>
         <div className={styles.row}>

@@ -57,7 +57,7 @@ function Speaker() {
  }
 
  const getPlays = () => {
-    axios.get("http://localhost:5000/speaker/get_speakers",{params: {station: fields.station}}).then((data)=> {
+    axios.get("http://192.168.30.245:5000/speaker/get_speakers",{params: {station: fields.station}}).then((data)=> {
         setPlays(data.data)
         setPlays((plays) => plays.map((item)=> item))
     }).catch((error)=> {
@@ -123,7 +123,7 @@ function Speaker() {
                                 <td>{item.stage}</td>
                                 <td>{item.counter}</td>
                                 <td>{item.station}</td>
-                                <td><GptPlayer token={Number(removeLeadingZeros(item.ticket_no))} counter={Number(removeLeadingZeros(item.counter))} stage='meds' isPlaying={item.talking===true?true:false}/></td>
+                                <td><GptPlayer token={Number(removeLeadingZeros(item.ticket_no))} counter={Number(removeLeadingZeros(item.counter))} stage={item.stage} isPlaying={item.talking===true?true:false}/></td>
                                 {/* <td>{item.talking===true?<GptPlayer token={Number(removeLeadingZeros(item.ticket_no))} counter={Number(removeLeadingZeros(item.counter))} stage='meds' isPlaying={item.talking===true?true:false}/>:"False"}</td>  */}
                             </tr>
                         ))
@@ -132,7 +132,7 @@ function Speaker() {
             </table>
             }
         </div>
-        <button onClick={()=> createItem("013","meds","m02","http://localhost:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button>
+        {/* <button onClick={()=> createItem("1005","meds","m02","http://192.168.30.245:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button> */}
     </div>
   )
 }

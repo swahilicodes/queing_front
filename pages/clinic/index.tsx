@@ -18,6 +18,8 @@ import { IoIosAdd, IoMdAdd } from "react-icons/io";
 import { FiMinus } from "react-icons/fi";
 import SequentialAudio from "@/components/audio_player/sequential/sequential";
 import isSpeakerState from "@/store/atoms/isSpeaker";
+import useCreateItem from "@/custom_hooks/useCreateItem";
+import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -36,12 +38,13 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [doktas, setDoktas] = useState([])
-  const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
+  const {data} = useFetchData("http://192.168.30.245:5000/clinic/get_clinics")
   const [isAddittion, setAddittion] = useState(false)
   const [isAdd, setAdd] = useState(false)
   const [attendantClinics, setAttendantClinics] = useState([])
   const [active, setActive] = useState(false)
   const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
+  const {createItem,loading} = useCreateItem()
   const [currentToken, setCurrentToken] = useState({
     ticket_no: "",
     stage: "",
@@ -59,17 +62,18 @@ function Recorder() {
   useEffect(() => {
     if(Object.keys(currentUser).length > 0 ){
       if(Object.keys(attendantClinics).length > 0 ){
+        console.log(attendantClinics)
         getTicks()
       }
       getDoktas()
       getDocClinics()
       getActive()
     }
-  }, [status, disable, ticket,currentUser,active,fields.clinic_code,currentToken]);
+  }, [status, disable, ticket,currentUser,active,fields.clinic_code,currentToken,attendantClinics.length]);
 
   const handleCurrentClinic = (code:string) => {
     if(code==="all"){
-      axios.post('http://localhost:5000/current_clinic/create_current',{clinic_code: "",clinic_name: ""}).then((data)=> {
+      axios.post('http://192.168.30.245:5000/current_clinic/create_current',{clinic_code: "",clinic_name: ""}).then((data)=> {
         setFields({...fields,clinic_code:"",clinic:""})
       })
       .catch((error) => {
@@ -86,7 +90,7 @@ function Recorder() {
     }else{
       const clinic = data.find((item:any)=> item.clinicicode===code)
     setFields({...fields,clinic: clinic.cliniciname,clinic_code: clinic.clinicicode})
-    axios.post('http://localhost:5000/current_clinic/create_current',{clinic_code: clinic.clinicicode,clinic_name: clinic.cliniciname}).then((data)=> {
+    axios.post('http://192.168.30.245:5000/current_clinic/create_current',{clinic_code: clinic.clinicicode,clinic_name: clinic.cliniciname}).then((data)=> {
       setFields({...fields,clinic: data.data.clinic_name,clinic_code: data.data.clinic_code})
     })
     .catch((error) => {
@@ -103,7 +107,7 @@ function Recorder() {
     }
   }
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/nurse_station"}})
+    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/nurse_station"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -126,7 +130,7 @@ function Recorder() {
   }
 
   const createClinic = () => {
-    axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://192.168.30.245:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
         //setPat(data.data)
         setAddittion(!isAddittion)
         getDocClinics()
@@ -144,7 +148,7 @@ function Recorder() {
     })
  }
  const deleteClinic = (clinic_code:string) => {
-    axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://192.168.30.245:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
         const updatedItems = attendantClinics.filter((item:any) => item.clinic_code !== clinic_code);
         setAttendantClinics(updatedItems.map((item)=> item));
     }).catch((error)=> {
@@ -158,7 +162,7 @@ function Recorder() {
     })
  }
  const getDocClinics = () => {
-    axios.get(`http://localhost:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://192.168.30.245:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
         setAttendantClinics(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -174,7 +178,7 @@ function Recorder() {
 
   const finishToken = () => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://192.168.30.245:5000/tickets/send_to_clinic`,{patient_id:fields.patient_id,doctor_id: fields.doctor_id, nurse_id: currentUser.phone}).then((data)=> {
       console.log(data)
       setInterval(()=> {
         setFinLoading(false)
@@ -195,12 +199,13 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getClinicTickets", {
+    axios.get("http://192.168.30.245:5000/tickets/getClinicTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station",clinic_code: attendantClinics.map((item:any)=> item.clinic_code), mr_no: ticket,current_clinic:fields.clinic_code },
       })
       .then((data) => {
         setTokens(data.data.data);
         setTotalItems(data.data.totalItems);
+        console.log('tokens data ',data.data.data)
         setInterval(() => {
           setFetchLoading(false);
         }, 2000);
@@ -219,8 +224,9 @@ function Recorder() {
   };
   const getDoktas = () => {
     setDocLoading(true);
-    axios.get("http://localhost:5000/doktas/get_free_doktas", {
-        params: { page, pagesize,clinic_code: currentUser.clinic_code,clinics: currentUser.clinics.map((item:any)=> item.clinic_code),selected_clinic: fields.clinic_code},
+    axios.get("http://192.168.30.245:5000/doktas/get_free_doktas", {
+        // params: { page, pagesize,clinic_code: currentUser.clinic_code,clinics: currentUser.clinics.map((item:any)=> item.clinic_code),selected_clinic: fields.clinic_code},
+        params: { page, pagesize,clinic_code: currentUser.clinic_code,clinics: currentUser.clinics !== undefined && currentUser.clinics.length> 0?currentUser.clinics.map((item:any)=> item.clinic_code):[204],selected_clinic: fields.clinic_code},
       })
       .then((data) => {
         setDoktas(data.data.data);
@@ -256,7 +262,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -286,7 +292,7 @@ function Recorder() {
   }
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -306,7 +312,7 @@ function Recorder() {
   };
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page})
+    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -327,7 +333,7 @@ function Recorder() {
   };
   const priotize = (ticket_no:string, data:string) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data}})
+    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data,stage:"nurse_station"}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -365,7 +371,7 @@ function Recorder() {
           </div>
             )
           }
-          <div className={styles.rest} onClick={()=> activate("/nurse_station")}>
+          <div className={styles.rest} onClick={()=> activate("/clinic_queue")}>
             {!active?"rest":"activate"}
           </div>
         </div>
@@ -500,9 +506,18 @@ function Recorder() {
                 <div onClick={()=> finishToken()} className={styles.button}>Submit</div>
                   {
                     (fields.room !== '' && tokens.length > 0 ) &&(
-                      <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
-                      <SequentialAudio token={`${currentToken.ticket_no}`} counter={`${fields.room}`} stage={currentToken.stage} isButton={true} talking={isSpeaker}/>
-                    </div>
+                      <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
+                        <div className={styles.rounder} onClick={()=> createItem(currentToken.ticket_no.toString(),"nurse_station","m02","http://192.168.30.245:5000/speaker/create_speaker",fields.room)}>
+                          {
+                            !loading
+                            ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
+                            : <HiOutlineSpeakerXMark className={styles.icon} size={30}/>
+                          }
+                        </div>
+                      </div>
+                    //   <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
+                    //   <SequentialAudio token={`${currentToken.ticket_no}`} counter={`${fields.room}`} stage={currentToken.stage} isButton={true} talking={isSpeaker}/>
+                    // </div>
                       // <div className={styles.button}>
                       //   <AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={true}/>
                       //   {/* <SequentialAudioPlayerFinish  token={`${tokens[0].token.ticket_no}`} counter={fields.room}/> */}
@@ -614,28 +629,6 @@ function Recorder() {
       </div>
         ))
       }
-        {/* {
-            tokens.length > 0 && (<AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={false}/>)
-        }
-        </div>
-        <div className={styles.row}>
-          <div className={styles.row_item} onClick={()=> editTicket(tokens[0].token.id,"pending")}>
-            <div className={styles.button}>Pend</div>
-          </div>
-          {/* <div className={styles.row_item} onClick={nextToken}> */}
-          {/* <div className={styles.row_item} onClick={()=> clinicGo(tokens[0].token.mr_no)}> */}
-          {/* <div className={styles.row_item} onClick={()=> setNext(true)}>
-            <div className={styles.button}>Finish</div>
-          </div> */}
-          {/* <div className={styles.row_item}>
-            <div className={styles.token}>{tokens.length> 0 && tokens[0].token.ticket_no}</div>
-          </div>
-          <div className={styles.row_item} onClick={()=> penalize(tokens[0].token.id)}>
-            <div className={styles.button}>Penalize</div>
-          </div>
-          <div className={styles.row_item} onClick={()=> preparePnF()}>
-            <div className={styles.button}>Finish & Penalize</div>
-          </div> */}
       {tokens.length > 0 && (
         <div className={styles.chini}>
           <div className={styles.top}>

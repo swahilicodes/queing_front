@@ -354,6 +354,27 @@
             .icon{
                 color: $secondColor;
             }
+            .spika{
+                border-radius: 50%;
+                background: $secondColor;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all .5s ease-in-out;
+                &.active{
+                    border: 4px solid $mainBold;
+                    animation: rotate-border 2s linear infinite;
+                }
+                .rounder{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 15px;
+                    .icon{
+                        color: white;
+                    }
+                }
+            }
         }
         .row{
             display: flex;
@@ -364,7 +385,6 @@
                 .button{
                     background: $mainColor;
                     padding: 5px 10px;
-                    border-radius: 10px;
                     color: white;
                     display: flex;
                     align-items: center;
@@ -440,3 +460,11 @@
         width: 100%;
     }
 }
+@keyframes rotate-border {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }

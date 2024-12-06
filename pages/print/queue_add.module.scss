@@ -154,6 +154,7 @@
                 align-items: center;
                 justify-content: center;
                 .sug{
+                    width: 120px;
                     border: 2px solid $divColor;
                     padding: 10px;
                     border-radius: 100px;
@@ -162,6 +163,9 @@
                     color: $mainBold;
                     cursor: pointer;
                     transition: all .5s ease-in-out;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     &.active{
                         background: $mainColor;
                         color: white;
@@ -239,6 +243,7 @@
                     color: white;
                     font-weight: 400;
                     font-family: "roboto";
+                    font-size: 30px;
                 }
             }
             .conts{
@@ -276,20 +281,33 @@
                     align-items: center;
                     justify-content: space-between;
                     .right{
-                        background: $divColor;
-                        padding: 10px;
                         cursor: pointer;
                         margin: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        .baa{
+                            background: $divColor;
+                            padding: 10px;
+                            &:nth-child(1){
+                                margin-right: 10px;
+                            }
+                        }
                         .icon{
                             color: $mainColor;
                         }
                     }
                     .left{
-                        margin: 20px;
-                        font-size: 40px;
-                        font-weight: 600;
-                        color: $mainColor;
-                        opacity: .7;
+                        input{
+                            outline: none;
+                            font-size: 50px;
+                            font-weight: 600;
+                            color: $mainColor;
+                            direction: ltr;
+                            text-align: right;
+                            border: none;
+                            opacity: .7;
+                        }
                     }
                 }
                 .keyBoard{
@@ -307,6 +325,7 @@
                         text-align: center;
                         cursor: pointer;
                         font-weight: 600;
+                        font-size: 25px;
                     }
                 }
                 .exceptions{
@@ -396,6 +415,7 @@
                         color: white;
                         padding: 20px;
                         cursor: pointer;
+                        font-size: 25px;
                     }
                     .cleara{
                         width: 20%;
