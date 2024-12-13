@@ -6,6 +6,8 @@ import { useRouter } from 'next/router'
 import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
 import useFetchData from '@/custom_hooks/fetch'
+import { useSetRecoilState } from 'recoil'
+import messageState from '@/store/atoms/message'
 
 export default function Services() {
 const [isAdd, setAdd] = useState(false)
@@ -18,7 +20,8 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading,error} = useFetchData("http://192.168.30.245:5000/clinic/get_clinics")
+const {data,loading,error} = useFetchData("http://localhost:5000/clinic/get_clinics")
+const setMessage = useSetRecoilState(messageState)
 const [fields, setFields] = useState({
     service: "",
     clinic: "",
@@ -37,44 +40,56 @@ const clinicSeta = (code:string) => {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.245:5000/rooms/create_room",{namba: fields.namba, clinic: fields.clinic,clinic_code: fields.code}).then((data:any)=> {
+    axios.post("http://localhost:5000/rooms/create_room",{namba: fields.namba, clinic: fields.clinic,clinic_code: fields.code}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
  const deleteService  = (id:any) => {
-    axios.put(`http://192.168.30.245:5000/counters/delete_counter/${id}`).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/delete_counter/${id}`).then((data:any)=> {
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://192.168.30.245:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
@@ -92,18 +107,22 @@ const clinicSeta = (code:string) => {
   };
  const getServices  = () => {
     setFetchLoading(true)
-    axios.get("http://192.168.30.245:5000/rooms/get_rooms",{params: {page,pagesize, clinic_code: fields.code}}).then((data:any)=> {
+    axios.get("http://localhost:5000/rooms/get_rooms",{params: {page,pagesize, clinic_code: fields.code}}).then((data:any)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
     }).catch((error:any)=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }

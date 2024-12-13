@@ -7,6 +7,8 @@ import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
 import useFetchData from '@/custom_hooks/fetch'
 import { RxEnterFullScreen } from 'react-icons/rx'
+import { useSetRecoilState } from 'recoil'
+import messageState from '@/store/atoms/message'
 
 export default function Admins() {
 const [name,setName] = useState("")
@@ -21,9 +23,10 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data} = useFetchData("http://192.168.30.245:5000/services/get_all_services")
+const {data} = useFetchData("http://localhost:5000/services/get_all_services")
 const [isFull,setFull] = useState(false)
 const [desc,setDesc] = useState('')
+const setMessage = useSetRecoilState(messageState)
 
 useEffect(()=> {
     getAttendants()
@@ -36,44 +39,38 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.245:5000/adverts/create_advert",{name,description}).then((data:any)=> {
+    axios.post("http://localhost:5000/adverts/create_advert",{name,description}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }
  const deleteService  = (id:string) => {
-    axios.put(`http://192.168.30.245:5000/adverts/delete_advert/${id}`).then(()=> {
+    axios.put(`http://localhost:5000/adverts/delete_advert/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://192.168.30.245:5000/services/edit_service/${id}`,{name}).then((data:any)=> {
+    axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }
@@ -96,18 +93,16 @@ useEffect(()=> {
  }
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://192.168.30.245:5000/adverts/get_adverts",{params: {page,pagesize}}).then((data)=> {
+    axios.get("http://localhost:5000/adverts/get_adverts",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
     }).catch((error:any)=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }

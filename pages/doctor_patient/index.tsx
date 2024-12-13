@@ -1,7 +1,7 @@
 import currentUserState from '@/store/atoms/currentUser'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import styles from './patient_doc.module.scss'
 import { useRouter } from 'next/router'
 import Cubes from '@/components/loaders/cubes/cubes'
@@ -11,6 +11,7 @@ import { IoIosAdd, IoMdAdd } from 'react-icons/io'
 import useFetchData from '@/custom_hooks/fetch'
 import { FiMinus } from 'react-icons/fi'
 import { MdDeleteOutline } from 'react-icons/md'
+import messageState from '@/store/atoms/message'
 
 export default function DoctorPatient() {
  const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
@@ -23,7 +24,8 @@ export default function DoctorPatient() {
  const [isAdd, setAdd] = useState(false)
  const [jeevaClinics, setJeevaClinics] = useState([])
  const [attendantClinics, setAttendantClinics] = useState([])
- const {data} = useFetchData("http://192.168.30.245:5000/clinic/get_clinics")
+ const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
+ const setMessage = useSetRecoilState(messageState)
  const [fields, setFields] = useState({
     clinic: "",
     clinic_code: ""
@@ -37,20 +39,24 @@ export default function DoctorPatient() {
  },[currentUser])
 
  const getDocPat = () => {
-    axios.get(`http://192.168.30.245:5000/tickets/clinic_patient`,{params: {clinic_code: currentUser.clinic_code}}).then((data)=> {
+    axios.get(`http://localhost:5000/tickets/clinic_patient`,{params: {clinic_code: currentUser.clinic_code}}).then((data)=> {
         setPat(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
  const createClinic = () => {
-    axios.post(`http://192.168.30.245:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`,{clinic_code: fields.clinic_code,clinic: fields.clinic, attendant_id: currentUser.phone}).then((data)=> {
         //setPat(data.data)
         setAddittion(!isAddittion)
         getDocClinics()
@@ -60,37 +66,50 @@ export default function DoctorPatient() {
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
  const deleteClinic = (clinic_code:string) => {
-    axios.get(`http://192.168.30.245:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`,{params: {clinic_code: clinic_code,attendant_id: currentUser.phone}}).then((data)=> {
         const updatedItems = attendantClinics.filter((item:any) => item.clinic_code !== clinic_code);
         setAttendantClinics(updatedItems.map((item)=> item));
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
  const getDocClinics = () => {
-    axios.get(`http://192.168.30.245:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
+    axios.get(`http://localhost:5000/attendant_clinics/get_clinics`,{params: {attendant_id: currentUser.phone}}).then((data)=> {
         setAttendantClinics(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
@@ -102,7 +121,7 @@ export default function DoctorPatient() {
 
  const finishToken = () => {
     setFinLoading(true)
-    axios.post("http://192.168.30.245:5000/doktas/finish_patient",{doctor_id: currentUser.phone,patient_id: pat.mr_no}).then((data)=> {
+    axios.post("http://localhost:5000/doktas/finish_patient",{doctor_id: currentUser.phone,patient_id: pat.mr_no}).then((data)=> {
         console.log(data)
         setInterval(()=> {
             setFinLoading(false)

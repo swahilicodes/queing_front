@@ -6,6 +6,8 @@ import { useRouter } from 'next/router'
 import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
 import useFetchData from '@/custom_hooks/fetch'
+import { useSetRecoilState } from 'recoil'
+import messageState from '@/store/atoms/message'
 
 export default function Services() {
 const [isAdd, setAdd] = useState(false)
@@ -18,7 +20,8 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data} = useFetchData("http://192.168.30.245:5000/clinic/get_clinics")
+const setMessage = useSetRecoilState(messageState)
+const {data} = useFetchData("http://localhost:5000/clinic/get_clinics")
 const [fields, setFields] = useState({
     service: "",
     clinic: "",
@@ -37,44 +40,44 @@ const clinicSeta = (code:string) => {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.245:5000/counters/create_counter",{service:fields.service,namba: fields.namba, clinic: fields.clinic,code: fields.code}).then((data:any)=> {
+    axios.post("http://localhost:5000/counters/create_counter",{service:fields.service,namba: fields.namba, clinic: fields.clinic,code: fields.code}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
             console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }
  const deleteService  = (id:string) => {
-    axios.put(`http://192.168.30.245:5000/counters/delete_counter/${id}`).then(()=> {
+    axios.put(`http://localhost:5000/counters/delete_counter/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
             console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://192.168.30.245:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
+    axios.put(`http://localhost:5000/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
             console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }
@@ -92,7 +95,7 @@ const clinicSeta = (code:string) => {
   };
  const getServices  = () => {
     setFetchLoading(true)
-    axios.get("http://192.168.30.245:5000/counters/get_counters",{params: {page,pagesize}}).then((data)=> {
+    axios.get("http://localhost:5000/counters/get_counters",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -100,10 +103,10 @@ const clinicSeta = (code:string) => {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
             console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
         }
     })
  }

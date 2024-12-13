@@ -13,6 +13,8 @@ import { TiChevronRight } from 'react-icons/ti'
 import errorState from '@/store/atoms/error'
 import LanguageState from '@/store/atoms/language'
 import { IoArrowUndoOutline } from 'react-icons/io5'
+import Cubes from '@/components/loaders/cubes/cubes'
+import messageState from '@/store/atoms/message'
 
 export default function QueueAdd() {
   const [cat,setcat] = useState("")
@@ -32,6 +34,7 @@ export default function QueueAdd() {
  const [subLoading, setSubLoading] = useState(false)
  const [error, setError] = useRecoilState(errorState)
  const language = useRecoilValue(LanguageState)
+ const setMessage = useSetRecoilState(messageState)
  const [seleccted, setSelected] = useState({
     index: 0,
     reason: "",
@@ -74,7 +77,7 @@ export default function QueueAdd() {
 
   const handleSubmit = () => {
     setSubLoading(true)
-    axios.post("http://192.168.30.245:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
+    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
         setSubLoading(false)
         setSelected({...seleccted,index:0,type:"",reason: ""})
         setError(language==="English"?"Thank you for your feedback..":"Asante kwa Maoni Yako..")
@@ -112,7 +115,7 @@ export default function QueueAdd() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.245:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
+    axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
@@ -128,10 +131,15 @@ export default function QueueAdd() {
         console.log(error.response)
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            //alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
   }
@@ -254,12 +262,13 @@ function printImage(src: string) {
         {
             isSuccess && (
                 <div className={styles.overlay}>
-                    <div className={styles.content}>
+                    <Cubes/>
+                    {/* <div className={styles.content}>
                         <div className={styles.conts}>
                         <div className={styles.topa}><IoMdCheckmark size={40} className={styles.icon}/></div>
                         <h1>Success</h1>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             )
         }

@@ -5,7 +5,7 @@ import AdvertScroller from "@/components/adverts/advert";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { FaArrowTrendUp } from "react-icons/fa6";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import currentConditionState from "@/store/atoms/current";
 import LanguageState from "@/store/atoms/language";
 import { BiCurrentLocation } from "react-icons/bi";
@@ -18,10 +18,11 @@ import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
 import { TiArrowRepeat } from "react-icons/ti";
 import { TbHeartHandshake } from "react-icons/tb";
 import Cubes from "@/components/loaders/cubes/cubes";
+import messageState from "@/store/atoms/message";
 
 export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
+  //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function Home() {
   const [language] = useRecoilState(LanguageState);
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://192.168.30.245:5000/socket/display_tokens_stream');
+  //const eventSource = new EventSource('http://localhost:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -50,6 +51,7 @@ export default function Home() {
   const amPm = hours >= 12 ? "PM" : "AM";
   const [isRest, setRest] = useState<boolean>(true)
   const [serving, setServing] = useState<any>({})
+  const setMessage = useSetRecoilState(messageState)
   const [nextServe, setNextServe] = useState({
     id: 0,
     window: 0
@@ -149,36 +151,34 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: router.pathname } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: router.pathname } })
       .then((data) => {
         setActive(data.data.isActive);
       })
       .catch((error) => {
         console.log(error.response);
         if (error.response && error.response.status === 400) {
-          //console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-          //console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
         }
       });
   };
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
       .catch((error) => {
-        alert(error);
+        setMessage({...onmessage,title:error.message,category: "error"})
       });
   };
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
+      .get("http://localhost:5000/tickets/get_display_tokens", {
         params: { stage: "accounts", clinic_code: "" },
       })
       .then((data) => {
@@ -187,8 +187,7 @@ export default function Home() {
       })
       .catch((error) => {
         setLoading(false);
-        alert(error);
-        console.log(error.response)
+        setMessage({...onmessage,title:error.message,category: "error"})
       });
   };
 

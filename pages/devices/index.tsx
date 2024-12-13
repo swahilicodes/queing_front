@@ -9,6 +9,8 @@ import useFetchData from "@/custom_hooks/fetch";
 import { RxEnterFullScreen } from "react-icons/rx";
 import useAuth from "@/custom_hooks/useAuth";
 import { IoIosAdd } from "react-icons/io";
+import { useSetRecoilState } from "recoil";
+import messageState from "@/store/atoms/message";
 
 export default function Admins() {
   const [name, setName] = useState("");
@@ -23,14 +25,15 @@ export default function Admins() {
   const [pagesize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [id, setId] = useState("");
+  const setMessage = useSetRecoilState(messageState)
   const { data } = useFetchData(
-    "http://192.168.30.245:5000/services/get_all_services"
+    "http://localhost:5000/services/get_all_services"
   );
   const [isFull, setFull] = useState(false);
   const [desc, setDesc] = useState("");
   const [pages, setPages] = useState([]);
   const { data: clinics } = useFetchData(
-    "http://192.168.30.245:5000/clinic/get_clinics"
+    "http://localhost:5000/clinic/get_clinics"
   );
   const [isAddittion, setAddittion] = useState(false);
   const [attendantClinics, setAttendantClinics] = useState([]);
@@ -74,7 +77,7 @@ export default function Admins() {
 
   const createClinic = (deviceId: string) => {
     axios
-      .post(`http://192.168.30.245:5000/attendant_clinics/create_attendant_clinic`, {
+      .post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`, {
         clinic_code: fields.clinic_code,
         clinic: fields.clinic,
         attendant_id: deviceId,
@@ -90,16 +93,22 @@ export default function Admins() {
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
   const deleteClinic = (clinic_code: string, device_id: string) => {
     axios
-      .get(`http://192.168.30.245:5000/attendant_clinics/delete_clinic`, {
+      .get(`http://localhost:5000/attendant_clinics/delete_clinic`, {
         params: { clinic_code: clinic_code, attendant_id: device_id },
       })
       .then((data) => {
@@ -111,16 +120,22 @@ export default function Admins() {
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
   const getDocClinics = (device_id: string) => {
     axios
-      .get(`http://192.168.30.245:5000/attendant_clinics/get_clinics`, {
+      .get(`http://localhost:5000/attendant_clinics/get_clinics`, {
         params: { attendant_id: device_id },
       })
       .then((data) => {
@@ -129,10 +144,16 @@ export default function Admins() {
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
@@ -141,7 +162,7 @@ export default function Admins() {
   const editService = (e: React.FormEvent) => {
     e.preventDefault();
     axios
-      .get(`http://192.168.30.245:5000/network/edit_device`, {
+      .get(`http://localhost:5000/network/edit_device`, {
         params: { page: fields.page, id: id, deviceName: inputs.deviceName, deviceModel: inputs.deviceModel, manufucturer: inputs.manufucturer },
       })
       .then(() => {
@@ -151,16 +172,22 @@ export default function Admins() {
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
   const deleteService = () => {
     axios
-      .get(`http://192.168.30.245:5000/network/delete_device`, {
+      .get(`http://localhost:5000/network/delete_device`, {
         params: { id: id },
       })
       .then(() => {
@@ -170,10 +197,16 @@ export default function Admins() {
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
@@ -198,7 +231,7 @@ export default function Admins() {
 
   const getPages = () => {
     axios
-      .get("http://192.168.30.245:3000/api/getPages")
+      .get("http://localhost:3000/api/getPages")
       .then((data) => {
         const pags = data.data.pages.map((page: string) =>
           getFirstPathSegment(page)
@@ -217,7 +250,7 @@ export default function Admins() {
   const getAttendants = () => {
     setFetchLoading(true);
     axios
-      .get("http://192.168.30.245:5000/network/get_devices", {
+      .get("http://localhost:5000/network/get_devices", {
         params: { page, pagesize },
       })
       .then((data) => {
@@ -229,10 +262,16 @@ export default function Admins() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };

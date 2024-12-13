@@ -6,10 +6,11 @@ import axios from 'axios'
 import cx from 'classnames'
 import SequentialAudio from '@/components/audio_player/sequential/sequential'
 import { useRouter } from 'next/router'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import isSpeakerState from '@/store/atoms/isSpeaker'
 import { CiMicrophoneOff, CiMicrophoneOn } from 'react-icons/ci'
 import GptPlayer from '@/components/audio_player/gpt/gpt'
+import messageState from '@/store/atoms/message'
 
 function Speaker() {
  const {createItem,loading} = useCreateItem()
@@ -17,6 +18,7 @@ function Speaker() {
  const [isLoading,setLoading] = useState(false)
  const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
  const router = useRouter()
+ const setMessage = useSetRecoilState(messageState)
  const [fields, setFields] = useState({
     station: ""
  })
@@ -57,7 +59,7 @@ function Speaker() {
  }
 
  const getPlays = () => {
-    axios.get("http://192.168.30.245:5000/speaker/get_speakers",{params: {station: fields.station}}).then((data)=> {
+    axios.get("http://localhost:5000/speaker/get_speakers",{params: {station: fields.station}}).then((data)=> {
         setPlays(data.data)
         setPlays((plays) => plays.map((item)=> item))
     }).catch((error)=> {
@@ -65,9 +67,15 @@ function Speaker() {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.message}`)
             alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
@@ -132,7 +140,7 @@ function Speaker() {
             </table>
             }
         </div>
-        {/* <button onClick={()=> createItem("1005","meds","m02","http://192.168.30.245:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button> */}
+        {/* <button onClick={()=> createItem("1005","meds","m02","http://localhost:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button> */}
     </div>
   )
 }

@@ -5,6 +5,8 @@ import { MdDelete, MdOutlineClear } from 'react-icons/md'
 import { useRouter } from 'next/router'
 import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
+import { useSetRecoilState } from 'recoil'
+import messageState from '@/store/atoms/message'
 
 export default function Services() {
 const [name,setName] = useState("")
@@ -18,6 +20,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
+const setMessage = useSetRecoilState(messageState)
 
 useEffect(()=> {
     getServices()
@@ -25,44 +28,56 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.245:5000/services/create_service",{name}).then(()=> {
+    axios.post("http://localhost:5000/services/create_service",{name}).then(()=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
  const deleteService  = (id:string) => {
-    axios.put(`http://192.168.30.245:5000/services/delete_service/${id}`).then(()=> {
+    axios.put(`http://localhost:5000/services/delete_service/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://192.168.30.245:5000/services/edit_service/${id}`,{name}).then(()=> {
+    axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then(()=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }
@@ -80,18 +95,22 @@ useEffect(()=> {
   };
  const getServices  = () => {
     setFetchLoading(true)
-    axios.get("http://192.168.30.245:5000/services/get_services",{params: {page,pagesize}}).then((data)=> {
+    axios.get("http://localhost:5000/services/get_services",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
     }).catch((error)=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+            setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
     })
  }

@@ -39,6 +39,18 @@ export default function Layout({children}:any) {
   useAuth();
 
   useEffect(() => {
+    const reloadAtMidnight = () => {
+      const now = new Date();
+      const nextMidnight = new Date();
+      nextMidnight.setHours(24, 0, 0, 0); // Set to the next midnight
+      const timeUntilMidnight = nextMidnight.getTime() - now.getTime();
+
+      setTimeout(() => {
+        window.location.reload(); // Reload the app
+      }, timeUntilMidnight);
+    };
+
+    reloadAtMidnight();
     window.addEventListener('keydown', handleKeyDown);
 
     const languageId = setInterval(()=> {
@@ -72,6 +84,8 @@ const handleKeyDown = (event: KeyboardEvent) => {
     }
   }else if(event.key==="/"){
     setFull(false)
+  }else if(event.key==="@"){
+    setUser(true)
   }
 };
 

@@ -5,36 +5,24 @@ import AdvertScroller from "@/components/adverts/advert";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { FaArrowTrendUp } from "react-icons/fa6";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import currentConditionState from "@/store/atoms/current";
 import LanguageState from "@/store/atoms/language";
-import { BiCurrentLocation } from "react-icons/bi";
-import { IoMdStopwatch } from "react-icons/io";
-import { TfiDirectionAlt } from "react-icons/tfi";
 import { FaArrowsAltH } from "react-icons/fa";
-import { BsMicMute, BsStopwatch } from "react-icons/bs";
-import { VscUnmute } from "react-icons/vsc";
+import { BsStopwatch } from "react-icons/bs";
 import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
-import { TiArrowRepeat } from "react-icons/ti";
 import { TbHeartHandshake } from "react-icons/tb";
-import Cubes from "@/components/loaders/cubes/cubes";
+import messageState from "@/store/atoms/message";
 
 export default function Home() {
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
-  const router = useRouter();
   const [time, setTime] = useState(0);
-  // const minutes = Math.floor(time / 60) % 60;
-  // const hours = Math.floor(minutes / 60) % 3600;
-  // const seconds = time % 60;
   const [condition, setCondition] = useRecoilState(currentConditionState);
   const [, setLoading] = useState(false);
   const [language] = useRecoilState(LanguageState);
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://192.168.30.245:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -47,9 +35,10 @@ export default function Home() {
   const day = String(now.getDate()).padStart(2, "0");
   const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
   const year = now.getFullYear();
-  const amPm = hours >= 12 ? "PM" : "AM";
+  const amPm = hour >= "12"? "PM" : "AM";
   const [isRest, setRest] = useState<boolean>(true)
   const [serving, setServing] = useState<any>({})
+  const setMessage = useSetRecoilState(messageState)
   const [nextServe, setNextServe] = useState({
     id: 0,
     window: 0
@@ -67,19 +56,6 @@ export default function Home() {
       getServing()
     }, 1000);
 
-    //   eventSource.onmessage = (event) => {
-    //     const data = JSON.parse(event.data);
-    //     console.log('Received data:', data);
-    // };
-
-    // eventSource.onerror = (error) => {
-    //     console.error('SSE error:', error);
-    // };
-    // setInterval(() => {
-    //   getTickets()
-    //   //router.reload()
-    // // }, 30000);
-    // }, 30000);
     const timer = setInterval(() => {
       setSeconds((prevSeconds) => {
         if (prevSeconds === 59) {
@@ -111,7 +87,7 @@ export default function Home() {
         clearInterval(restId);
       },10000)
     };
-  }, [condition, blink,token, serveId,isRest, language]);
+  }, [condition, blink,token, serveId,isRest, language, amPm]);
 
   const getServing = () => {
     if(tickets.length > 0){
@@ -149,25 +125,29 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
       .catch((error) => {
         console.log(error.response);
         if (error.response && error.response.status === 400) {
-          //console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-          //console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -178,7 +158,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
+      .get("http://localhost:5000/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "" },
       })
       .then((data) => {
@@ -352,7 +332,7 @@ export default function Home() {
                       className={styles.item}
                       style={{ backgroundColor: "#FF5D00" }}
                     ></div>
-                    <p>{language==="English"?"TOKEN":"TOKENI"}</p>
+                    <p>{language==="English"?"TICKET":"TIKETI"}</p>
                   </div>
                 </div>
             </div>

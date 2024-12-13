@@ -1,0 +1,131 @@
+@import '../../global.scss';
+.bar{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    .top_bar{
+        position: absolute;
+        top: 0;
+        width: 100%;
+        background: $mainColor;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .left{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .item{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                label{
+                    font-size: 18px;
+                    color: white;
+                    margin-right: 10px;
+                }
+                select{
+                    outline: none;
+                    border: 2px solid $divColor;
+                    border-radius: 3px;
+                    padding: 10px;
+                }
+            }
+        }
+        .right{
+            margin: 10px;
+            p{
+                color: $mainBold;
+                font-size: 20px;
+                span{
+                    color: white;
+                }
+            }
+        }
+    }
+    .graph{
+        width: 100%;
+        height: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        position: relative;
+        .graph_wrap{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            .idadi{
+                position: absolute;
+                opacity: 0;
+                top: -10px;
+                background: rgba(0,0,0,.5);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all .5s ease-in-out;
+                padding: 5px;
+                font-size: 20px;
+                font-weight: 600;
+                &.active{
+                    opacity: 1;
+                }
+            }
+            .bar{
+                width: 80px;
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                height: 100%;
+                cursor: pointer;
+                .completed{
+                    width: 50%;
+                    background: $mainColor;
+                    border-bottom: 2px solid $mainColor;
+                }
+                .uncompleted{
+                    display: none;
+                    width: 33%;
+                    background: $mainBold;
+                    border-bottom: 2px solid $mainBold;
+                }
+                .total{
+                    width: 50%;
+                    background: $secondColor;
+                    border-bottom: 2px solid $secondColor;
+                }
+            }
+            .label{
+                position: absolute;
+                bottom: -5%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: red;
+            }
+        }
+        .x_axis{
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            height: 100%;
+            width: 5%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            h1{
+                color: $mainColor;
+                font-size: 18px;
+            }
+        }
+    }
+}

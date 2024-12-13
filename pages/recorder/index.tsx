@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./recorder.module.scss";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
 import { MdClear } from "react-icons/md";
@@ -18,6 +18,7 @@ import isSpeakerState from "@/store/atoms/isSpeaker";
 import GptPlayer from "@/components/audio_player/gpt/gpt";
 import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 import useCreateItem from "@/custom_hooks/useCreateItem";
+import messageState from "@/store/atoms/message";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -40,6 +41,7 @@ function Recorder() {
   const [active, setActive] = useState(false)
   const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
   const {createItem,loading} = useCreateItem()
+  const setMessage = useSetRecoilState(messageState)
   const [fields, setFields] = useState({
     finish_id: "",
     patName: "",
@@ -64,7 +66,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://192.168.30.245:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -74,21 +76,30 @@ function Recorder() {
       console.log('accounts error ',error.response)
       if (error.response && error.response.status === 400) {
         //console.log(`there is an error ${error.message}`)
-        alert(error.response.data.error);
+        setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
     } else {
         //console.log(`there is an error message ${error.message}`)
-        alert(error.message);
+        setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
     }
     })
     }else{
-      alert('Patient not found')
+      setMessage({...onmessage,title:'Patient not found',category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
     }
   }
 
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://192.168.30.245:5000/tickets/getMedsTickets", {
+    axios.get("http://localhost:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data) => {
@@ -103,10 +114,16 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
@@ -117,7 +134,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -128,17 +145,23 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -149,16 +172,22 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
   const priotize = (ticket_no:string, data:string, stage: string) => {
     setFetchLoading(true);
-    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data,stage}})
+    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data,stage}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -169,16 +198,22 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
+    axios.post(`http://localhost:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -190,15 +225,21 @@ function Recorder() {
         console.log(error.response)
         if (error.response && error.response.status === 400) {
           //console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           //console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
   const getActive = () => {
-    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -207,17 +248,23 @@ function Recorder() {
         console.log(error.response)
         if (error.response && error.response.status === 400) {
           //console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           //console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://192.168.30.245:5000/tickets/next_stage", {
+    axios.get("http://localhost:5000/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -230,10 +277,16 @@ function Recorder() {
         setFinLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
@@ -381,7 +434,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://192.168.30.245:5000/speaker/create_speaker",item.counter.namba)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>

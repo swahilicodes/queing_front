@@ -5,7 +5,7 @@ import AdvertScroller from "@/components/adverts/advert";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { FaArrowTrendUp } from "react-icons/fa6";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import currentConditionState from "@/store/atoms/current";
 import LanguageState from "@/store/atoms/language";
 import { BiCurrentLocation } from "react-icons/bi";
@@ -16,10 +16,11 @@ import { BsMicMute } from "react-icons/bs";
 import { VscUnmute } from "react-icons/vsc";
 import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
 import deviceState from "@/store/atoms/device";
+import messageState from "@/store/atoms/message";
 
 export default function CashierQueue() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
+  //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
@@ -32,12 +33,13 @@ export default function CashierQueue() {
   const [language] = useRecoilState(LanguageState);
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://192.168.30.245:5000/socket/display_tokens_stream');
+  //const eventSource = new EventSource('http://localhost:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(true)
   const device = useRecoilValue(deviceState)
+  const setMessage = useSetRecoilState(messageState)
 
   useEffect(() => {
     if(Object.keys(device).length > 0 && (device.clinics !== undefined && Object.keys(device.clinics).length > 0)){
@@ -78,25 +80,29 @@ export default function CashierQueue() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/nurse_station" } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/nurse_station" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
       .catch((error) => {
         console.log(error.response);
         if (error.response && error.response.status === 400) {
-          //console.log(`there is an error ${error.message}`);
-          //alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
-          //console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -107,7 +113,7 @@ export default function CashierQueue() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/get_clinic_tokens", {
+      .get("http://localhost:5000/tickets/get_clinic_tokens", {
         params: { selected_clinic: "", clinics: device.clinics.map((item:any)=> item.clinic_code) },
       })
       .then((data) => {

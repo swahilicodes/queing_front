@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState } from "react";
 import styles from "./accounts.module.scss";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
 import { MdClear } from "react-icons/md";
@@ -17,6 +17,7 @@ import SequentialAudio from "@/components/audio_player/sequential/sequential";
 import isSpeakerState from "@/store/atoms/isSpeaker";
 import useCreateItem from "@/custom_hooks/useCreateItem";
 import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
+import messageState from "@/store/atoms/message";
 
 function Recorder() {
   const currentUser = useRecoilValue(currentUserState);
@@ -37,6 +38,7 @@ function Recorder() {
   const [active, setActive] = useState(false)
   const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
   const {createItem,loading} = useCreateItem()
+  const setMessage = useSetRecoilState(messageState)
   const [fields, setFields] = useState({
     mr_no: "",
     status: ""
@@ -58,7 +60,7 @@ function Recorder() {
 
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
+    axios.post(`http://localhost:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -69,18 +71,16 @@ function Recorder() {
         setFetchLoading(false);
         console.log(error.response)
         if (error.response && error.response.status === 400) {
-          //console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-          //console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
         }
       });
   };
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://192.168.30.245:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:data.data})
       setTokens((tokens)=> tokens.map((item)=> item))
       setFinLoading(false)
@@ -94,12 +94,9 @@ function Recorder() {
           setFinLoading(false)
           router.reload()
         },2000)
-        //setFields({...fields,status:error.response.data.error})
-        //alert(error.response.data.error)
       }else{
         setFinLoading(false)
-        //setFields({...fields,status:error.message})
-        alert(error.message)
+        setMessage({...onmessage,title:error.message,category: "error"})
       }
     })
   }
@@ -107,7 +104,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://192.168.30.245:5000/tickets/getMedsTickets", {
+    axios.get("http://localhost:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
       })
       .then((data: any) => {
@@ -120,11 +117,9 @@ function Recorder() {
       .catch((error: any) => {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-          console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
         }
       });
   };
@@ -136,7 +131,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -146,17 +141,15 @@ function Recorder() {
       .catch((error) => {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-          console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
         }
       });
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -167,15 +160,15 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
           console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
         }
       });
   };
   const getActive = () => {
-    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/accounts_queue"}})
+    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/accounts_queue"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -184,10 +177,10 @@ function Recorder() {
         console.log(error.response)
         if (error.response && error.response.status === 400) {
           //console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
           //console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
         }
       });
   };
@@ -197,7 +190,7 @@ function Recorder() {
   }
   const priotize = (ticket_no:string, data:string) => {
     setFetchLoading(true);
-    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts"}})
+    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts"}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -207,11 +200,9 @@ function Recorder() {
       .catch((error) => {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-          console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
         }
       });
   };
@@ -353,7 +344,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://192.168.30.245:5000/speaker/create_speaker",item.counter.namba)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
