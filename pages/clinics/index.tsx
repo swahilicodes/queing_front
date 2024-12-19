@@ -1,59 +1,130 @@
-import axios from 'axios';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from "react";
+import styles from "./devices.module.scss";
+import axios from "axios";
+import { MdDelete, MdDeleteOutline, MdOutlineClear } from "react-icons/md";
+import { useRouter } from "next/router";
+import cx from "classnames";
+import { FiEdit2, FiMinus } from "react-icons/fi";
+import useFetchData from "@/custom_hooks/fetch";
+import { RxEnterFullScreen } from "react-icons/rx";
+import useAuth from "@/custom_hooks/useAuth";
+import { IoIosAdd } from "react-icons/io";
+import { useSetRecoilState } from "recoil";
+import messageState from "@/store/atoms/message";
 
-const Clinics = () => {
+export default function Admins() {
+  const [isAdd, setAdd] = useState(false);
+  const [services, setServices] = useState([]);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const router = useRouter();
+  const [page, setPage] = useState(1);
+  const [pagesize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [id, setId] = useState("");
+  const setMessage = useSetRecoilState(messageState)
+  const { data } = useFetchData(
+    "http://192.168.30.245:5000/services/get_all_services"
+  );
+  useAuth();
+
 
   useEffect(() => {
-    getClinics()
-    // jeevaClinics()
-  }, []);
+    getAttendants();
+  }, [page, data]);
 
-  // const jeevaClinics = () => {
-  //   axios.get("http://localhost:5000/clinic/jeeva_clinics").then((data)=> {
-  //       if(data.status === 200){
-  //           data.data.data.forEach((item) => {
-  //               console.log(item)
-  //               setInterval(()=> {
-  //                   if(clinics.length> 0){
-  //                       if(!clinics.includes(item.clinicicode)){
-  //                           axios.post("http://localhost:5000/clinic/create_clinic",{cliniciname: item.clinicname,clinicicode: item.clinicode,status: item.status,deptcode: item.deptcode}).then((data)=> {
-  //                              console.log('new clinic added',data) 
-  //                              router.reload()
-  //                           }).catch((error)=> {
-  //                               console.log(error)
-  //                           })
-  //                       }
-  //                   }else{
-  //                       if(!clinics.includes(item.clinicicode)){
-  //                           axios.post("http://localhost:5000/clinic/create_clinic",{cliniciname: item.clinicname,clinicicode: item.clinicode,status: item.status,deptcode: item.deptcode}).then((data)=> {
-  //                              console.log('new clinic added',data) 
-  //                              router.reload()
-  //                           }).catch((error)=> {
-  //                               console.log(error)
-  //                           })
-  //                       }
-  //                   }
-  //               },3000)
-  //           })
-  //       }
-  //   }).catch((error)=> {
-  //       console.log(error)
-  //   })
-  // }
+  const handlePageChange = (namba: number) => {
+    setPage(namba);
+  };
 
-  const getClinics = () => {
-    axios.get("http://localhost:5000/clinic/get_clinics").then((data)=> {
-        console.log(data.data)
-    }).catch((error)=> {
-        console.log(error)
-    })
-  }
+  const getAttendants = () => {
+    setFetchLoading(true);
+    axios
+      .get("http://192.168.30.245:5000/clinic/get_display_clinics", {
+        params: { page, pagesize },
+      })
+      .then((data) => {
+        setServices(data.data.data);
+        setFetchLoading(false);
+        setTotalItems(data.data.totalItems);
+      })
+      .catch((error: any) => {
+        setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        }
+      });
+  };
 
   return (
-    <div>
-      <h1>API Data Check</h1>
+    <div className={styles.devices}>
+      <div className={styles.service_top}>
+        <div className={styles.service_left}>{router.pathname}</div>
+        <div className={styles.service_right} onClick={() => setAdd(!isAdd)}>
+          <p>{totalItems}</p>
+        </div>
+      </div>
+      <div className={styles.service_list}>
+        {fetchLoading ? (
+          <div className={styles.loader}>loading...</div>
+        ) : (
+          <div className={styles.check}>
+            {services.length > 0 ? (
+              <div className={styles.services_list}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th className={styles.name}>Clinic Code</th>
+                      <th className={styles.name}>Clinic Name</th>
+                      <th className={styles.name}>Department</th>
+                      <th className={styles.name}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {services.map((data: any, index: number) => (
+                      <tr
+                        key={index}
+                        className={cx(index % 2 === 0 && styles.active)}
+                      >
+                        <td>{data.id}</td>
+                        <td className={cx(styles.name)}>{data.clinicicode}</td>
+                        <td className={styles.name}>{data.cliniciname}</td>
+                        <td className={styles.name}>{data.deptcode}</td>
+                        <td className={styles.name}>{data.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className={styles.pagination}>
+                  {Array.from({ length: Math.ceil(totalItems / pagesize) }).map(
+                    (_, index) => (
+                      <button
+                        key={index + 1}
+                        onClick={() => handlePageChange(index + 1)}
+                        className={cx(index + 1 === page && styles.active)}
+                      >
+                        {index + 1}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className={styles.message}>No Devices </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-export default Clinics;
+}

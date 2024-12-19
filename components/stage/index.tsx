@@ -11,7 +11,8 @@ function StageGraph() {
   const [tokens, setTokens] = useState([])
   const [token, setToken] = useState<any>({})
   const setMessage = useSetRecoilState(messageState)
-  const [stagers, setStagers] = useState([])
+  const [stagers, setStagers] = useState<any>([])
+  const [output, setOutput] = useState<any>({})
   const [fields, setFields] = useState({
     idadi: 0,
     index: 0,
@@ -21,10 +22,11 @@ function StageGraph() {
   useEffect(()=> {
     getTicks()
     getStagers()
+    console.log('the output is ',output)
   },[fields.stage,fields.time])
 
   const getTicks = () => {
-    axios.get("http://localhost:5000/analytics/token_analytics")
+    axios.get("http://192.168.30.245:5000/analytics/token_analytics")
       .then((data: any) => {
         setToken(data.data)
         //console.log(data)
@@ -46,7 +48,7 @@ function StageGraph() {
       });
   };
   const getStagers = () => {
-    axios.get("http://localhost:5000/analytics/stage_analytics",{params: {stage: fields.stage,time_factor:fields.time}})
+    axios.get("http://192.168.30.245:5000/analytics/stage_analytics",{params: {stage: fields.stage,time_factor:fields.time}})
       .then((data: any) => {
         setStagers(data.data)
         console.log(data)
@@ -68,30 +70,88 @@ function StageGraph() {
       });
   };
 
+  const handleOut = (data:any) => {
+    setOutput(data)
+    console.log(output)
+  }
+
   const createArray = (max:number) => {
     const step = max / 10;
     return Array.from({ length: 10 }, (_, index) => Math.round(step * (index + 1)));
   };
   return (
     <div className={styles.bar}>
+      <div className={styles.day_descriptions}>
+        <div className={styles.colors}>
+          <div className={styles.item}>
+            <div className={cx(styles.color, styles.total)}></div>
+            <div className={styles.label}>Total Tickets</div>
+          </div>
+          <div className={styles.item}>
+            <div className={cx(styles.color, styles.med)}></div>
+            <div className={styles.label}>Medical Records</div>
+          </div>
+          <div className={styles.item}>
+            <div className={cx(styles.color, styles.account)}></div>
+            <div className={styles.label}>Cashier</div>
+          </div>
+          <div className={styles.item}>
+            <div className={cx(styles.color, styles.station)}></div>
+            <div className={styles.label}>Nurse Station</div>
+          </div>
+          <div className={styles.item}>
+            <div className={cx(styles.color, styles.clinic)}></div>
+            <div className={styles.label}>Doctor</div>
+          </div>
+        </div>
+        {
+          fields.time === "week"
+          ? <div className={styles.array}>
+            <div className={styles.time_item} key={0}>
+              <div className={cx(styles.labela, styles.med)}></div>
+              <div className={styles.itema}>{output.med_time}</div>
+            </div>
+              <div className={styles.time_item} key={1}>
+              <div className={cx(styles.labela, styles.account)}></div>
+              <div className={styles.itema}>{output.account_time}</div>
+            </div>
+              <div className={styles.time_item} key={2}>
+              <div className={cx(styles.labela,styles.station)}></div>
+              <div className={styles.itema}>{output.station_time}</div>
+            </div>
+              <div className={styles.time_item} key={3}>
+              <div className={cx(styles.labela,styles.clinic)}></div>
+              <div className={styles.itema}>{output.clinic_time}</div>
+            </div>
+          </div>
+          : <div className={styles.array}>
+          <div className={styles.time_item} key={0}>
+          <div className={cx(styles.labela, styles.med)}></div>
+          <div className={styles.itema}>{stagers[0].med_time}</div>
+        </div>
+          <div className={styles.time_item} key={1}>
+          <div className={cx(styles.labela, styles.account)}></div>
+          <div className={styles.itema}>{stagers[0].account_time}</div>
+        </div>
+          <div className={styles.time_item} key={2}>
+          <div className={cx(styles.labela,styles.station)}></div>
+          <div className={styles.itema}>{stagers[0].station_time}</div>
+        </div>
+          <div className={styles.time_item} key={3}>
+          <div className={cx(styles.labela,styles.clinic)}></div>
+          <div className={styles.itema}>{stagers[0].clinic_time}</div>
+        </div>
+        </div>
+        }
+      </div>
       <div className={styles.top_bar}>
         <div className={styles.left}>
-        <div className={styles.item}>
-        <label>Stage</label>
-        <select
-        onChange={e => setFields({...fields,stage: e.target.value})}
-        >
-         <option value="meds">Medical Records</option>
-         <option value="accounts">Cashier</option>
-         <option value="nurse_station">Nurse Station</option>
-         <option value="clinic">Doctor</option>
-        </select>
-        </div>
         <div className={styles.item}>
         <label>Duration</label>
         <select
         onChange={e => setFields({...fields,time: e.target.value})}
         >
+         <option value="all">All</option>
          <option value="week">Week</option>
          <option value="month">Month</option>
          <option value="year">Year</option>
@@ -99,7 +159,7 @@ function StageGraph() {
         </div>
         </div>
         <div className={styles.right}>
-          <p>Total: <span>{stagers.reduce((accumulator, current:any) => accumulator + current.total, 0)}</span></p>
+          <p>Total: <span>{stagers.reduce((accumulator: any, current:any) => accumulator + current.total, 0)}</span></p>
         </div>
       </div>
       <div className={styles.graph}>
@@ -114,12 +174,18 @@ function StageGraph() {
           stagers.map((item:any,index:number)=> (
             <div className={styles.graph_wrap}>
               <div className={cx(styles.idadi,fields.idadi !== 0 && fields.index===index && styles.active)}>{fields.idadi}</div>
-              <div className={styles.bar}>
-              <div className={styles.completed} style={{height: `${(item.completed/Math.max(...stagers.map((item:any)=> item.total))) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.completed,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.bar} onClick={()=> handleOut(item)}>
+              {/* <div className={styles.completed} style={{height: `${(item.completed/Math.max(...stagers.map((item:any)=> item.total))) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.completed,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div> */}
               <div className={styles.total} style={{height: `${item.total/Math.max(...stagers.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
-              <div className={styles.uncompleted} style={{height: `${item.uncompleted/Math.max(...stagers.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.uncompleted,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              {/* <div className={styles.uncompleted} style={{height: `${item.uncompleted/Math.max(...stagers.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.uncompleted,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div> */}
+              <div className={styles.med} style={{height: `${item.med_total/Math.max(...stagers.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.med_total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.account} style={{height: `${item.account_total/Math.max(...stagers.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.account_total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.clinic} style={{height: `${item.clinic_total/Math.max(...stagers.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.clinic_total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
+              <div className={styles.station} style={{height: `${item.station_total/Math.max(...stagers.map((item:any)=> item.total)) * 100}%`}} onMouseEnter={()=> setFields({...fields,idadi:item.station_total,index: index})} onMouseLeave={()=> setFields({...fields,idadi:0,index: 0})}></div>
             </div>
-            <div className={styles.label}>{item.day},{item.diff_time}</div>
+            <div className={styles.label}>
+              <div className={styles.day}>{item.day}</div>
+            </div>
             </div>
           ))
         }

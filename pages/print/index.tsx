@@ -77,7 +77,7 @@ export default function QueueAdd() {
 
   const handleSubmit = () => {
     setSubLoading(true)
-    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
+    axios.post("http://192.168.30.245:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
         setSubLoading(false)
         setSelected({...seleccted,index:0,type:"",reason: ""})
         setError(language==="English"?"Thank you for your feedback..":"Asante kwa Maoni Yako..")
@@ -115,7 +115,7 @@ export default function QueueAdd() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
+    axios.post("http://192.168.30.245:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)

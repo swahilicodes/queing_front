@@ -39,6 +39,18 @@ export default function Home() {
   const [isRest, setRest] = useState<boolean>(true)
   const [serving, setServing] = useState<any>({})
   const setMessage = useSetRecoilState(messageState)
+  const maneno = [
+  {
+    "english":"WELCOME TO",
+    "swahili":"KARIBU"
+  },
+  {
+    "english":"MLOGANZILA",
+    "swahili":"MLOGANZILA"
+  }
+]
+const [currentText, setCurrentText] = useState(0)
+const indexa = maneno[currentText].swahili
   const [nextServe, setNextServe] = useState({
     id: 0,
     window: 0
@@ -54,6 +66,11 @@ export default function Home() {
       setBlink(!blink);
       getActive();
       getServing()
+      if(currentText === 0){
+        setCurrentText(1)
+      }else{
+        setCurrentText(0)
+      }
     }, 1000);
 
     const timer = setInterval(() => {
@@ -87,7 +104,7 @@ export default function Home() {
         clearInterval(restId);
       },10000)
     };
-  }, [condition, blink,token, serveId,isRest, language, amPm]);
+  }, [condition, blink,token, serveId,isRest, language, amPm,currentText]);
 
   const getServing = () => {
     if(tickets.length > 0){
@@ -125,7 +142,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -147,7 +164,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -158,7 +175,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/get_display_tokens", {
+      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "" },
       })
       .then((data) => {
@@ -218,9 +235,13 @@ export default function Home() {
                 </div>
               </div>
                 : <div className={styles.servicer}>
-                  <div className={styles.video}>
-                      <video src="/videos/stomach.mp4" autoPlay muted loop/>
-                    </div>
+                  <div className={styles.jina}>
+                    <h1 className={cx(styles.h1,indexa===maneno[currentText].swahili && styles.active)}>
+                    {
+                      language==="English"? maneno[currentText].english:maneno[currentText].swahili
+                    }
+                    </h1>
+                  </div>
                 </div>
               }
               <div className={styles.nexting}>

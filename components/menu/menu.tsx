@@ -23,13 +23,6 @@ function Chakula_Menu() {
       users: ["admin", "doctor", "nurse", "accountant"],
     },
     {
-      id: 654,
-      path: "/nurse_station",
-      name: "Nurse Queue",
-      icon: "fa fa-share-square-o",
-      users: ["admin","nurse"],
-    },
-    {
       id: 1,
       path: "/print",
       name: "Queue",
@@ -136,9 +129,37 @@ function Chakula_Menu() {
     },
     {
       id: 15,
-      path: "/cashier_queue",
+      path: "/accounts_queue",
       name: "Cashier Queue",
       icon: "fa fa-money",
+      users: ["admin"],
+    },
+    {
+      id: 16,
+      path: "/speaker",
+      name: "Speaker",
+      icon: "fa fa-volume-up",
+      users: ["admin"],
+    },
+    {
+      id: 17,
+      path: "/graph",
+      name: "Analytics",
+      icon: "fa fa-line-chart",
+      users: ["admin"],
+    },
+    {
+      id: 18,
+      path: "/services",
+      name: "Services",
+      icon: "fa fa-server",
+      users: ["admin"],
+    },
+    {
+      id: 19,
+      path: "/devices",
+      name: "Devices",
+      icon: "fa fa-desktop",
       users: ["admin"],
     },
   ];

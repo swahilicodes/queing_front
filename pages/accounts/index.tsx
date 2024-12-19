@@ -60,7 +60,7 @@ function Recorder() {
 
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page})
+    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -80,7 +80,7 @@ function Recorder() {
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://192.168.30.245:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:data.data})
       setTokens((tokens)=> tokens.map((item)=> item))
       setFinLoading(false)
@@ -104,7 +104,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("http://192.168.30.245:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
       })
       .then((data: any) => {
@@ -131,7 +131,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -149,7 +149,7 @@ function Recorder() {
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -168,7 +168,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/accounts_queue"}})
+    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/accounts_queue"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -190,7 +190,7 @@ function Recorder() {
   }
   const priotize = (ticket_no:string, data:string) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts"}})
+    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts"}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -344,7 +344,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://192.168.30.245:5000/speaker/create_speaker",item.counter.namba)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
