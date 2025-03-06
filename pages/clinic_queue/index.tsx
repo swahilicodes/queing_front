@@ -7,36 +7,23 @@ import { useRouter } from "next/router";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import currentConditionState from "@/store/atoms/current";
-import LanguageState from "@/store/atoms/language";
-import { BiCurrentLocation } from "react-icons/bi";
-import { IoMdStopwatch } from "react-icons/io";
-import { TfiDirectionAlt } from "react-icons/tfi";
 import { FaArrowsAltH } from "react-icons/fa";
-import { BsMicMute, BsStopwatch } from "react-icons/bs";
-import { VscUnmute } from "react-icons/vsc";
+import { BsStopwatch } from "react-icons/bs";
 import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
-import { TiArrowRepeat } from "react-icons/ti";
 import { TbHeartHandshake } from "react-icons/tb";
-import Cubes from "@/components/loaders/cubes/cubes";
 import deviceState from "@/store/atoms/device";
 import messageState from "@/store/atoms/message";
 
 export default function Home() {
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
   const [time, setTime] = useState(0);
-  // const minutes = Math.floor(time / 60) % 60;
-  // const hours = Math.floor(minutes / 60) % 3600;
-  // const seconds = time % 60;
   const [condition, setCondition] = useRecoilState(currentConditionState);
   const [, setLoading] = useState(false);
-  const [language] = useRecoilState(LanguageState);
+  const [language, setLanguage] = useState("Swahili");
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://192.168.30.245:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -122,6 +109,19 @@ export default function Home() {
     };
   }, [condition, blink,token, serveId,isRest, language, device]);
 
+  useEffect(()=> {
+    const langId = setInterval(() => {
+      if(language==="Swahili"){
+        setLanguage("English")
+      }else{
+        setLanguage("Swahili")
+      }
+    }, 5000);
+    return () => {
+      clearInterval(langId);
+    };
+  },[language])
+
   const getServing = () => {
     if(tickets.length > 0){
       const sava = tickets.find((item:any)=> item.ticket.serving===true)
@@ -135,6 +135,18 @@ export default function Home() {
       }else{
         setServing({})
       }
+    }
+  }
+
+  function formatNumber(num: string) {
+    const numStr = num.toString();
+  
+    if (numStr.length === 1) {
+      return `00${numStr}`;
+    } else if (numStr.length === 2) {
+      return `0${numStr}`;
+    } else {
+      return numStr;
     }
   }
 
@@ -158,7 +170,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: router.pathname } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: router.pathname } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -174,19 +186,22 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
       .catch((error) => {
-        alert(error);
+        setMessage({...onmessage,title:error.message,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
       });
   };
 
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/pata_clinic", {
+      .get("http://localhost:5000/tickets/pata_clinic", {
         params: { stage: "nurse_station", clinics: device.clinics.map((item:any)=> item.clinic_code) },
       })
       .then((data) => {
@@ -195,7 +210,10 @@ export default function Home() {
       })
       .catch((error) => {
         setLoading(false);
-        alert(error);
+        setMessage({...onmessage,title:error.message,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
         setMessage({...onmessage,title:error.message,category: "error"})
       });
   };
@@ -263,7 +281,7 @@ export default function Home() {
                       <video src="/videos/stomach.mp4" autoPlay muted loop/>
                     </div>
                     : <div className={styles.tiketi}>
-                      <p>{nextServe.id}</p>
+                      <p>{formatNumber(nextServe.id.toString())}</p>
                       <TbHeartHandshake className={styles.icon} size={50}/>
                       <p>{nextServe.window}</p>
                     </div>

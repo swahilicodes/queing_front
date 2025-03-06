@@ -6,6 +6,28 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    .peak_time{
+        position: absolute;
+        top: 80px;
+        left: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        h1{
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .peaks{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            p{
+                margin-right: 10px;
+            }
+        }
+    }
     .day_descriptions{
         top: 80px;
         position: absolute;

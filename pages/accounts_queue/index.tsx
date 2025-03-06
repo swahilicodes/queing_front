@@ -22,7 +22,7 @@ import messageState from "@/store/atoms/message";
 
 export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
+  //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
@@ -32,10 +32,10 @@ export default function Home() {
   // const seconds = time % 60;
   const [condition, setCondition] = useRecoilState(currentConditionState);
   const [, setLoading] = useState(false);
-  const [language] = useRecoilState(LanguageState);
+  const [language, setLanguage] = useState("Swahili");
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://192.168.30.245:5000/socket/display_tokens_stream');
+  //const eventSource = new EventSource('http://localhost:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -131,6 +131,19 @@ export default function Home() {
     };
   }, [condition, blink,token, serveId,isRest, language]);
 
+  useEffect(()=> {
+    const langId = setInterval(() => {
+      if(language==="Swahili"){
+        setLanguage("English")
+      }else{
+        setLanguage("Swahili")
+      }
+    }, 5000);
+    return () => {
+      clearInterval(langId);
+    };
+  },[language])
+
   const getServing = () => {
     if(tickets.length > 0){
       const sava = tickets.find((item:any)=> item.ticket.serving===true)
@@ -167,7 +180,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: router.pathname } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: router.pathname } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -183,7 +196,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -194,7 +207,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
+      .get("http://localhost:5000/tickets/get_display_tokens", {
         params: { stage: "accounts", clinic_code: "" },
       })
       .then((data) => {
@@ -206,6 +219,18 @@ export default function Home() {
         setMessage({...onmessage,title:error.message,category: "error"})
       });
   };
+
+  function formatNumber(num: string) {
+    const numStr = num.toString();
+  
+    if (numStr.length === 1) {
+      return `00${numStr}`;
+    } else if (numStr.length === 2) {
+      return `0${numStr}`;
+    } else {
+      return numStr;
+    }
+  }
 
   return (
     <div className={styles.index}>
@@ -270,7 +295,7 @@ export default function Home() {
                       <video src="/videos/stomach.mp4" autoPlay muted loop/>
                     </div>
                     : <div className={styles.tiketi}>
-                      <p>{nextServe.id}</p>
+                      <p>{formatNumber(nextServe.id.toString())}</p>
                       <TbHeartHandshake className={styles.icon} size={50}/>
                       <p>{nextServe.window}</p>
                     </div>

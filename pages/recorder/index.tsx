@@ -42,12 +42,19 @@ function Recorder() {
   const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
   const {createItem,loading} = useCreateItem()
   const setMessage = useSetRecoilState(messageState)
+  const [isPrior, setPrior] = useState(false)
   const [fields, setFields] = useState({
     finish_id: "",
     patName: "",
     sex: "",
     category: "",
     age: ""
+  })
+  const reasons = ["Staff","Wheel Chair","Pediatric","Old","Premature","Fast Track", "Pregnancy"]
+  const [reason, setReason] = useState("")
+  const [priorFields, setPriorFields] = useState({
+    ticket_no: '',
+    stage: ''
   })
   
 
@@ -66,7 +73,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://192.168.30.245:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -99,7 +106,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://192.168.30.245:5000/tickets/getMedsTickets", {
+    axios.get("http://localhost:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data) => {
@@ -134,7 +141,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.245:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -161,7 +168,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.245:5000/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -185,9 +192,9 @@ function Recorder() {
         }
       });
   };
-  const priotize = (ticket_no:string, data:string, stage: string) => {
+  const priotize = (ticket_no:string, data:string, stage: string, reason:string) => {
     setFetchLoading(true);
-    axios.get(`http://192.168.30.245:5000/tickets/priority`,{params: {ticket_no,data,stage}})
+    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data,stage, reason}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -213,7 +220,7 @@ function Recorder() {
   };
   const activate = (page:string) => {
     setFetchLoading(true);
-    axios.post(`http://192.168.30.245:5000/active/activate`,{page: page})
+    axios.post(`http://localhost:5000/active/activate`,{page: page})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -239,7 +246,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://192.168.30.245:5000/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -264,7 +271,7 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://192.168.30.245:5000/tickets/next_stage", {
+    axios.get("http://localhost:5000/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -294,8 +301,31 @@ function Recorder() {
     localStorage.removeItem('token')
     router.reload()
   }
+
+  const priorReady = (ticket_no:string, stage: string) => {
+    setPrior(true)
+    setPriorFields({...priorFields,ticket_no: ticket_no, stage: stage})
+  }
   return (
     <div className={styles.recorder}>
+      {
+        isPrior && (
+          <div className={styles.priority}>
+            <div className={styles.prior_data}>
+              <div className={styles.title}>Select Reason</div>
+              <select onChange={e => setReason(e.target.value)}>
+                <option value="" selected disabled>--select--</option>
+                {
+                  reasons.map((item,index)=> (
+                    <option value={item} key={index}>{item}</option>
+                  ))
+                }
+              </select>
+              <button onClick={()=> priotize(`${priorFields.ticket_no}`,"priority",priorFields.stage, reason)}>Prioritize</button>
+            </div>
+          </div>
+        )
+      }
       <div className={styles.meds_top}>
         <div className={styles.left}>
           {currentUser.name !== undefined && <h4>{currentUser.name}| <span>{currentUser.role} | {currentUser.counter}</span> </h4> }
@@ -402,10 +432,11 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage)}>{item.token.serving===true?"serving":"Serve"}</div>
+                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage, reason)}>{item.token.serving===true?"serving":"Serve"}</div>
                             </div>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.disabled && styles.priority)} onClick={()=> priotize(`${item.token.ticket_no}`,"priority",item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div>
+                              <div className={cx(styles.serve,item.token.disabled && styles.prioritya)} onClick={()=> priorReady(`${item.token.ticket_no}`,item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div>
+                              {/* <div className={cx(styles.serve,item.token.disabled && styles.priority)} onClick={()=> priotize(`${item.token.ticket_no}`,"priority",item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div> */}
                             </div>
                           </div>
                         </td>
@@ -434,7 +465,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://192.168.30.245:5000/speaker/create_speaker",item.counter.namba)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
@@ -453,18 +484,18 @@ function Recorder() {
             <div className={styles.button}>Pend</div>
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
-          <div className={styles.row_item} onClick={()=> prepareFinish(item.token.id)}>
-            <div className={styles.button}>Finish</div>
-          </div>
           <div className={styles.row_item}>
             <div className={styles.token}>{tokens.length> 0 && item.token.ticket_no}</div>
           </div>
-          <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
+          <div className={styles.row_item} onClick={()=> prepareFinish(item.token.id)}>
+            <div className={styles.button}>Finish</div>
+          </div>
+          {/* <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
             <div className={styles.button}>Penalize</div>
           </div>
           <div className={styles.row_item} onClick={()=> preparePnF()}>
             <div className={styles.button}>Finish & Penalize</div>
-          </div>
+          </div> */}
         </div>
       </div>
         ))

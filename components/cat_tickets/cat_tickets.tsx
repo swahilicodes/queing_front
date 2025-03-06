@@ -21,28 +21,24 @@ useEffect(()=> {
     getCounter()
 },[category])
  const getTickets = () => {
-    axios.get('http://192.168.30.245:5000/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
+    axios.get('http://localhost:5000/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
         setData(data.data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.response.data.error}`)
-            //alert(error.response.data.error);
         } else {
             console.log(error.message)
-            //alert(error.message);
         }
     })
  }
  const getCounter = () => {
-    axios.get('http://192.168.30.245:5000/tickets/getTicketCounter',{params: {category:category}}).then((data:any)=> {
+    axios.get('http://localhost:5000/tickets/getTicketCounter',{params: {category:category}}).then((data:any)=> {
         setService(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             console.log(`there is an error ${error.response.data.error}`)
-            //alert(error.response.data.error);
         } else {
             console.log(error.message)
-            //alert(error.message);
         }
     })
  }

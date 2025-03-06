@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import styles from './barOne.module.scss';
 import cx from 'classnames'
 import axios from 'axios';
+import { useSetRecoilState } from 'recoil';
+import messageState from '@/store/atoms/message';
 
 interface DataItem {
   year: number;
@@ -18,6 +20,7 @@ const data: DataItem[] = [
   { year: 2006, completed: false, quantity: 60},
 ];
 const BarGraphOne: React.FC = () => {
+  const setMessage = useSetRecoilState(messageState)
   // Group data by year for rendering
   const groupedData = data.reduce((acc: { [key: number]: DataItem[] }, curr) => {
     if (!acc[curr.year]) {
@@ -32,17 +35,21 @@ const BarGraphOne: React.FC = () => {
   },[])
 
   const getTicks = () => {
-    axios.get("http://192.168.30.245:5000/analytics/token_analytics")
+    axios.get("http://localhost:5000/analytics/token_analytics")
       .then((data: any) => {
         console.log(data)
       })
       .catch((error: any) => {
         if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`);
-          alert(error.response.data.error);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
         } else {
-          console.log(`there is an error message ${error.message}`);
-          alert(error.message);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
         }
       });
   };

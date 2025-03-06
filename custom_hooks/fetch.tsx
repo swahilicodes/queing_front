@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import messageState from '@/store/atoms/message';
 
 const useFetchData = (url:string) => {
   const [data, setData] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("")
+  const setMessage = useSetRecoilState(messageState)
   const page = 1;
   const pagesize = 10;
 
@@ -19,15 +21,18 @@ const useFetchData = (url:string) => {
             console.log(error.response)
             setLoading(false)
             if (error.response && error.response.status === 400) {
-                console.log(`there is an error ${error.message}`)
-                alert(error.response.data.error);
+              setMessage({...onmessage,title:error.response.data.error,category: "error"})
+              setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})
+              },3000)
             } else {
-                console.log(`there is an error message ${error.message}`)
-                alert(error.message);
+              setMessage({...onmessage,title:error.message,category: "error"})
+              setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})
+              },3000)
             }
         })
       } catch (error:any) {
-        alert(error);
         setLoading(false);
       }
     };

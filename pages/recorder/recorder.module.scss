@@ -3,6 +3,57 @@
     width: 100vw;
     height: calc(100vh - 70px);
     position: relative;
+    .priority{
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .prior_data{
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            .title{
+                font-size: 20px;
+                color: $mainColor;
+                opacity: .6;
+            }
+            select{
+                border: 2px solid $divColor;
+                padding: 15px;
+                outline: none;
+                color: black;
+                opacity: .7;
+                font-weight: 600;
+                width: 200px;
+                margin-top: 10px;
+                option{
+                    color: black;
+                    opacity: .6;
+                }
+            }
+            button{
+                width: 200px;
+                padding: 15px;
+                background: $mainColor;
+                color: white;
+                outline: none;
+                border: none;
+                cursor: pointer;
+                margin-top: 10px;
+                transition: all .5s ease-in-out;
+                &:hover{
+                    opacity: .5;
+                }
+            }
+        }
+    }
     .meds_top{
         width: 100%;
         background: $mainBold;
@@ -276,7 +327,7 @@
                                 &.active{
                                     background: #2bf72b;
                                 }
-                                &.priority{
+                                &.prioritya{
                                     background: red;
                                 }
                                 &:hover{

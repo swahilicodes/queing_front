@@ -27,13 +27,13 @@ export default function Admins() {
   const [id, setId] = useState("");
   const setMessage = useSetRecoilState(messageState)
   const { data } = useFetchData(
-    "http://192.168.30.245:5000/services/get_all_services"
+    "http://localhost:5000/services/get_all_services"
   );
   const [isFull, setFull] = useState(false);
   const [desc, setDesc] = useState("");
   const [pages, setPages] = useState([]);
   const { data: clinics } = useFetchData(
-    "http://192.168.30.245:5000/clinic/get_clinics"
+    "http://localhost:5000/clinic/get_clinics"
   );
   const [isAddittion, setAddittion] = useState(false);
   const [attendantClinics, setAttendantClinics] = useState([]);
@@ -77,7 +77,7 @@ export default function Admins() {
 
   const createClinic = (deviceId: string) => {
     axios
-      .post(`http://192.168.30.245:5000/attendant_clinics/create_attendant_clinic`, {
+      .post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`, {
         clinic_code: fields.clinic_code,
         clinic: fields.clinic,
         attendant_id: deviceId,
@@ -108,7 +108,7 @@ export default function Admins() {
   };
   const deleteClinic = (clinic_code: string, device_id: string) => {
     axios
-      .get(`http://192.168.30.245:5000/attendant_clinics/delete_clinic`, {
+      .get(`http://localhost:5000/attendant_clinics/delete_clinic`, {
         params: { clinic_code: clinic_code, attendant_id: device_id },
       })
       .then((data) => {
@@ -135,7 +135,7 @@ export default function Admins() {
   };
   const getDocClinics = (device_id: string) => {
     axios
-      .get(`http://192.168.30.245:5000/attendant_clinics/get_clinics`, {
+      .get(`http://localhost:5000/attendant_clinics/get_clinics`, {
         params: { attendant_id: device_id },
       })
       .then((data) => {
@@ -160,10 +160,11 @@ export default function Admins() {
 
 
   const editService = (e: React.FormEvent) => {
+    console.log(inputs)
     e.preventDefault();
     axios
-      .get(`http://192.168.30.245:5000/network/edit_device`, {
-        params: { page: fields.page, id: id, deviceName: inputs.deviceName, deviceModel: inputs.deviceModel, manufucturer: inputs.manufucturer },
+      .get(`http://localhost:5000/network/edit_device`, {
+        params: { page: inputs.page, id: id, deviceName: inputs.deviceName, deviceModel: inputs.deviceModel, manufucturer: inputs.manufucturer },
       })
       .then(() => {
         setEdit(false);
@@ -187,7 +188,7 @@ export default function Admins() {
   };
   const deleteService = () => {
     axios
-      .get(`http://192.168.30.245:5000/network/delete_device`, {
+      .get(`http://localhost:5000/network/delete_device`, {
         params: { id: id },
       })
       .then(() => {
@@ -231,7 +232,7 @@ export default function Admins() {
 
   const getPages = () => {
     axios
-      .get("http://192.168.30.245:3000/api/getPages")
+      .get("http://localhost:3000/api/getPages")
       .then((data) => {
         const pags = data.data.pages.map((page: string) =>
           getFirstPathSegment(page)
@@ -250,7 +251,7 @@ export default function Admins() {
   const getAttendants = () => {
     setFetchLoading(true);
     axios
-      .get("http://192.168.30.245:5000/network/get_devices", {
+      .get("http://localhost:5000/network/get_devices", {
         params: { page, pagesize },
       })
       .then((data) => {
@@ -385,11 +386,34 @@ export default function Admins() {
               <option value="" selected disabled>
                 Select Page
               </option>
-              {pages.map((item, index) => (
+              <option value="/accounts">accounts</option>
+              <option value="/accounts_queue">accounts_queue</option>
+              <option value="/admins">admins</option>
+              <option value="/adverts">adverts</option>
+              <option value="/attendants">attendants</option>
+              <option value="/clinic">clinic</option>
+              <option value="/clinic_queue">clinic_queue</option>
+              <option value="/clinics">clinics</option>
+              <option value="/counters">counters</option>
+              <option value="/dashboard">dashboard</option>
+              <option value="/devices">devices</option>
+              <option value="/doctor_patient">doctor_patient</option>
+              <option value="/doktas">doktas</option>
+              <option value="/graph">graph</option>
+              <option value="/nurse_station">nurse_station</option>
+              <option value="/nurses">nurses</option>
+              <option value="/print">print</option>
+              <option value="/recorder">recorder</option>
+              <option value="/rooms">rooms</option>
+              <option value="/services">services</option>
+              <option value="/settings">settings</option>
+              <option value="/speaker">speaker</option>
+              <option value="/">home</option>
+              {/* {pages.map((item, index) => (
                 <option value={item} key={index}>
                   {item}
                 </option>
-              ))}
+              ))} */}
             </select>
             </div>
             <div className={styles.item}>

@@ -1,11 +1,14 @@
+import messageState from '@/store/atoms/message';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { useSetRecoilState } from 'recoil';
 
 interface MyComponentProps {
     stage: string;
     status: string;
   }
   const Medicine_Category_Length: React.FC<MyComponentProps> = ({stage,status}) => {
+    const setMessage = useSetRecoilState(messageState)
     const [tickets,setTickets] = useState<any>(0)
     const pagesize = 10
     const page = 1
@@ -15,15 +18,13 @@ interface MyComponentProps {
       }, [stage,status]);
     
       const getTickets = () => {
-        axios.get("http://192.168.30.245:5000/patients/status_totals",{params: {stage,status}}).then((data)=> {
+        axios.get("http://localhost:5000/patients/status_totals",{params: {stage,status}}).then((data)=> {
           setTickets(data.data)
         }).catch((error)=> {
           if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
         }
         })
       }

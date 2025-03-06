@@ -20,7 +20,7 @@ export default function Home() {
   const [time, setTime] = useState(0);
   const [condition, setCondition] = useRecoilState(currentConditionState);
   const [, setLoading] = useState(false);
-  const [language] = useRecoilState(LanguageState);
+  const [language, setLanguage] = useState("Swahili");
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
   const [hours, setHours] = useState(0);
@@ -38,6 +38,7 @@ export default function Home() {
   const amPm = hour >= "12"? "PM" : "AM";
   const [isRest, setRest] = useState<boolean>(true)
   const [serving, setServing] = useState<any>({})
+  const router = useRouter()
   const setMessage = useSetRecoilState(messageState)
   const maneno = [
   {
@@ -104,7 +105,20 @@ const indexa = maneno[currentText].swahili
         clearInterval(restId);
       },10000)
     };
-  }, [condition, blink,token, serveId,isRest, language, amPm,currentText]);
+  }, [condition, blink,token, serveId,isRest, amPm,currentText]);
+
+  useEffect(()=> {
+    const langId = setInterval(() => {
+      if(language==="Swahili"){
+        setLanguage("English")
+      }else{
+        setLanguage("Swahili")
+      }
+    }, 5000);
+    return () => {
+      clearInterval(langId);
+    };
+  },[language])
 
   const getServing = () => {
     if(tickets.length > 0){
@@ -142,7 +156,7 @@ const indexa = maneno[currentText].swahili
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -164,18 +178,21 @@ const indexa = maneno[currentText].swahili
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
       .catch((error) => {
-        alert(error);
+        setMessage({...onmessage,title:error,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
       });
   };
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
+      .get("http://localhost:5000/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "" },
       })
       .then((data) => {
@@ -184,10 +201,25 @@ const indexa = maneno[currentText].swahili
       })
       .catch((error) => {
         setLoading(false);
-        alert(error);
-        console.log(error.response)
+        setMessage({...onmessage,title:error,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
       });
   };
+
+  function formatNumber(num: string) {
+    const numStr = num.toString();
+  
+    if (numStr.length === 1) {
+      return `00${numStr}`;
+    } else if (numStr.length === 2) {
+      return `0${numStr}`;
+    } else {
+      return numStr;
+    }
+  }
+  
 
   return (
     <div className={styles.index}>
@@ -210,7 +242,11 @@ const indexa = maneno[currentText].swahili
                   : <CiMicrophoneOff className={styles.icon} size={40}/>
                 }
               </div>
-              <video src="/videos/mnh.mp4" autoPlay loop muted={muted} />
+              <video src="/videos/mnh.mp4" autoPlay loop muted={muted}/>
+              {/* <video autoPlay loop muted={muted}>
+                <source src="/videos/mnh.mp4" type="video/mp4"/>
+                Your browser does not support the video tag.
+              </video> */}
             </div>
           )}
             <div className={cx(styles.left_wrap,active && styles.none)}>
@@ -250,9 +286,13 @@ const indexa = maneno[currentText].swahili
                     !isRest
                     ? <div className={styles.video}>
                       <video src="/videos/stomach.mp4" autoPlay muted loop/>
+                      {/* <video autoPlay loop muted={muted}>
+                <source src="/videos/mnh.mp4" type="video/mp4"/>
+                Your browser does not support the video tag.
+              </video> */}
                     </div>
                     : <div className={styles.tiketi}>
-                      <p>{nextServe.id}</p>
+                      <p>{formatNumber(nextServe.id.toString())}</p>
                       <TbHeartHandshake className={styles.icon} size={50}/>
                       <p>{nextServe.window}</p>
                     </div>
@@ -300,7 +340,7 @@ const indexa = maneno[currentText].swahili
               </div>
               <div className={styles.body}>
                 {
-                  tickets.map((item:any,index:number)=> (
+                  tickets.slice(0,8).map((item:any,index:number)=> (
                     <div className={cx(styles.item,item.ticket.disabled===true && styles.disabled)} key={index} onLoad={()=> setServeId(index+1)}>
                       <div className={cx(styles.absa,item.ticket.serving===true && styles.serving, (nextServe.id !==0 && nextServe.id===Number(item.ticket.id)) && styles.next)} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>{index+1}</div>
                       <div className={styles.left}>
@@ -360,7 +400,7 @@ const indexa = maneno[currentText].swahili
               : <div className={styles.loader}>
                 {
                   Array.from({length: 10}).map((_,index:number)=> (
-                    <div className={styles.div}>
+                    <div className={styles.div} key={index}>
                       <div className={styles.shimmer}></div>
                     </div>
                   ))
@@ -369,7 +409,7 @@ const indexa = maneno[currentText].swahili
             }
             {tickets.length > 0 ? (
               <div className={styles.queue_div}>
-                {tickets.map(
+                {tickets.slice(0,8).map(
                   (
                     item: {
                       ticket: {

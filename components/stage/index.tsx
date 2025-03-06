@@ -12,21 +12,25 @@ function StageGraph() {
   const [token, setToken] = useState<any>({})
   const setMessage = useSetRecoilState(messageState)
   const [stagers, setStagers] = useState<any>([])
+  const [peaks, setPeaks] = useState<any>([])
+  const [clinics, setClinics] = useState<any>([])
   const [output, setOutput] = useState<any>({})
   const [fields, setFields] = useState({
     idadi: 0,
     index: 0,
     stage: "meds",
     time: "week",
+    clinic: ""
   })
   useEffect(()=> {
     getTicks()
     getStagers()
-    console.log('the output is ',output)
-  },[fields.stage,fields.time])
+    getPeaks()
+    getClinics()
+  },[fields.stage,fields.time, fields.clinic])
 
   const getTicks = () => {
-    axios.get("http://192.168.30.245:5000/analytics/token_analytics")
+    axios.get("http://localhost:5000/analytics/token_analytics")
       .then((data: any) => {
         setToken(data.data)
         //console.log(data)
@@ -47,13 +51,53 @@ function StageGraph() {
         }
       });
   };
-  const getStagers = () => {
-    axios.get("http://192.168.30.245:5000/analytics/stage_analytics",{params: {stage: fields.stage,time_factor:fields.time}})
+  const getClinics = () => {
+    axios.get("http://localhost:5000/clinic/get_clinics")
+      .then((data: any) => {
+        setClinics(data.data)
+        console.log('clinics are ',data.data)
+      })
+      .catch((error: any) => {
+        if (error.response && error.response.status === 400) {
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        } else {
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        }
+      });
+  };
+
+  const getPeaks = () => {
+    axios.get("http://localhost:5000/analytics/peak_times",{params: {time: fields.time}})
       .then((data: any) => {
         setStagers(data.data)
-        console.log(data)
-        setTokens(data.data)
+        setPeaks(data.data)
         // console.log(tokens.slice(0,5))
+      })
+      .catch((error: any) => {
+        if (error.response && error.response.status === 400) {
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        } else {
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        }
+      });
+  };
+  const getStagers = () => {
+    axios.get("http://localhost:5000/analytics/stage_analytics",{params: {stage: fields.stage,time_factor:fields.time, clinic: fields.clinic}})
+      .then((data: any) => {
+        setStagers(data.data)
+        setTokens(data.data)
       })
       .catch((error: any) => {
         if (error.response && error.response.status === 400) {
@@ -81,6 +125,16 @@ function StageGraph() {
   };
   return (
     <div className={styles.bar}>
+      <div className={styles.peak_time}>
+        <h1>Peak Hours</h1>
+        <div className={styles.peaks}>
+        {
+          peaks.map((item:any,index:number)=> (
+              <p>{item.hour}</p>
+          ))
+        }
+        </div>
+      </div>
       <div className={styles.day_descriptions}>
         <div className={styles.colors}>
           <div className={styles.item}>
@@ -151,10 +205,23 @@ function StageGraph() {
         <select
         onChange={e => setFields({...fields,time: e.target.value})}
         >
-         <option value="all">All</option>
+         <option value="day">Day</option>
          <option value="week">Week</option>
          <option value="month">Month</option>
          <option value="year">Year</option>
+         <option value="all">All</option>
+        </select>
+        </div>
+        <div className={styles.item}>
+        <label>Clinic</label>
+        <select
+        onChange={e => setFields({...fields,clinic: e.target.value})}
+        >
+        {clinics.length > 0} && {
+            clinics.map((item:any,index:number)=> (
+              <option value={item.clinicicode}>{item.cliniciname}</option>
+            ))
+          }
         </select>
         </div>
         </div>

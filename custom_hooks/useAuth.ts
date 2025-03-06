@@ -6,6 +6,7 @@ import { useSetRecoilState } from 'recoil';
 import currentUserState from '@/store/atoms/currentUser';
 import deviceState from '@/store/atoms/device';
 import { getLocalDeviceIP } from './deviceInfo';
+import messageState from '@/store/atoms/message';
 
 const useAuth = () => {
   const router = useRouter();
@@ -13,6 +14,7 @@ const useAuth = () => {
   const setDeviceState =  useSetRecoilState(deviceState)
   const path = router.pathname
   const [ipAddress, setIpAddress] = useState(null);
+  const setMessage = useSetRecoilState(messageState)
   const id = getLocalDeviceIP()
 
   useEffect(() => {
@@ -63,7 +65,7 @@ const validRoutes = (piga: string) => {
 }
 const getAdmin = (phone: string) => {
   const user = localStorage.getItem('user_service')
-  axios.get('http://192.168.30.245:5000/users/get_user',{params: {phone}}).then((data) => {
+  axios.get('http://localhost:5000/users/get_user',{params: {phone}}).then((data) => {
       setCurrentUser(data.data)
       if(user){
         localStorage.removeItem('user_service')
@@ -76,18 +78,22 @@ const getAdmin = (phone: string) => {
       }
   }).catch((error) => {
       if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`)
-          alert(error.response.data.error);
+        setMessage({...onmessage,title:error.response.data.error,category: "error"})
+        setTimeout(()=> {
+          setMessage({...onmessage,title:"",category: ""})
+        },3000)
       } else {
-          console.log(`there is an error message ${error.message}`)
-          alert(error.message);
+        setMessage({...onmessage,title:error.message,category: "error"})
+        setTimeout(()=> {
+          setMessage({...onmessage,title:"",category: ""})
+        },3000)
       }
   })
 }
 const getMac = async () => {
   if(typeof window !== "undefined"){
     if(id){
-      await axios.post("http://192.168.30.245:5000/network/create_update",{macAddress: `${localStorage.getItem('unique_id')}`,deviceName:"Null",deviceModel:id.type,manufacturer: "Null"}).then((dita)=> {
+      await axios.post("http://localhost:5000/network/create_update",{macAddress: `${localStorage.getItem('unique_id')}`,deviceName:"Null",deviceModel:id.type,manufacturer: "Null"}).then((dita)=> {
         setDeviceState(dita.data)
         validRoutes(dita.data.default_page)
       }).catch((error)=> {

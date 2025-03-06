@@ -1,5 +1,7 @@
+import messageState from '@/store/atoms/message';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { useSetRecoilState } from 'recoil';
 
 interface MyComponentProps {
     category: string;
@@ -7,6 +9,7 @@ interface MyComponentProps {
   }
   const Ticket_Category_Length: React.FC<MyComponentProps> = ({category,status}) => {
     const [tickets,setTickets] = useState<any>(0)
+    const setMessage = useSetRecoilState(messageState)
     const pagesize = 10
     const page = 1
     useEffect(() => {
@@ -14,15 +17,19 @@ interface MyComponentProps {
       }, [category,status]);
     
       const getTickets = () => {
-        axios.get("http://192.168.30.245:5000/tickets/getTicketTotal",{params: {status,stage:category}}).then((data)=> {
+        axios.get("http://localhost:5000/tickets/getTicketTotal",{params: {status,stage:category}}).then((data)=> {
           setTickets(data.data)
         }).catch((error)=> {
           if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            alert(error.response.data.error);
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
         } else {
-            console.log(`there is an error message ${error.message}`)
-            alert(error.message);
+          setMessage({...onmessage,title:error.message,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
         }
         })
       }

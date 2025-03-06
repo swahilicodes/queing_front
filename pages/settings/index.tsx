@@ -6,10 +6,12 @@ import { MdOutlineClear } from 'react-icons/md'
 import { IoSettingsOutline } from 'react-icons/io5'
 import useFetchData from '@/custom_hooks/fetch'
 import axios from 'axios'
+import { useSetRecoilState } from 'recoil'
+import messageState from '@/store/atoms/message'
 
 export default function Settings() {
 //  const pages = ["/","/attendants","/counters","/dashboard","/login","/queue_list","/services","/settings","/queue_add"]
- const {data:clinics,loading} = useFetchData("http://192.168.30.245:5000/clinic/get_clinics")
+ const {data:clinics,loading} = useFetchData("http://localhost:5000/clinic/get_clinics")
  const [page,setPage] = useState('')
  const [clinic,setClinic] = useState('')
  const [defaultPage, setDefaultPage] = useState('')
@@ -18,6 +20,7 @@ export default function Settings() {
  const [isAddDefaultPage, setAddDefaultPage] = useState(false)
  const [isAddDefaultClinic, setAddDefaultClinic] = useState(false)
  const [pages, setPages] = useState([])
+ const setMessage = useSetRecoilState(messageState)
 
  useEffect(()=> {
     retrievePage(),
@@ -46,7 +49,10 @@ export default function Settings() {
     e.preventDefault()
     const saved = localStorage.getItem('page')
     if(!page){
-        alert("page is required")
+        setMessage({...onmessage,title:"page is required",category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
     }else{
         if(saved){
             localStorage.removeItem('page')
@@ -62,7 +68,10 @@ export default function Settings() {
     e.preventDefault()
     const saved = localStorage.getItem('clinic')
     if(!clinic){
-        alert("clinic is required")
+        setMessage({...onmessage,title:"clinic is required",category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
     }else{
         if(saved){
             localStorage.removeItem('clinic')
@@ -76,7 +85,7 @@ export default function Settings() {
  }
 
  const getPages = () => {
-    axios.get("http://192.168.30.245:3000/api/getPages").then((data)=> {
+    axios.get("http://localhost:3000/api/getPages").then((data)=> {
       const pags = data.data.pages.map((page: string)=> getFirstPathSegment(page))
       setPages(pags)
     }).catch((error)=> {

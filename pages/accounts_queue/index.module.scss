@@ -1,3 +1,1033 @@
+// @import '../../global.scss';
+// .index{
+//     width: 100vw;
+//     height: 100vh;
+//     display: flex;
+//     align-items: flex-start;
+//     justify-content: center;
+//     background: $divColor;
+//     position: relative;
+//     overflow: hidden;
+//     .queue_wrap{
+//         width: 100%;
+//         height: 100%;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         background: $divColor;
+//         position: relative;
+//         overflow: hidden;
+//         .top_bar{
+//             width: 100%;
+//             background: $mainBold;
+//             height: 8%;
+//             position: absolute;
+//             top: 0;
+//             display: flex;
+//             align-items: center;
+//             justify-content: center;
+//             h1{
+//                 color: white;
+//             }
+//             .date{
+//                 width: 100%;
+//                 position: absolute;
+//                 bottom: 0;
+//                 border: 2px solid $mainColor;
+//                 display: flex;
+//                 align-items: center;
+//                 justify-content: center;
+//                 color: white;
+//                 padding: 5px;
+//                 display: none;
+//             }
+//         }
+//         .new_look{
+//             width: 100%;
+//             display: flex;
+//             align-items: center;
+//             justify-content: space-between;
+//             padding: 0 5px;
+//             // margin-top: 70px;
+//             height: 82%;
+//             .new_left{
+//                 width: 60%;
+//                 height: 100%;
+//                 position: relative;
+//                 .vid{
+//                     width: 100%;
+//                     height: 100%;
+//                     position: absolute;
+//                     video{
+//                         width: 100%;
+//                         height: 100%;
+//                         object-fit: cover;
+//                     }
+//                     .mute{
+//                         position: inherit;
+//                         bottom: 10px;
+//                         right: 10px;
+//                         cursor: pointer;
+//                         z-index: 100;
+//                         .icon{
+//                             color: $secondColor;
+//                             cursor: pointer;
+//                         }
+//                     }
+//                 }
+//                 .left_wrap{
+//                 width: 100%;
+//                 height: 100%;
+//                 display: flex;
+//                 flex-direction: column;
+//                 align-items: center;
+//                 justify-content:space-between;
+//                 position: relative;
+//                 .servicer{
+//                     width: 100%;
+//                     height: 89%;
+//                     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+//                     background: white;
+//                     display: flex;
+//                     flex-direction: column;
+//                     align-items: center;
+//                     justify-content: center;
+//                     position: relative;
+//                     .jina{
+//                         font-size: 50px;
+//                         color: $secondColor;
+//                         font-weight: 600;
+//                         //opacity: 0;
+//                         transition: all .5s ease-in-out;
+//                         &.active{
+//                             opacity: 1;
+//                         }
+//                     }
+//                     .title{
+//                         position: absolute;
+//                         width: 50%;
+//                         height: 10%;
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: center;
+//                         top: 0;
+//                         background: $mainBold;
+//                         h3{
+//                             color: $secondColor;
+//                             text-align: center;
+//                             font-size: 25px;
+//                         }
+//                     }
+//                     .namba{
+//                         h1{
+//                             color: $secondColor;
+//                             font-size: 250px;
+//                         }
+//                     }
+//                     .counter{
+//                         position: absolute;
+//                         bottom: 0;
+//                         width: 25%;
+//                         height: 80px;
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: center;
+//                         flex-direction: column;
+//                         .stop{
+//                             height: 100%;
+//                             width: 20%;
+//                             position: inherit;
+//                             right: 0;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             .stopa_wrap{
+//                                 width: 90%;
+//                                 height: 90%;
+//                                 background: $secondColor;
+//                                 display: flex;
+//                                 align-items: center;
+//                                 justify-content: center;
+//                                 .stop_watch{
+//                                     color: white;
+//                                 }
+//                             }
+//                         }
+//                         .stopa_time{
+//                             width: 100%;
+//                             height: 100%;
+//                             font-size: 30px;
+//                             background: $mainBold;
+//                             color: white;
+//                             font-weight: 600;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                         }
+//                     }
+//                 }
+//                 .nexting{
+//                     width: 100%;
+//                     height: 10%;
+//                     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+//                     background: white;
+//                     position: relative;
+//                     display: flex;
+//                     .nextang{
+//                         width: 80%;
+//                         height: 100%;
+//                         .tiketi{
+//                             width: 100%;
+//                             height: 100%;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: space-around;
+//                             transition: all .5s ease-in-out;
+//                             animation: bounceIn 1s both;
+//                             .icon{
+//                                 color: $secondColor;
+//                             }
+//                             p{
+//                                 color: $mainColor;
+//                                 font-size: 40px;
+//                                 font-weight: 600;
+//                             }
+//                         }
+//                         .video{
+//                             width: 100%;
+//                             height: 100%;
+//                             video{
+//                                 width: 100%;
+//                                 height: 100%;
+//                                 object-fit: cover;
+//                             }
+//                         }
+//                         &.rest{
+//                             .icon{
+//                                 color: $mainColor;
+//                                 scale: 1.5;
+//                             }
+//                             p{
+//                                 color: $secondColor;
+//                                 font-weight: 800;
+//                             }
+//                         }
+//                     }
+//                     .signage{
+//                         position: absolute;
+//                         right: 0;
+//                         width: 20%;
+//                         height: 100%;
+//                         background: $mainBold;
+//                         //background: linear-gradient(to left, $secondColor,$mainColor);
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: center;
+//                         font-size: 30px;
+//                         font-weight: 600;
+//                         transition: all .5s ease-in-out;
+//                         &.rest{
+//                             background: $secondColor;
+//                             color: white;
+//                         }
+//                         .wrapper_sig{
+//                             width: 95%;
+//                             height: 90%;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             //background: $mainColor;
+//                             color: $secondColor;
+//                             transition: all .5s ease-in-out;
+//                             //background: linear-gradient(to left, $mainColor,$secondColor);
+//                             &.rest{
+//                                 color: white;
+//                             }
+//                             p{
+//                                 animation: flyIn 1s both;
+//                                 font-weight: 500;
+//                                 font-size: 18px;
+//                             }
+//                             .indicators{
+//                                 display: flex;
+//                                 .divAnimation{
+//                                     width: 20px;
+//                                     height: 20px;
+//                                     background: $secondColor;
+//                                     animation: fadeIn 2s ease-in-out infinite;
+//                                     opacity: 0;
+//                                     margin: 5px;
+//                                     &:nth-child(1){
+//                                         animation-delay: 0s;  
+//                                     }
+//                                     &:nth-child(2){
+//                                         animation-delay: .5s; 
+//                                         background: #01d401; 
+//                                     }
+//                                     &:nth-child(3){
+//                                         animation-delay: 1s;  
+//                                         background: #f1f519;
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//                 &.none{
+//                     display: none;
+//                 }
+//                     .hudumiwa{
+//                         width: 100%;
+//                         height: 100%;
+//                         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+//                         background: white;
+//                         .wrap{
+//                             width: 100%;
+//                             height: 100%;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             position: relative;
+//                             &.none{
+//                                 display: none;
+//                             }
+//                             .tatatata{
+//                                 position: absolute;
+//                                 top: 0;
+//                                 width: 80%;
+//                                 height: 80px;
+//                                 background: $mainColor;
+//                                 display: flex;
+//                                 align-items: center;
+//                                 justify-content: center;
+//                                 h1{
+//                                     color: white;
+//                                     font-size: 40px;
+//                                 }
+//                                 &.none{
+//                                     display: none;
+//                                 }
+//                             }
+//                             .sepera{
+//                                 position: absolute;
+//                                 //box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+//                                 bottom: -2px;
+//                                 width: 80%;
+//                                 height: 4px;
+//                                 background: $mainColor;
+//                                 display: none;
+//                                 align-items: center;
+//                                 justify-content: center;
+//                                 opacity: .6;
+//                                 h1{
+//                                     color: white;
+//                                     font-size: 50px;
+//                                 }
+//                             }
+//                             .round{
+//                                 width: 100%;
+//                                 display: flex;
+//                                 flex-direction: column;
+//                                 align-items: center;
+//                                 justify-content: center;
+//                                 margin-top: 100px;
+//                                 .sava{
+//                                     width: 100%;
+//                                     display: flex;
+//                                     flex-direction: column;
+//                                     align-items: center;
+//                                     justify-content: center;
+//                                     .logo{
+//                                         width: 200px;
+//                                         height: 150px;
+//                                         img{
+//                                             width: 100%;
+//                                             height: 100%;
+//                                             object-fit: contain;
+//                                         }
+//                                     }
+//                                     .tokeni{
+//                                         width: 100%;
+//                                         display: flex;
+//                                         align-items: center;
+//                                         justify-content: center;
+//                                         flex-direction: column;
+//                                         .title{
+//                                             font-size: 40px;
+//                                             padding: 10px 0;
+//                                             word-spacing: 4;
+//                                             color: $mainColor;
+//                                         }
+//                                         .token{
+//                                             border: 2px solid $secondColor;
+//                                             color: $secondColor;
+//                                             font-size: 150px;
+//                                             padding: 0 50px;
+//                                             font-weight: 600;
+//                                         }
+//                                     }
+//                                     .waiting_time{
+//                                         display: flex;
+//                                         align-items: center;
+//                                         justify-content: center;
+//                                         margin-top: 15px;
+//                                         .icon{
+//                                             color: $mainColor;
+//                                         }
+//                                         span{
+//                                             font-size: 40px;
+//                                             color: $mainColor;
+//                                             margin-left: 15px;
+//                                             font-weight: 600;
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     .nexta{
+//                         width: 80%;
+//                         background: $mainColor;
+//                         position: absolute;
+//                         bottom: 0;
+//                         display: none;
+//                         //height: 12%;
+//                         .tita{
+//                             width: 100%;
+//                             height: 100%;
+//                             position: absolute;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             .title{
+//                                 width: 80%;
+//                                 position: absolute;
+//                                 display: flex;
+//                                 align-items: center;
+//                                 justify-content: center;
+//                                 bottom: -20px;
+//                                 background: $secondColor;
+//                                 height: 40px;
+//                                 font-size: 30px;
+//                                 color: $mainColor;
+//                                 font-weight: 600;
+//                                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+//                             }
+//                         }
+//                         .nexta_content{
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             width: 100%;
+//                             height: 100%;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             .row{
+//                                 display: flex;
+//                                 align-items: center;
+//                                 justify-content: center;
+//                                 .token{
+//                                     color: white;
+//                                     margin-right: 20px;
+//                                     font-size: 50px;
+//                                     font-weight: 600;
+//                                 }
+//                                 .tokena{
+//                                     color: white;
+//                                     margin-left: 20px;
+//                                     font-size: 50px;
+//                                     font-weight: 600;
+//                                     opacity: .6;
+//                                 }
+//                                 .icon{
+//                                     color: $secondColor;
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+                
+//             }
+//             .new_right{
+//                 width: 39.5%;
+//                 height: 100%;
+//                 display: flex;
+//                 flex-direction: column;
+//                 align-items: flex-start;
+//                 justify-content: flex-start;
+//                 .loader{
+//                     width: 100%;
+//                     .div{
+//                         width: 100%;
+//                         background: $mainColor;
+//                         height: 60px;
+//                         margin-bottom: 4px;
+//                         overflow: hidden;
+//                         position: relative;
+//                         .shimmer {
+//                             width: 100%;
+//                             height: 100%;
+//                             background: linear-gradient(to right, $mainColor,#e0e0e0);
+//                             background-size: 200% 100%;
+//                             animation: shimmer 1.5s infinite;
+//                           }
+//                     }
+//                 }
+//                 .new_queue{
+//                     width: 100%;
+//                     position: relative;
+//                     height: 100%;
+//                     //background: white;
+//                     box-shadow: rgba(0, 0, 0, 0.5);
+//                     .top{
+//                         position: absolute;
+//                         top: 0;
+//                         width: 100%;
+//                         height: 9%;
+//                         background: $mainBold;
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: space-around;
+//                         margin-bottom: 5px;
+//                         .namba{
+//                             width: 49%;
+//                             height: 95%;
+//                             //background: $secondColor;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             font-size: 30px;
+//                             color: white;
+//                             font-weight: 600;
+//                             box-shadow: rgba(0, 0, 0, 0.5);
+//                             &:nth-child(1){
+//                                 border-right: 4px solid $secondColor;
+//                             }
+//                         }
+//                     }
+//                     .body{
+//                         width: 100%;
+//                         margin-top: 10%;
+//                         height: calc(100% - 10%);
+//                         .item{
+//                             background: $mainColor;
+//                             width: 100%;
+//                             height: 55px;
+//                             margin: 5px 0;
+//                             box-shadow: rgba(0, 0, 0, 0.5);
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: space-between;
+//                             padding: 0 10px;
+//                             position: relative;
+//                             padding: 0 20%;
+//                             &.disabled{
+//                                 border-bottom: 3px solid red;
+//                             }
+//                             .left{
+//                                 font-size: 30px;
+//                                 font-weight: 600;
+//                                 color: white;
+//                             }
+//                             .right{
+//                                 font-size: 30px;
+//                                 font-weight: 600;
+//                                 color: white;
+//                             }
+//                             .middle{
+//                                 .con{
+//                                     color: $secondColor;
+//                                 }
+//                                 .cona{
+//                                     color: $secondColor;
+//                                     transition: all .5s ease-in-out;
+//                                     opacity: 0;
+//                                     &.blink{
+//                                         opacity: 1;
+//                                     }
+//                                 }
+//                             }
+//                             .absa{
+//                                 position: absolute;
+//                                 background: $mainBold;
+//                                 width: 7%;
+//                                 height: 90%;
+//                                 left: 5px;
+//                                 display: flex;
+//                                 align-items: center;
+//                                 justify-content: center;
+//                                 color: white;
+//                                 font-weight: 600;
+//                                 font-size: 30px;
+//                                 &.serving{
+//                                     background: #01d401;
+//                                 }
+//                                 &.next{
+//                                     background: #fae103;
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     .color_description{
+//                         width: 100%;
+//                         position: absolute;
+//                         bottom: 0;
+//                         display: flex;
+//                         flex-wrap: wrap;
+//                         align-items: center;
+//                         justify-content: center;
+//                         .color_item{
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             .item{
+//                                 width: 20px;
+//                                 height: 20px;
+//                             }
+//                             p{
+//                                 color: $mainColor;
+//                                 margin: 5px;
+//                                 font-weight: 500;
+//                                 font-size: 18px;
+//                             }
+//                         }
+//                     }
+//                 }
+//                 .queue_div{
+//                     width: 100%;
+//                     height: 100%;
+//                     display: none;
+//                     flex-direction: column;
+//                     align-items: flex-start;
+//                     justify-content: flex-start;
+//                     position: relative;
+//                     .div{
+//                         width: 100%;
+//                         background: $mainColor;
+//                         height: 70px;
+//                         //border-radius: 10px;
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: space-between;
+//                         margin-bottom: 5px;
+//                         color: white;
+//                         position: relative;
+//                         &.serving{
+//                             border-bottom: 5px solid red;   
+//                         }
+//                         .indi{
+//                             position: absolute;
+//                             height: 90%;
+//                             left: 5px;
+//                             width: 10%;
+//                             background: $mainBold;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             p{
+//                                 font-weight: 600;
+//                                 font-size: 30px;
+//                             }
+//                             &.serving{
+//                                 background: #34e734;
+//                             }
+//                             &.next{
+//                                 background: yellow;
+//                             }
+//                         }
+//                         .ticket_info{
+//                             position: absolute;
+//                             width: 100%;
+//                             right: 0;
+//                             width: 80%;
+//                             padding: 10px;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: space-between;
+//                             .con{
+//                                 color: $secondColor;
+//                                 transition: all .5s ease-in-out;
+//                                 &.blink{
+//                                     opacity: 1;
+//                                 }
+//                             }
+//                             .cona{
+//                                 color: $secondColor;
+//                                 transition: all .5s ease-in-out;
+//                                 opacity: 0;
+//                                 &.blink{
+//                                     opacity: 1;
+//                                 }
+//                             }
+//                             p{
+//                                 font-weight: 600;
+//                                 font-size: 30px;
+//                             }
+//                             span{
+//                                 font-weight: 400;
+//                                 font-size: 30px;
+//                                 margin-right: 10px;
+//                                 span{
+//                                     font-weight: 600;
+//                                     color: white;
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     .color_description{
+//                         width: 100%;
+//                         position: absolute;
+//                         bottom: 0;
+//                         display: flex;
+//                         flex-wrap: wrap;
+//                         align-items: flex-start;
+//                         .color_item{
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             .item{
+//                                 width: 20px;
+//                                 height: 20px;
+//                             }
+//                             p{
+//                                 color: $mainColor;
+//                                 margin: 5px;
+//                                 font-weight: 500;
+//                                 font-size: 20px;
+//                             }
+//                         }
+//                     }
+//                     .shimmer_top{
+//                         position: relative;
+//                         overflow: hidden;
+//                         background: linear-gradient(to right, $mainBold,$mainColor);
+//                         width: 100%;
+//                         height: 60px;
+//                         margin-bottom: 5px;
+//                         .shimmer{
+//                             position: absolute;
+//                             top: 0;
+//                             left: -100%;
+//                             width: 100%;
+//                             height: 100%;
+//                             background: linear-gradient(
+//                                 to right,
+//                                 rgba(255, 255, 255, 0) 0%,
+//                                 rgba(255, 255, 255, 0.4) 50%,
+//                                 rgba(255, 255, 255, 0) 100%
+//                             );
+//                             animation: shimmer 1.5s infinite;
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//         .cats_loader{
+//             width: 100%;
+//             table{
+//                 width: 100%;
+//                 thead{
+//                     width: 100%;
+//                     background: $mainBold;
+//                     height: 70px;
+//                     display: flex;
+//                     align-items: center;
+//                     justify-content: center;
+//                     tr{
+//                         width: 100%;
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: space-between;
+//                         //padding: 20px 15px;
+//                         height: 90%;
+//                         th{
+//                             position: relative;
+//                             overflow: hidden;
+//                             background: linear-gradient(to right, $mainBold,$secondColor);
+//                             width: 20%;
+//                             height: 100%;
+//                             .shimmer{
+//                                 position: absolute;
+//                                 top: 0;
+//                                 left: -100%;
+//                                 width: 100%;
+//                                 height: 100%;
+//                                 background: linear-gradient(
+//                                     to right,
+//                                     rgba(255, 255, 255, 0) 0%,
+//                                     rgba(255, 255, 255, 0.4) 50%,
+//                                     rgba(255, 255, 255, 0) 100%
+//                                 );
+//                                 animation: shimmer 1.5s infinite;
+//                             }
+//                         }
+//                     }
+//                 }
+//                 tbody{
+//                     width: 100%;
+//                     height: 70px;
+//                     display: flex;
+//                     flex-direction: column;
+//                     align-items: center;
+//                     justify-content: center;
+//                     tr{
+//                         width: 100%;
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: space-between;
+//                         //padding: 20px 15px;
+//                         height: 90%;
+//                         td{
+//                             position: relative;
+//                             overflow: hidden;
+//                             background: linear-gradient(to right, $mainBold,$mainColor);
+//                             width: 20%;
+//                             height: 100%;
+//                             .shimmer{
+//                                 position: absolute;
+//                                 top: 0;
+//                                 left: -100%;
+//                                 width: 100%;
+//                                 height: 100%;
+//                                 background: linear-gradient(
+//                                     to right,
+//                                     rgba(255, 255, 255, 0) 0%,
+//                                     rgba(255, 255, 255, 0.4) 50%,
+//                                     rgba(255, 255, 255, 0) 100%
+//                                 );
+//                                 animation: shimmer 1.5s infinite;
+//                             }
+//                         }
+//                     }
+//                 }
+//             }  
+//         }
+//         .cats{
+//             width: 100%;
+//             table{
+//                 width: 100%;
+//                 thead{
+//                     width: 100%;
+//                     background: $mainBold;
+//                     height: 70px;
+//                     display: flex;
+//                     align-items: center;
+//                     justify-content: center;
+//                     tr{
+//                         width: 100%;
+//                         display: flex;
+//                         align-items: center;
+//                         justify-content: space-between;
+//                         //padding: 20px 15px;
+//                         height: 90%;
+//                         th{
+//                             background: $secondColor;
+//                             text-align: center;
+//                             width: 20%;
+//                             //padding: 0 15px;
+//                             color: $divColor;
+//                             font-size: 40px;
+//                             font-weight: 400;
+//                             height: 100%;
+//                             display: flex;
+//                             align-items: center;
+//                             justify-content: center;
+//                             .th_item{
+//                                 background: $mainBold;
+//                                 width: 99%;
+//                                 height: 95%;
+//                             }
+//                         }
+//                     }
+//                 }
+//                 tbody{
+//                     width: 100%;
+//                     background: $mainColor;
+//                     tr{
+//                         width: 100%;
+//                         display: flex;
+//                         align-items: flex-start;
+//                         justify-content: space-between;
+//                         //padding: 0 20px;
+//                         td{
+//                             width: 100%;
+//                             text-align: left;
+//                             width: 20%;
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//         .color_expla{
+//             position: absolute;
+//             bottom: 70px;
+//             align-items: center;
+//             justify-content: space-between;
+//             width: 100%;
+//             padding: 20px;
+//             width: 100%;
+//             display: flex;
+//             align-items: center;
+//             justify-content: space-between;
+//             .item{
+//                 display: flex;
+//                 align-items: center;
+//                 justify-content: center;
+//                 .color_left{
+//                     width: 35px;
+//                     height: 35px;
+//                     background: $divColor;
+//                     &.main{
+//                         background: $secondColor;
+//                     }
+//                     &.gold{
+//                         background: $goldColor;
+//                     }
+//                     &.red{
+//                         background: red;
+//                     }
+//                     &.green{
+//                         background: green;
+//                     }
+//                     &.yellow{
+//                         background: yellow;
+//                     }
+//                 }
+//                 .color_right{
+//                     margin-left: 10px;
+//                     color: white;
+//                     font-size: 40px;
+//                 }
+//             }
+//         }
+//         .ads{
+//             background: $mainBold;
+//             height: 8%;
+//             width: 100%;
+//             display: flex;
+//             align-items: center;
+//             justify-content: center;
+//             position: absolute;
+//             bottom: 0;
+//             .ad{
+//                 display: inline-block;
+//                 padding: 10px;
+//                 color: white;
+//                 animation: scroll 20s linear infinite;
+//                 font-size: 30px;
+//             }
+//             .logo{
+//                 height: 100%;
+//                 position: inherit;
+//                 left: 0;
+//                 width: 5%;
+//                 z-index: 10;
+//                 border-right: 3px solid $secondColor;
+//                 //background: linear-gradient(to left, $mainBold, $secondColor);
+//                 .wrapper{
+//                     position: relative;
+//                     width: 100%;
+//                     height: 100%;
+//                     background: white;
+//                     // background: linear-gradient(to right, white, $secondColor);
+//                     img{
+//                         width: 95%;
+//                         height: 95%;
+//                         object-fit: contain;
+//                     }
+//                     .line{
+//                         width: 100%;
+//                         height: 100%;
+//                         background: $secondColor;
+//                         position: absolute;
+//                     }
+//                 }
+//             }
+//             .time{
+//                 position: inherit;
+//                 right: 0;
+//                 height: 100%;
+//                 width: 200px;
+//                 background: linear-gradient(to right, $mainBold, $secondColor);
+//                 color: white;
+//                 font-size: 25px;
+//                 display: flex;
+//                 flex-direction: column;
+//                 align-items: center;
+//                 justify-content: center;
+//                 font-weight: 600;
+//                 font-family: "Roboto";
+//                 .date{
+//                     font-size: 18px;
+//                     font-weight: 500;
+//                 }
+//             }
+//         }
+//     }
+// }
+// @keyframes scroll {
+//     0% {
+//       transform: translateX(100%);
+//     }
+//     100% {
+//       transform: translateX(-100%);
+//     }
+//   }
+//   @keyframes shimmer {
+//     0% {
+//       transform: translateX(-100%);
+//     }
+//     100% {
+//       transform: translateX(100%);
+//     }
+//   }
+//   @keyframes fadeIn {
+//     from {
+//       opacity: 0;
+//     }
+//     to {
+//       opacity: 1;
+//     }
+//   }
+
+//   @keyframes bounceIn {
+//     0%, 20%, 40%, 60%, 80%, 100% {
+//       animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+//     }
+//     0% {
+//       opacity: 0;
+//       transform: scale3d(0.3, 0.3, 0.3);
+//     }
+//     20% {
+//       transform: scale3d(1.1, 1.1, 1.1);
+//     }
+//     40% {
+//       transform: scale3d(0.9, 0.9, 0.9);
+//     }
+//     60% {
+//       opacity: 1;
+//       transform: scale3d(1.03, 1.03, 1.03);
+//     }
+//     80% {
+//       transform: scale3d(0.97, 0.97, 0.97);
+//     }
+//     100% {
+//       opacity: 1;
+//       transform: scale3d(1, 1, 1);
+//     }
+//   }
+//   @keyframes flyIn {
+//     0% {
+//       transform: translateY(-100%);
+//       opacity: 0;
+//     }
+//     100% {
+//       transform: translateY(0);
+//       opacity: 1;
+//     }
+//   }
+
 @import '../../global.scss';
 .index{
     width: 100vw;
@@ -8,15 +1038,32 @@
     background: $divColor;
     position: relative;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
     .queue_wrap{
         width: 100%;
         height: 100%;
+        // max-width: 1920px;
+        // max-height: 1080px;
         display: flex;
         align-items: center;
         justify-content: center;
         background: $divColor;
         position: relative;
         overflow: hidden;
+        box-sizing: border-box;
+        // @media (max-width: 1920px) {
+        //     width: 90%;
+        //     height: 90%;
+        // }
+        // @media (max-width: 1366px){
+        //     width: 85%;
+        //     height: 85%;
+        // }
+        // @media (max-width: 1024px){
+        //     width: 80%;
+        //     height: 80%;
+        // }
         .top_bar{
             width: 100%;
             background: $mainBold;
@@ -92,12 +1139,20 @@
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
+                    position: relative;
                     .jina{
-                        font-size: 50px;
-                        color: $secondColor;
-                        font-weight: 600;
-                        //opacity: 0;
+                        width: 100%;
+                        height: 100%;
                         transition: all .5s ease-in-out;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        h1{
+                            font-size: 500%;
+                            color: $secondColor;
+                            font-weight: 600;
+                            //opacity: 0;
+                        }
                         &.active{
                             opacity: 1;
                         }
@@ -114,24 +1169,32 @@
                         h3{
                             color: $secondColor;
                             text-align: center;
-                            font-size: 25px;
+                            font-size: 18px;
                         }
                     }
                     .namba{
                         h1{
                             color: $secondColor;
-                            font-size: 250px;
+                            font-size: 200px;
                         }
                     }
                     .counter{
                         position: absolute;
-                        bottom: 0;
                         width: 25%;
-                        height: 80px;
+                        height: 10%;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        flex-direction: column;
+                        bottom: 0;
+                        background: $mainBold;
+                        // position: absolute;
+                        // bottom: 80px;
+                        // width: 25%;
+                        // height: 80px;
+                        // display: flex;
+                        // align-items: center;
+                        // justify-content: center;
+                        // flex-direction: column;
                         .stop{
                             height: 100%;
                             width: 20%;
@@ -155,7 +1218,7 @@
                         .stopa_time{
                             width: 100%;
                             height: 100%;
-                            font-size: 30px;
+                            font-size: 20px;
                             background: $mainBold;
                             color: white;
                             font-weight: 600;
@@ -245,7 +1308,7 @@
                             p{
                                 animation: flyIn 1s both;
                                 font-weight: 500;
-                                font-size: 18px;
+                                font-size: 15px;
                             }
                             .indicators{
                                 display: flex;
@@ -512,7 +1575,7 @@
                         .item{
                             background: $mainColor;
                             width: 100%;
-                            height: 55px;
+                            height: 9%;
                             margin: 5px 0;
                             box-shadow: rgba(0, 0, 0, 0.5);
                             display: flex;
@@ -587,8 +1650,8 @@
                             p{
                                 color: $mainColor;
                                 margin: 5px;
-                                font-weight: 500;
-                                font-size: 18px;
+                                font-weight: 600;
+                                font-size: 13px;
                             }
                         }
                     }
@@ -604,7 +1667,7 @@
                     .div{
                         width: 100%;
                         background: $mainColor;
-                        height: 70px;
+                        height: 8%;
                         //border-radius: 10px;
                         display: flex;
                         align-items: center;
@@ -957,8 +2020,8 @@
                 justify-content: center;
                 font-weight: 600;
                 font-family: "Roboto";
-                .date{
-                    font-size: 18px;
+                .date,.timer{
+                    font-size: 15px;
                     font-weight: 500;
                 }
             }
@@ -1026,3 +2089,4 @@
       opacity: 1;
     }
   }
+  
