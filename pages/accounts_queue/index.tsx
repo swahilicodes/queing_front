@@ -22,7 +22,7 @@ import messageState from "@/store/atoms/message";
 
 export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+  //const {data:queue,loading,error} = useFetchData("http://192.168.30.245:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
@@ -35,7 +35,7 @@ export default function Home() {
   const [language, setLanguage] = useState("Swahili");
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://localhost:5000/socket/display_tokens_stream');
+  //const eventSource = new EventSource('http://192.168.30.245:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -180,7 +180,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: router.pathname } })
+      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: router.pathname } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -196,7 +196,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -207,7 +207,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/get_display_tokens", {
+      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
         params: { stage: "accounts", clinic_code: "" },
       })
       .then((data) => {

@@ -27,13 +27,13 @@ export default function Admins() {
   const [id, setId] = useState("");
   const setMessage = useSetRecoilState(messageState)
   const { data } = useFetchData(
-    "http://localhost:5000/services/get_all_services"
+    "http://192.168.30.245:5000/services/get_all_services"
   );
   const [isFull, setFull] = useState(false);
   const [desc, setDesc] = useState("");
   const [pages, setPages] = useState([]);
   const { data: clinics } = useFetchData(
-    "http://localhost:5000/clinic/get_clinics"
+    "http://192.168.30.245:5000/clinic/get_clinics"
   );
   const [isAddittion, setAddittion] = useState(false);
   const [attendantClinics, setAttendantClinics] = useState([]);
@@ -77,7 +77,7 @@ export default function Admins() {
 
   const createClinic = (deviceId: string) => {
     axios
-      .post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`, {
+      .post(`http://192.168.30.245:5000/attendant_clinics/create_attendant_clinic`, {
         clinic_code: fields.clinic_code,
         clinic: fields.clinic,
         attendant_id: deviceId,
@@ -108,7 +108,7 @@ export default function Admins() {
   };
   const deleteClinic = (clinic_code: string, device_id: string) => {
     axios
-      .get(`http://localhost:5000/attendant_clinics/delete_clinic`, {
+      .get(`http://192.168.30.245:5000/attendant_clinics/delete_clinic`, {
         params: { clinic_code: clinic_code, attendant_id: device_id },
       })
       .then((data) => {
@@ -135,7 +135,7 @@ export default function Admins() {
   };
   const getDocClinics = (device_id: string) => {
     axios
-      .get(`http://localhost:5000/attendant_clinics/get_clinics`, {
+      .get(`http://192.168.30.245:5000/attendant_clinics/get_clinics`, {
         params: { attendant_id: device_id },
       })
       .then((data) => {
@@ -163,7 +163,7 @@ export default function Admins() {
     console.log(inputs)
     e.preventDefault();
     axios
-      .get(`http://localhost:5000/network/edit_device`, {
+      .get(`http://192.168.30.245:5000/network/edit_device`, {
         params: { page: inputs.page, id: id, deviceName: inputs.deviceName, deviceModel: inputs.deviceModel, manufucturer: inputs.manufucturer },
       })
       .then(() => {
@@ -188,7 +188,7 @@ export default function Admins() {
   };
   const deleteService = () => {
     axios
-      .get(`http://localhost:5000/network/delete_device`, {
+      .get(`http://192.168.30.245:5000/network/delete_device`, {
         params: { id: id },
       })
       .then(() => {
@@ -232,7 +232,7 @@ export default function Admins() {
 
   const getPages = () => {
     axios
-      .get("http://localhost:3000/api/getPages")
+      .get("http://192.168.30.245:3000/api/getPages")
       .then((data) => {
         const pags = data.data.pages.map((page: string) =>
           getFirstPathSegment(page)
@@ -251,7 +251,7 @@ export default function Admins() {
   const getAttendants = () => {
     setFetchLoading(true);
     axios
-      .get("http://localhost:5000/network/get_devices", {
+      .get("http://192.168.30.245:5000/network/get_devices", {
         params: { page, pagesize },
       })
       .then((data) => {

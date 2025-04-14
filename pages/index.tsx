@@ -156,7 +156,7 @@ const indexa = maneno[currentText].swahili
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -178,7 +178,7 @@ const indexa = maneno[currentText].swahili
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -192,7 +192,7 @@ const indexa = maneno[currentText].swahili
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/get_display_tokens", {
+      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "" },
       })
       .then((data) => {

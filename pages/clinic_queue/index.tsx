@@ -170,7 +170,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: router.pathname } })
+      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: router.pathname } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -186,7 +186,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -201,7 +201,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/pata_clinic", {
+      .get("http://192.168.30.245:5000/tickets/pata_clinic", {
         params: { stage: "nurse_station", clinics: device.clinics.map((item:any)=> item.clinic_code) },
       })
       .then((data) => {

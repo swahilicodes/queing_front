@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './queue_add.module.scss'
 import { MdClear, MdOutlineClear } from 'react-icons/md'
 import QRCode from 'qrcode.react'
@@ -12,9 +12,10 @@ import html2canvas from 'html2canvas'
 import { TiChevronRight } from 'react-icons/ti'
 import errorState from '@/store/atoms/error'
 import LanguageState from '@/store/atoms/language'
-import { IoArrowUndoOutline } from 'react-icons/io5'
+import { IoArrowUndoOutline, IoChevronDown } from 'react-icons/io5'
 import Cubes from '@/components/loaders/cubes/cubes'
 import messageState from '@/store/atoms/message'
+import { TbWorld } from 'react-icons/tb'
 
 export default function QueueAdd() {
   const [cat,setcat] = useState("")
@@ -33,25 +34,62 @@ export default function QueueAdd() {
  const [index,setIndex] = useState(0)
  const [subLoading, setSubLoading] = useState(false)
  const [error, setError] = useRecoilState(errorState)
- const language = useRecoilValue(LanguageState)
+ const [language, setLanguage] = useState("Swahili")
  const setMessage = useSetRecoilState(messageState)
  const [seleccted, setSelected] = useState({
     index: 0,
     reason: "",
     type: "",
  })
+
+ useEffect(()=> {
+    const handleContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+      };
+
+      if (seleccted.index > 0 && seleccted.type !== "") {
+        setTimeout(()=> {
+            setSubLoading(true)
+        axios.post("http://192.168.30.245:5000/suggestion/create_suggestion", {
+          type: seleccted.type,
+          reason: seleccted.reason
+        }).then(() => {
+          setSubLoading(false)
+          setSelected({ index: 0, type: "", reason: "" })
+          setError(language === "English" ? "Thank you for your Feedback" : "Asante kwa Maoni Yako")
+          setTimeout(() => setError(""), 3000)
+        }).catch((error) => {
+          setSubLoading(false)
+          console.log(error.response)
+        })
+        setTimeout(() => {
+          setSubLoading(false)
+          setSelected({...seleccted,index:0,type: ""})
+        }, 3000)
+        },2000)
+      }
+  
+      document.addEventListener('contextmenu', handleContextMenu);
+  
+      return () => {
+        document.removeEventListener('contextmenu', handleContextMenu);
+      };
+ },[language,seleccted.index, seleccted.type])
  const suggestions = [
     {
         swahili: "Nzuri",
-        english: "Good"
+        english: "Good",
+        icon: "/good.webp"
     },
     {
         swahili: "Kawaida",
-        english: "Normal"
+        english: "Normal",
+        icon: "/normal.webp"
     },
     {
         swahili: "Mbaya",
-        english: "Bad"
+        english: "Bad",
+        icon: "/bad.png"
     },
  ]
  const [items, setItems] = useState([
@@ -59,38 +97,11 @@ export default function QueueAdd() {
     { id: 2, name: 'mjamzito', isActive: false },
     { id: 3, name: 'mlemavu', isActive: false },
   ]);
- const sags = [
-    {
-        id: 1,
-        name: 'Mzee'
-    },
-    {
-        id: 2,
-        name: 'Mjamzito'
-    },
-    {
-        id: 3,
-        name: 'Mlemavu'
-    },
- ]
+ 
 
 
-  const handleSubmit = () => {
-    setSubLoading(true)
-    axios.post("http://localhost:5000/suggestion/create_suggestion",{type: seleccted.type, reason: seleccted.reason}).then(()=> {
-        setSubLoading(false)
-        setSelected({...seleccted,index:0,type:"",reason: ""})
-        setError(language==="English"?"Thank you for your feedback..":"Asante kwa Maoni Yako..")
-        setTimeout(()=> {
-            setError("")
-        },3000)
-    }).catch((error)=> {
-        setSubLoading(false)
-        console.log(error.response)
-    })
-    setTimeout(()=> {
-        setSubLoading(false)
-    },3000)
+  const handleSubmit = (index:number, item:any) => {
+    setSelected({...seleccted,index:index+1,type: language==="English"?item.english:item.swahili})
   };
 
   const enterNumber = () => {
@@ -115,7 +126,7 @@ export default function QueueAdd() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
+    axios.post("http://192.168.30.245:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
@@ -124,8 +135,6 @@ export default function QueueAdd() {
         setInterval(()=> {
             setSuccess(false)
             handleCapture()
-            //handleConvertToImage()
-            //convert1()
         },5000)
     }).catch((error)=> {
         console.log(error.response)
@@ -191,15 +200,36 @@ function printImage(src: string) {
     win.document.close();
 }
 
+ const changeLanguage = () => {
+    if(language==="Swahili"){
+        setLanguage("English")
+    }else{
+        setLanguage('Swahili')
+    }
+ }
+
 
   return (
     <div className={styles.queue_add}>
         <div className={cx(styles.note,error && styles.display)}>
             {error}
         </div>
+        <div className={styles.language}>
+            <div className={styles.lang_icons} onClick={()=> changeLanguage()}>
+                <TbWorld size={30} className={cx(styles.world,styles.icon__)}/>
+                <p>{language==="Swahili"?"sw":"eng"}</p>
+            </div>
+        </div>
         <div className={styles.top_notch}>
+            <div className={styles.logo}>
+                <img src="/tz.png" alt="" />
+            </div>
             <div className={styles.title}>
-                <h1>{language==="English"?"MUHIMBILI NATIONAL HOSPITAL - MLOGANZILA":"HOSPITALI YA TAIFA MUHIMBILI-MLOGANZILA"}</h1>
+                <h1>{language==="English"?"The United Republic of Tanzania":"Jamhuri Ya Muungano wa Tanzania"}</h1>
+                <h2>{language==="English"?"Muhimbili National Hospital - Mloganzila":"Hospitali ya Taifa Muhimbili - Mloganzila"}</h2>
+            </div>
+            <div className={styles.logo}>
+                <img src="/mnh.png" alt="" />
             </div>
         </div>
         {
@@ -210,8 +240,8 @@ function printImage(src: string) {
                     <div className={styles.qr}><QRCode value={qrData} /></div>
                     {/* <p style={{fontWeight: "600", fontSize: "18px"}}>Karibu Hospitali ya Taifa Muhimbili Mloganzila</p> */}
                     </div>
-                    <p style={{fontWeight: "600", fontSize: "18px"}} className={styles.date}>{date.getDate().toString().padStart(2, '0') }/{month.toString().padStart(2, '0')}/{date.getUTCFullYear()}   <span>{date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}</span></p>
-                    <h6 style={{fontWeight: "600", fontSize: "20px", color:"blue"}}>www.mloganzila.or.tz</h6>
+                    <p style={{fontWeight: "600", fontSize: "12px"}} className={styles.date}>{date.getDate().toString().padStart(2, '0') }/{month.toString().padStart(2, '0')}/{date.getUTCFullYear()}   <span>{date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}</span></p>
+                    <h6 style={{fontWeight: "600", fontSize: "15px", color:"blue"}}>www.mloganzila.or.tz</h6>
                 </form>
             </div>
         }
@@ -273,9 +303,6 @@ function printImage(src: string) {
             )
         }
         <div className={styles.items}>
-            <div className={styles.icon}>
-                <img src="/mnh.png" alt="" />
-            </div>
             <div className={styles.item} onClick={()=> enterNumber()}>
                 <p>{language==="English"?"Take Ticket":"Chukua Tiketi"}</p>
             </div>
@@ -286,29 +313,18 @@ function printImage(src: string) {
                 <div className={styles.sugs}>
                     {
                         suggestions.map((item,index:number)=> (
-                            <div className={cx(styles.sug,seleccted.index===index+1 && styles.active)} key={index} onClick={()=> setSelected({...seleccted,index:index+1,type: language==="English"?item.english:item.swahili})}>{language==="English"?item.english:item.swahili}</div>
+                            <div className={cx(styles.sug,seleccted.index===index+1 && styles.active)} key={index} onClick={()=> handleSubmit(index,item)}>
+                                <div className={styles.imoji_content}>
+                                <p>{language==="English"?item.english:item.swahili}</p>
+                                <div className={styles.image_wrapper}>
+                                 <img src={item.icon} alt="" />
+                                </div>
+                                </div>
+                            </div>
                         ))
                     }
                 </div>
-                {
-                    seleccted.index !== 0 && (
-                        <div className={styles.sug_action}>
-                            {/* {
-                                seleccted.type =="Mbaya" && (
-                                    <input 
-                                    type="text"
-                                    placeholder='Tuambie Kwanini' 
-                                    value={seleccted.reason}
-                                    onChange={e => setSelected({...seleccted,reason: e.target.value})}
-                                    />
-                                )
-                            } */}
-                            <div className={cx(styles.buttona,subLoading && styles.loading)} onClick={handleSubmit}>
-                                <TiChevronRight className={styles.icon} size={20}/>
-                            </div>
-                        </div>
-                    )
-                }
+                
             </div>
         </div>
     </div>

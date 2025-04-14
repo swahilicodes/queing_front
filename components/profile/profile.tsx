@@ -25,7 +25,7 @@ export default function Profile() {
     e.preventDefault();
     if (isEditable) {
       axios
-        .put(`http://localhost:5000/users/edit_user/${currentUser.id}`, {
+        .put(`http://192.168.30.245:5000/users/edit_user/${currentUser.id}`, {
           oldPass,
           newPass,
         })
