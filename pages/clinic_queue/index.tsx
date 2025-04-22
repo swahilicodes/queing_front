@@ -41,6 +41,7 @@ export default function Home() {
   const [serving, setServing] = useState<any>({})
   const device = useRecoilValue(deviceState)
   const setMessage = useSetRecoilState(messageState)
+  const [video, setVideo] = useState("")
   const [nextServe, setNextServe] = useState({
     id: 0,
     window: 0
@@ -170,9 +171,10 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: router.pathname } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/clinic_queue" } })
       .then((data) => {
         setActive(data.data.isActive);
+        setVideo(data.data.video)
       })
       .catch((error) => {
         console.log(error.response);
@@ -186,7 +188,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -201,7 +203,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/pata_clinic", {
+      .get("http://localhost:5000/tickets/pata_clinic", {
         params: { stage: "nurse_station", clinics: device.clinics.map((item:any)=> item.clinic_code) },
       })
       .then((data) => {
@@ -239,7 +241,7 @@ export default function Home() {
                   : <CiMicrophoneOff className={styles.icon} size={40}/>
                 }
               </div>
-              <video src="/videos/mnh.mp4" autoPlay loop muted={muted} />
+              <video src={video} autoPlay loop muted={muted} />
             </div>
           )}
             <div className={cx(styles.left_wrap,active && styles.none)}>

@@ -39,6 +39,7 @@ export default function Home() {
   const [isRest, setRest] = useState<boolean>(true)
   const [serving, setServing] = useState<any>({})
   const router = useRouter()
+  const [video, setVideo] = useState("")
   const setMessage = useSetRecoilState(messageState)
   const maneno = [
   {
@@ -156,9 +157,10 @@ const indexa = maneno[currentText].swahili
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.245:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
+        setVideo(data.data.video)
       })
       .catch((error) => {
         console.log(error.response);
@@ -178,7 +180,7 @@ const indexa = maneno[currentText].swahili
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.245:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -192,7 +194,7 @@ const indexa = maneno[currentText].swahili
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.245:5000/tickets/get_display_tokens", {
+      .get("http://localhost:5000/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "" },
       })
       .then((data) => {
@@ -242,7 +244,7 @@ const indexa = maneno[currentText].swahili
                   : <CiMicrophoneOff className={styles.icon} size={40}/>
                 }
               </div>
-              <video src="/videos/mnh.mp4" autoPlay loop muted={muted}/>
+              <video src={video} autoPlay loop muted={muted}/>
               {/* <video autoPlay loop muted={muted}>
                 <source src="/videos/mnh.mp4" type="video/mp4"/>
                 Your browser does not support the video tag.

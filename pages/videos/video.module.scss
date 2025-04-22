@@ -1,0 +1,168 @@
+@import '../../global.scss';
+.video_page{
+    width: 100vw;
+    position: relative;
+    .top{
+        width: 100%;
+        background: $mainColor;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        .left{
+            color: white;
+        }
+        .right{
+            button{
+                outline: none;
+                border: none;
+                background: $mainBold;
+                padding: 15px;
+                border-radius: 10px;
+                color: white;
+                cursor: pointer;
+                font-size: 18px;
+            }
+        }
+    }
+    .overlay{
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .contents{
+            width: 40%;
+            background: white;
+            padding: 20px;
+            form{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                .videoa{
+                    width: 90%;
+                    .video_wrapper{
+                        width: 100%;
+                        height: 300px;
+                        video{
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    }
+                    label{
+                        width: 100%;
+                        height: 300px;
+                        background: $divColor;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                    }
+                }
+                input{
+                    width: 90%;
+                    outline: none;
+                    border: 2px solid $divColor;
+                    padding: 15px;
+                    margin: 10px 0;
+                }
+                textarea{
+                    width: 90%;
+                    outline: none;
+                    border: 2px solid $divColor;
+                    padding: 15px;
+                    margin: 10px 0;
+                }
+                button{
+                    margin: 10px 0;
+                    width: 90%;
+                    outline: none;
+                    background: $mainColor;
+                    color: white;
+                    font-size: 20px;
+                    padding: 15px;
+                    border: none;
+                    cursor: pointer;
+                }
+            }
+            &.loading{
+                display: none;
+            }
+        }
+        .upload_progress{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            p{
+                color: white;
+                font-size: 25px;
+                font-weight: 500;
+                margin: 15px 0;
+            }
+        }
+    }
+    .video_content{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 80px;
+        .video_list{
+            width: 100%;
+            overflow: hidden;
+            .wrapper{
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: rgb(221, 219, 219);
+                padding: 15px 20px;
+                &:nth-child(odd){
+                    background: white;
+                }
+                p{
+                    font-size: 18px;
+                    color: #262626;
+                }
+                .video_div{
+                    width: 50px;
+                    height: 50px;
+                    video{
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                }
+                .action{
+                    cursor: pointer;
+                }
+            }
+        }
+        .video_loader{
+            width: 100%;
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            p{
+                font-size: 20px;
+                font-weight: 600;
+                color: $mainColor;
+                opacity: .7;
+            }
+        }
+    }
+}

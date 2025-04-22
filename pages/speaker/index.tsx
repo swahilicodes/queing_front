@@ -59,7 +59,7 @@ function Speaker() {
  }
 
  const getPlays = () => {
-    axios.get("http://192.168.30.245:5000/speaker/get_speakers",{params: {station: fields.station}}).then((data)=> {
+    axios.get("http://localhost:5000/speaker/get_speakers",{params: {station: fields.station}}).then((data)=> {
         setPlays(data.data)
         setPlays((plays) => plays.map((item)=> item))
     }).catch((error)=> {
@@ -139,7 +139,7 @@ function Speaker() {
             </table>
             }
         </div>
-        {/* <button onClick={()=> createItem("1005","meds","m02","http://192.168.30.245:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button> */}
+        {/* <button onClick={()=> createItem("1005","meds","m02","http://localhost:5000/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button> */}
     </div>
   )
 }

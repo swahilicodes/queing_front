@@ -18,7 +18,7 @@ interface MyComponentProps {
       }, [category,status]);
     
       const getTickets = () => {
-        axios.get("http://192.168.30.245:5000/patients/getCatPatients",{params: {page,pagesize,category:category??"mazoezi",status}}).then((data)=> {
+        axios.get("http://localhost:5000/patients/getCatPatients",{params: {page,pagesize,category:category??"mazoezi",status}}).then((data)=> {
           setTickets(data.data.totalItems)
         }).catch((error)=> {
           if (error.response && error.response.status === 400) {
