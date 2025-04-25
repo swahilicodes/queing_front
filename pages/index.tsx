@@ -121,6 +121,22 @@ const indexa = maneno[currentText].swahili
     };
   },[language])
 
+  function getCurrentDay() {
+    const days = [
+      { english: "Sunday", swahili: "Jumapili" },
+      { english: "Monday", swahili: "Jumatatu" },
+      { english: "Tuesday", swahili: "Jumanne" },
+      { english: "Wednesday", swahili: "Jumatano" },
+      { english: "Thursday", swahili: "Alhamisi" },
+      { english: "Friday", swahili: "Ijumaa" },
+      { english: "Saturday", swahili: "Jumamosi" }
+    ];
+  
+    const today = new Date();
+    return days[today.getDay()];
+  }
+  
+
   const getServing = () => {
     if(tickets.length > 0){
       const sava = tickets.find((item:any)=> item.ticket.serving===true)
@@ -338,7 +354,7 @@ const indexa = maneno[currentText].swahili
               ? <div className={styles.new_queue}>
               <div className={styles.top}>
                 <div className={styles.namba}>{language==="Swahili"?"TIKETI":"TICKET"}</div>
-                <div className={styles.namba}>{language==="Swahili"?"DIRISHA":"WINDOW"}</div>
+                <div className={styles.namba}>{language==="Swahili"?"DIRISHA":"COUNTER"}</div>
               </div>
               <div className={styles.body}>
                 {
@@ -550,10 +566,9 @@ const indexa = maneno[currentText].swahili
           <div className={styles.ad}>
             {adverts.length > 0 && <AdvertScroller adverts={adverts} />}
           </div>
-          {/* <div className={styles.time}>MATANGAZO</div> */}
           <div className={styles.time}>
             <div className={styles.timer}>{hour}:{minute} {amPm}</div>
-            <div className={styles.date}>{day}/{month}/{year}</div>
+            <div className={styles.date}>{language=="English"?getCurrentDay().english:getCurrentDay().swahili} <div className={cx(styles.break,language=="Swahili" && styles.swahili)}></div> {day}/{month}/{year}</div>
           </div>
         </div>
       </div>

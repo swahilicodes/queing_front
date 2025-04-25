@@ -1,0 +1,318 @@
+@import "../../global.scss";
+// Colors
+$indigo-100: #e0e7ff;
+$indigo-800: #3730a3;
+$green-100: #d1fae5;
+$green-800: #065f46;
+$blue-100: #dbeafe;
+$blue-800: #1e40af;
+$purple-100: #f3e8ff;
+$purple-800: #6b21a8;
+$red-100: #fee2e2;
+$red-700: #b91c1c;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-700: #374151;
+$gray-800: #1f2937;
+
+// Base styles
+.dashboardContainer {
+  min-height: 100vh;
+  width: 100vw;
+  background: $divColor;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  .top_bar{
+    width: 100%;
+    height: 80px;
+    background: $mainBold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    h1{
+        color: white;
+    }
+  }
+}
+
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.dashboardTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  text-align: center;
+  color: $indigo-800;
+  margin-bottom: 2rem;
+}
+
+// Duration Selector
+.durationSelectorContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.durationSelector {
+  display: inline-flex;
+  background-color: white;
+  border-radius: 0.375rem;
+  padding: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.durationButton {
+  padding: 0.5rem 1rem;
+  font-size: 18px;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: $mainColor;
+  padding: 15px;
+  font-weight: 600;
+
+  &:hover {
+    background-color: $indigo-100;
+  }
+}
+
+.activeDuration {
+  background-color: $indigo-800;
+  color: white;
+
+  &:hover {
+    background-color: $indigo-800;
+  }
+}
+
+// Loading Spinner
+.loadingSpinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 16rem;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 0.25rem solid $indigo-100;
+  border-top-color: $indigo-800;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Error Alert
+.errorAlert {
+  background-color: $red-100;
+  border: 1px solid $red-700;
+  color: $red-700;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+// Dashboard Grid
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// Cards
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.summaryCard {
+  grid-column: 1 / -1;
+
+  @media (min-width: 1024px) {
+    grid-column: span 3;
+  }
+}
+
+.cardContent {
+  padding: 1.5rem;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $gray-800;
+  margin-bottom: 1rem;
+}
+
+// Summary Cards
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.summaryItem {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+
+  &.indigo {
+    background-color: $indigo-100;
+    color: $indigo-800;
+  }
+
+  &.green {
+    background-color: $green-100;
+    color: $green-800;
+  }
+
+  &.blue {
+    background-color: $blue-100;
+    color: $blue-800;
+  }
+
+  &.purple {
+    background-color: $purple-100;
+    color: $purple-800;
+  }
+}
+
+.summaryIcon {
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+}
+
+.summaryTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.summaryValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+// Peak Times
+.peakTimesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.peakTimeItem {
+  display: flex;
+  align-items: center;
+}
+
+.peakTimeNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  background-color: $indigo-100;
+  color: $indigo-800;
+  margin-right: 0.75rem;
+  font-weight: 500;
+}
+
+.peakTimeValue {
+  color: $gray-700;
+}
+
+.noDataText {
+  color: $gray-700;
+  font-style: italic;
+}
+
+// Time Cards
+.timeCardsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background-color: $gray-50;
+  border-radius: 0.5rem;
+}
+
+.timeCardContent {
+  display: flex;
+  align-items: center;
+}
+
+.timeCardIcon {
+  margin-right: 0.5rem;
+}
+
+.timeCardTitle {
+  font-weight: 500;
+  color: $gray-800;
+}
+
+.timeCardValue {
+  font-weight: 600;
+  color: $indigo-800;
+
+  &.naValue {
+    color: $gray-700;
+  }
+}
+
+// Date Range
+.dateRangeContainer {
+  background-color: $indigo-100;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.dateRangeText {
+  color: $indigo-800;
+  font-weight: 500;
+  margin: 0;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.dateRangeLabel {
+  font-weight: 600;
+}

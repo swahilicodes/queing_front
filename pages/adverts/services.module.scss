@@ -52,6 +52,33 @@
             align-items: center;
             justify-content: center;
             animation: move .5s ease-in-out;
+            input{
+                width: 90%;
+                padding: 15px;
+                border: 2px solid $divColor;
+                outline: none;
+            }
+            textarea{
+                width: 90%;
+                padding: 15px;
+                border: 2px solid $divColor;
+                outline: none;
+                margin: 5px 0;
+            }
+            .form_action{
+                width: 90%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                button,.clear{
+                    background: $mainColor;
+                    padding: 15px;
+                    color: white;
+                    cursor: pointer;
+                    outline: none;
+                    border: none;
+                }
+            }
             .add_items{
                 width: 100%;
                 display: flex;

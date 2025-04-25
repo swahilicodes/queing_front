@@ -45,8 +45,14 @@ useEffect(()=> {
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         } else {
             setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         }
     })
  }
@@ -56,21 +62,34 @@ useEffect(()=> {
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         } else {
             setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         }
     })
  }
- const editService  = (e:React.FormEvent) => {
-    e.preventDefault()
-    axios.put(`http://localhost:5000/services/edit_service/${id}`,{name}).then((data:any)=> {
+ 
+ const editAdvert  = (name:string,description:string) => {
+    axios.put(`http://localhost:5000/adverts/edit_advert/${id}`,{id: id,name,description}).then((data:any)=> {
         setEdit(false)
+        //console.log(data)
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
             setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         } else {
             setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         }
     })
  }
@@ -81,10 +100,11 @@ useEffect(()=> {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (namba:string,name:string) => {
+ const handleEdit = (namba:string,name:string, description: string) => {
     setId(namba);
     setEdit(true)
     setName(name)
+    setDescription(description)
   };
 
  const showFull = (desc:string) => {
@@ -101,8 +121,14 @@ useEffect(()=> {
         setFetchLoading(false)
         if (error.response && error.response.status === 400) {
             setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         } else {
             setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""}) 
+            },2000)
         }
     })
  }
@@ -157,8 +183,12 @@ useEffect(()=> {
                     onChange={e => setName(e.target.value)}
                     placeholder='name*'
                     />
-                    <div className={styles.action}>
-                    <button onClick={editService}>submit</button>
+                    <textarea
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    />
+                    <div className={styles.form_action}>
+                    <div onClick={()=> editAdvert(name,description)} className={styles.clear}>submit</div>
                     <div className={styles.clear} onClick={()=> setEdit(false)}><MdOutlineClear className={styles.icon}/></div>
                     </div>
                 </form>
@@ -212,7 +242,7 @@ useEffect(()=> {
                                     <td className={styles.name}>{data.description}</td>
                                     <td>
                                         <div className={styles.delete} onClick={()=> handleDelete(data.id)}><MdDelete className={styles.icon}/></div> 
-                                        <div className={styles.edit} onClick={()=> handleEdit(data.id,data.name)}><FiEdit2 className={styles.icon}/></div> 
+                                        <div className={styles.edit} onClick={()=> handleEdit(data.id,data.name,data.description)}><FiEdit2 className={styles.icon}/></div> 
                                         <div className={styles.expand} onClick={()=> showFull(data.description)}><RxEnterFullScreen className={styles.icon}/></div> 
                                     </td>
                                 </tr>

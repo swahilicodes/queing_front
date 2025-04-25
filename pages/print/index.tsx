@@ -12,7 +12,7 @@ import html2canvas from 'html2canvas'
 import { TiChevronRight } from 'react-icons/ti'
 import errorState from '@/store/atoms/error'
 import LanguageState from '@/store/atoms/language'
-import { IoArrowUndoOutline, IoChevronDown } from 'react-icons/io5'
+import { IoArrowUndoOutline, IoCheckmarkDone, IoChevronDown } from 'react-icons/io5'
 import Cubes from '@/components/loaders/cubes/cubes'
 import messageState from '@/store/atoms/message'
 import { TbWorld } from 'react-icons/tb'
@@ -211,8 +211,13 @@ function printImage(src: string) {
 
   return (
     <div className={styles.queue_add}>
+        <div className={cx(styles.note_overlay,error && styles.display)}>
         <div className={cx(styles.note,error && styles.display)}>
-            {error}
+            <p>{error}</p>
+            <div className={styles.icon}>
+             <IoCheckmarkDone className={styles.icon__}/>
+            </div>
+        </div>
         </div>
         <div className={styles.language}>
             <div className={styles.lang_icons} onClick={()=> changeLanguage()}>

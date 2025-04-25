@@ -166,7 +166,7 @@ function SideBar() {
     },
     {
         id: 1,
-        path: "/queue_add",
+        path: "/print",
         name: "Queue",
         icon: "fa fa-users",
         users: ["admin","doctor","nurse","accountant"]
@@ -221,13 +221,6 @@ function SideBar() {
         users: ["admin"]
     },
     {
-        id: 9,
-        path: "/dashboard",
-        name: "Dashboard",
-        icon: "fa fa-tachometer",
-        users: ["admin"]
-    },
-    {
         id: 10,
         path: "/doctor_patient",
         name: "Consultation",
@@ -263,10 +256,10 @@ function SideBar() {
         users: ["admin"]
     },
     {
-        id: 15,
-        path: "/settings",
-        name: "Settings",
-        icon: "fa fa-cog",
+        id: 14,
+        path: "/rooms",
+        name: "Rooms",
+        icon: "fa fa-braille",
         users: ["admin"]
     },
   ]

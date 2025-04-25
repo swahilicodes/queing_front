@@ -11,6 +11,7 @@
         justify-content: space-between;
         position: fixed;
         top: 0;
+        padding: 15px;
         .left{
             color: white;
         }
@@ -40,6 +41,56 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        .delete_content{
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 20%;
+            .title{
+                padding: 10px;
+                font-weight: 600;
+                color: $mainColor;
+            }
+            .actions{
+                width: 100%;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                .action{
+                    background: $mainColor;
+                    padding: 10px;
+                    color: white;
+                    cursor: pointer;
+                    &.delete{
+                        background: red;
+                    }
+                }
+            }
+        }
+        .view_content{
+            width: 50%;
+            height: 50%;
+            background: white;
+            position: inherit;
+            .close{
+                position: absolute;
+                top: -20px;
+                right: -20px;
+                background: red;
+                border-radius: 50%;
+                color: white;
+                cursor: pointer;
+                padding: 10px;
+            }
+            video{
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
         .contents{
             width: 40%;
             background: white;
@@ -136,6 +187,7 @@
                 p{
                     font-size: 18px;
                     color: #262626;
+                    width: 20%;
                 }
                 .video_div{
                     width: 50px;
@@ -147,7 +199,26 @@
                     }
                 }
                 .action{
+                    width: 20%;
                     cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .action_item{
+                        background: $mainColor;
+                        padding: 5px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 5px;
+                        transition: all .5s ease-in-out;
+                        .icon__{
+                            color: white;
+                        }
+                        &:hover{
+                            background: $mainBold;
+                        }
+                    }
                 }
             }
         }

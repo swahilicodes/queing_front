@@ -79,13 +79,6 @@ function Chakula_Menu() {
       users: ["admin"],
     },
     {
-      id: 9,
-      path: "/dashboard",
-      name: "Dashboard",
-      icon: "fa fa-tachometer",
-      users: ["admin"],
-    },
-    {
       id: 10,
       path: "/doctor_patient",
       name: "Consultation",
@@ -121,13 +114,6 @@ function Chakula_Menu() {
       users: ["admin"],
     },
     {
-      id: 14,
-      path: "/settings",
-      name: "Settings",
-      icon: "fa fa-cog",
-      users: ["admin"],
-    },
-    {
       id: 15,
       path: "/accounts_queue",
       name: "Cashier Queue",
@@ -143,16 +129,9 @@ function Chakula_Menu() {
     },
     {
       id: 17,
-      path: "/graph",
+      path: "/analytics",
       name: "Analytics",
       icon: "fa fa-line-chart",
-      users: ["admin"],
-    },
-    {
-      id: 18,
-      path: "/services",
-      name: "Services",
-      icon: "fa fa-server",
       users: ["admin"],
     },
     {
@@ -161,6 +140,20 @@ function Chakula_Menu() {
       name: "Devices",
       icon: "fa fa-desktop",
       users: ["admin"],
+    },
+    {
+      id: 20,
+      path: "/clinic_queue",
+      name: "Clinic Queue",
+      icon: "fa fa-desktop",
+      users: ["admin", "doctor", "nurse", "accountant"],
+    },
+    {
+      id: 21,
+      path: "/videos",
+      name: "Videos",
+      icon: "fa fa-desktop",
+      users: ["admin", "pro"],
     },
   ];
 
@@ -174,7 +167,7 @@ function Chakula_Menu() {
     const restrict = routes.filter(
       (user) =>
         user.path === "/" ||
-        user.path === "/queue_add" ||
+        user.path === "/print" ||
         user.path === "/login"
     );
     setRestricted(restrict);
@@ -219,31 +212,6 @@ function Chakula_Menu() {
           ))}
         </div>
       )}
-      {/* {(currentUser !== undefined  && restricted.length > 0) && (
-        <div className={styles.links}>
-          {restricted.map((item: any, index: number) => (
-            <Link
-              key={index}
-              className={cx(styles.link)}
-              href={item.path}
-              onMouseEnter={() => setIndex(index + 1)}
-              onMouseLeave={() => setIndex(0)}
-            >
-              <div className={styles.icon}>
-                <i className={item.icon} aria-hidden="true" />
-              </div>
-              <div
-                className={cx(
-                  styles.title,
-                  index + 1 === currentIndex && styles.active
-                )}
-              >
-                {item.name}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )} */}
     </div>
   );
 }

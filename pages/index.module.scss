@@ -990,9 +990,25 @@
                 justify-content: center;
                 font-weight: 600;
                 font-family: "Roboto";
-                .date,.timer{
+                .timer{
                     font-size: 15px;
                     font-weight: 500;
+                }
+                .date{
+                    font-size: 12px;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .break{
+                        width: 10px;
+                        height: 10px;
+                        background: crimson;
+                        margin: 5px;
+                        &.swahili{
+                            background: #01d401;
+                        }
+                    }
                 }
             }
         }
