@@ -18,6 +18,7 @@ import isSpeakerState from "@/store/atoms/isSpeaker";
 import useCreateItem from "@/custom_hooks/useCreateItem";
 import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 import messageState from "@/store/atoms/message";
+import isUserState from "@/store/atoms/isUser";
 
 function Recorder() {
   const currentUser = useRecoilValue(currentUserState);
@@ -42,6 +43,7 @@ function Recorder() {
   const [activeVideo, setActiveVideo] = useState("")
   const [isVideo, setVideo] = useState(false)
   const [videos, setVideos] = useState([])
+  const [isUser, setUser] = useRecoilState(isUserState)
   const [fields, setFields] = useState({
     mr_no: "",
     status: ""
@@ -63,7 +65,7 @@ function Recorder() {
   }
 
   const getVideos = () => {
-    axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
+    axios.get("http://192.168.30.246:5000/uploads/get_videos").then((data)=> {
     setVideos(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -83,7 +85,7 @@ function Recorder() {
 
   const activate = (page:string,video:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page,video:video})
+    axios.post(`http://192.168.30.246:5000/active/activate`,{page: page,video:video})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -111,7 +113,7 @@ function Recorder() {
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://192.168.30.246:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:data.data})
       setTokens((tokens)=> tokens.map((item)=> item))
       setFinLoading(false)
@@ -135,7 +137,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("http://192.168.30.246:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
       })
       .then((data: any) => {
@@ -162,7 +164,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.246:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -180,7 +182,7 @@ function Recorder() {
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.246:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -199,7 +201,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/accounts_queue"}})
+    axios.get(`http://192.168.30.246:5000/active/get_active`,{params: {page: "/accounts_queue"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -219,9 +221,9 @@ function Recorder() {
     localStorage.removeItem('token')
     router.reload()
   }
-  const priotize = (ticket_no:string, data:string) => {
+  const priotize = (ticket_no:string, data:string,counter: number) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts"}})
+    axios.get(`http://192.168.30.246:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts",counter:counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -232,8 +234,14 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           setMessage({...onmessage,title:error.response.data.error,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
         } else {
           setMessage({...onmessage,title:error.message,category: "error"})
+          setTimeout(()=> {
+            setMessage({...onmessage,title:"",category: ""})
+          },3000)
         }
       });
   };
@@ -318,6 +326,11 @@ function Recorder() {
               <option value="pending">pending</option>
             </select>
           </div>
+          <div className={styles.side}>
+            <div className={styles.image} style={{width:"40px",height:"40px",borderRadius:"50%",cursor:"pointer"}} onClick={()=> setUser(true)}>
+              <img src="/place_holder.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"50%"}}/>
+            </div>
+          </div>
         </div>
       </div>
       <div className={cx(styles.overlay, next && styles.active)}>
@@ -373,11 +386,11 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve")}>{item.token.serving===true?"serving":"Serve"}</div>
+                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
                             </div>
-                            <div className={styles.action}>
+                            {/* <div className={styles.action}>
                               <div className={cx(styles.serve,item.token.disabled && styles.priority)}>{item.token.disabled?"prioritized":"prioritize"}</div>
-                            </div>
+                            </div> */}
                           </div>
                         </td>
                       </tr>
@@ -405,7 +418,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://192.168.30.246:5000/speaker/create_speaker",currentUser.counter)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>

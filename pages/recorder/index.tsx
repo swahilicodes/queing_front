@@ -19,6 +19,7 @@ import GptPlayer from "@/components/audio_player/gpt/gpt";
 import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 import useCreateItem from "@/custom_hooks/useCreateItem";
 import messageState from "@/store/atoms/message";
+import isUserState from "@/store/atoms/isUser";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
@@ -46,6 +47,7 @@ function Recorder() {
   const [videos, setVideos] = useState([])
   const [activeVideo, setActiveVideo] = useState("")
   const [isVideo, setVideo] = useState(false)
+  const setUser = useSetRecoilState(isUserState)
   const [fields, setFields] = useState({
     finish_id: "",
     patName: "",
@@ -68,7 +70,7 @@ function Recorder() {
   }, [status, disable, ticket, active]);
 
   const getVideos = () => {
-    axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
+    axios.get("http://192.168.30.246:5000/uploads/get_videos").then((data)=> {
     setVideos(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -95,7 +97,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
+    axios.put(`http://192.168.30.246:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -128,7 +130,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
+    axios.get("http://192.168.30.246:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data) => {
@@ -163,7 +165,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.246:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -190,7 +192,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.246:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -214,9 +216,9 @@ function Recorder() {
         }
       });
   };
-  const priotize = (ticket_no:string, data:string, stage: string, reason:string) => {
+  const priotize = (ticket_no:string, data:string, stage: string, reason:string,counter:number) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data,stage, reason}})
+    axios.get(`http://192.168.30.246:5000/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -242,7 +244,7 @@ function Recorder() {
   };
   const activate = (page:string,video:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page,video:video})
+    axios.post(`http://192.168.30.246:5000/active/activate`,{page: page,video:video})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -268,7 +270,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://192.168.30.246:5000/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -293,7 +295,7 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://localhost:5000/tickets/next_stage", {
+    axios.get("http://192.168.30.246:5000/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -372,7 +374,7 @@ function Recorder() {
                   ))
                 }
               </select>
-              <button onClick={()=> priotize(`${priorFields.ticket_no}`,"priority",priorFields.stage, reason)}>Prioritize</button>
+              <button onClick={()=> priotize(`${priorFields.ticket_no}`,"priority",priorFields.stage, reason,Number(currentUser.counter))}>Prioritize</button>
             </div>
           </div>
         )
@@ -423,6 +425,11 @@ function Recorder() {
               <option value="cancelled">cancelled</option>
               <option value="pending">pending</option>
             </select>
+          </div>
+          <div className={styles.side}>
+            <div className={styles.image} style={{width:"40px",height:"40px",borderRadius:"50%",cursor:"pointer"}} onClick={()=> setUser(true)}>
+              <img src="/place_holder.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"50%"}}/>
+            </div>
           </div>
         </div>
       </div>
@@ -484,7 +491,7 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage, reason)}>{item.token.serving===true?"serving":"Serve"}</div>
+                              <div className={cx(styles.serve,item.token.serving && styles.active, (item.token.serving && item.token.serving_id === currentUser.phone) && styles.owner)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage, "sasas",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
                             </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve,item.token.disabled && styles.prioritya)} onClick={()=> priorReady(`${item.token.ticket_no}`,item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div>
@@ -506,7 +513,7 @@ function Recorder() {
         )}
       </div>
       {
-        tokens.filter((item)=> item.token.serving===true).map((item:Token,index:number)=> (
+        tokens.filter((item)=> item.token.serving===true && item.token.serving_id=== currentUser.phone && item.token.status===status).map((item:Token,index:number)=> (
           <div
         className={cx(
           styles.serving,
@@ -517,7 +524,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://localhost:5000/speaker/create_speaker",item.counter.namba)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://192.168.30.246:5000/speaker/create_speaker",currentUser.counter)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
@@ -532,8 +539,8 @@ function Recorder() {
         }
         </div>
         <div className={styles.row}>
-          <div className={styles.row_item} onClick={()=> editTicket(item.token.id,"pending")}>
-            <div className={styles.button}>Pend</div>
+          <div className={styles.row_item} onClick={()=> editTicket(item.token.id, status==="pending"?"waiting":"pending")}>
+            <div className={styles.button}>{status==="pending"?"Unpend":"Pend"}</div>
           </div>
           {/* <div className={styles.row_item} onClick={nextToken}> */}
           <div className={styles.row_item}>

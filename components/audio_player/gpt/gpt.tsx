@@ -1,46 +1,399 @@
+// import React, { useEffect, useRef, useState } from "react";
+// import { FaPause, FaPlay } from "react-icons/fa6";
+// import styles from './gpt.module.scss'
+// import cx from 'classnames'
+// import axios from "axios";
+
+// interface NumberAudioPlayerProps {
+//   token: number;
+//   counter: number;
+//   isPlaying: boolean;
+//   stage: string,
+//   id: number
+// }
+
+// const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying, stage,id }) => {
+//   const [talking, setTalking] = useState(false)
+//   const [serving, setServing] = useState(0)
+//   const audioRef = useRef<HTMLAudioElement | null>(null);
+//   const button = document.getElementById('play-button')
+//   const [counting, setCounting] = useState({
+//     namba: 0,
+//     token: 0
+//   })
+
+//   useEffect(()=> {
+//     if(isPlaying){
+//       if(counting.namba <= 1){
+//         PlayThem()
+//         setCounting({...counting,namba: counting.namba + 1, token: token})
+//       }else{
+//         console.log(`token ${token}, serving ${serving}`)
+//         if(token !== serving){
+//           setCounting({...counting,namba: 0, token: token}) 
+//         }
+//       }
+//     }
+//   },[isPlaying,talking, token,counting.namba])
+
+//   const refresh = () => {
+//     if(counting.namba > 0){
+//       if(counting.token !== token){
+//         setCounting({...counting,namba: 0, token: token})
+//         audioRef.current?.pause()
+//       }else{
+//         audioRef.current?.pause()
+//       }
+//     }
+//   }
+
+//   const getAudioSequence = (number: number): string[] => {
+//     setTalking(true)
+//     const numString = number.toString();
+//     const length = numString.length;
+//     const audioSequence: string[] = [];
+//     if (length === 4) {
+//       audioSequence.push('/Edited/beep.mp3')
+//       audioSequence.push('/Edited/tiketi.mp3')
+//       audioSequence.push(`/Edited/1000.mp3`);
+//       if (numString[1] !== "0") {
+//         audioSequence.push(`/Edited/${numString[1]}00.mp3`);
+//       }
+//       if (numString[2] !== "0") {
+//         if (numString[2] === "1") {
+//           audioSequence.push(`/Edited/${numString[2]}0.mp3`);
+//         } else {
+//           audioSequence.push(`/Edited/${numString[2]}0.mp3`);
+//         }
+//       }if ( numString[3] !== "0") {
+//         audioSequence.push(`/Edited/na.mp3`);
+//         audioSequence.push(`/Edited/${numString[3]}.mp3`);
+//         if(stage==="clinic"){
+//           audioSequence.push(`/Edited/chumba.mp3`);
+//         }else{
+//           audioSequence.push(`/Edited/dirisha.mp3`);
+//         }
+//       }else{
+//         if(stage==="clinic"){
+//           audioSequence.push(`/Edited/chumba.mp3`);
+//         }else{
+//           audioSequence.push(`/Edited/dirisha.mp3`);
+//         }
+//       }
+//     } else if (length === 3) {
+//       audioSequence.push('/Edited/beep.mp3')
+//       audioSequence.push('/Edited/tiketi.mp3')
+//       audioSequence.push(`/Edited/${numString[0]}00.mp3`);
+//       if (numString[1] !== "0") {
+//         if(numString[2] === "0"){
+//             audioSequence.push(`/Edited/na.mp3`);
+//             audioSequence.push(`/Edited/${numString[1]}0.mp3`);
+//         }else{
+//             audioSequence.push(`/Edited/${numString[1]}0.mp3`);
+//         }
+//       }else{
+//         if(numString[1]==="0" && numString[2]==="0"){
+//           if(stage==="clinic"){
+//             audioSequence.push(`/Edited/chumba.mp3`);
+//           }else{
+//             audioSequence.push(`/Edited/dirisha.mp3`);
+//           } 
+//         }
+//       }
+//       if ( numString[2] !== "0") {
+//         audioSequence.push(`/Edited/na.mp3`);
+//         audioSequence.push(`/Edited/${numString[2]}.mp3`);
+//         if(stage==="clinic"){
+//           audioSequence.push(`/Edited/chumba.mp3`);
+//         }else{
+//           audioSequence.push(`/Edited/dirisha.mp3`);
+//         }
+//       }else{
+//         if(numString[1] !== "0"){
+//           if(stage==="clinic"){
+//             audioSequence.push(`/Edited/chumba.mp3`);
+//           }else{
+//             audioSequence.push(`/Edited/dirisha.mp3`);
+//           }
+//         }
+//       }
+//     } else if (length === 2) {
+//         audioSequence.push('/Edited/beep.mp3')
+//         audioSequence.push('/Edited/tiketi.mp3')
+//         audioSequence.push(`/Edited/${numString[0]}0.mp3`);
+//         if (numString[1] !== "0") {
+//           audioSequence.push(`/Edited/na.mp3`);
+//           audioSequence.push(`/Edited/${numString[1]}.mp3`);
+//           if(stage==="clinic"){
+//             audioSequence.push(`/Edited/chumba.mp3`);
+//           }else{
+//             audioSequence.push(`/Edited/dirisha.mp3`);
+//           }
+//         }else{
+//             if(stage==="clinic"){
+//           audioSequence.push(`/Edited/chumba.mp3`);
+//         }else{
+//           audioSequence.push(`/Edited/dirisha.mp3`);
+//         }
+//         }
+//     } else if (length === 1) {
+//       audioSequence.push('/Edited/beep.mp3')
+//       audioSequence.push('/Edited/tiketi.mp3')
+//       audioSequence.push(`/Edited/${numString}.mp3`);
+//       if(stage==="clinic"){
+//           audioSequence.push(`/Edited/chumba.mp3`);
+//         }else{
+//           audioSequence.push(`/Edited/dirisha.mp3`);
+//         }
+//     }
+
+//     return audioSequence;
+//   };
+
+//   const getAudioSequenceEnglish = (number: number): string[] => {
+//     const numString = number.toString();
+//     const length = numString.length;
+//     const audioSequence: string[] = [];
+  
+//     // Add common preamble
+//     audioSequence.push('/English/beep.mp3');
+//     audioSequence.push('/English/ticket.mp3');
+  
+//     if (length === 4) {
+//       // Handle thousands
+//       audioSequence.push(`/English/${numString[0]}000.mp3`); // Thousand part
+//       if (numString[1] !== '0') {
+//         audioSequence.push(`/English/${numString[1]}00.mp3`); // Hundred part
+//       }
+//       if (numString[2] !== '0' || numString[3] !== '0') {
+//         audioSequence.push('/English/and.mp3'); // Add "and" before tens/units
+//       }
+//       if (numString[2] !== '0') {
+//         audioSequence.push(`/English/${numString[2]}0.mp3`); // Tens part
+//       }
+//       if (numString[3] !== '0') {
+//         audioSequence.push(`/English/${numString[3]}.mp3`); // Units part
+//       }
+//     } else if (length === 3) {
+//       // Handle hundreds
+//       audioSequence.push(`/English/${numString[0]}00.mp3`); // Hundred part
+//       if (numString[1] !== '0' || numString[2] !== '0') {
+//         audioSequence.push('/English/and.mp3'); // Add "and" before tens/units
+//       }
+//       if (numString[1] !== '0') {
+//         audioSequence.push(`/English/${numString[1]}0.mp3`); // Tens part
+//       }
+//       if (numString[2] !== '0') {
+//         audioSequence.push(`/English/${numString[2]}.mp3`); // Units part
+//       }
+//     } else if (length === 2) {
+//       // Handle tens
+//       if (numString[0] === '1') {
+//         // Special case for teens
+//         audioSequence.push(`/English/${numString}.mp3`);
+//       } else {
+//         audioSequence.push(`/English/${numString[0]}0.mp3`); // Tens part
+//         if (numString[1] !== '0') {
+//           audioSequence.push(`/English/${numString[1]}.mp3`); // Units part
+//         }
+//       }
+//     } else if (length === 1) {
+//       // Handle single digits
+//       audioSequence.push(`/English/${numString}.mp3`);
+//     }
+  
+//     // Add stage-specific audio
+//     if (stage === 'clinic') {
+//       audioSequence.push('/English/room.mp3');
+//     } else {
+//       audioSequence.push('/English/counter.mp3');
+//     }
+  
+//     return audioSequence;
+//   };
+
+//   const getCounterEnglish = (number: number): string[] => {
+//     const numString = number.toString();
+//     const length = numString.length;
+//     const audioSequence: string[] = [];
+//     if (length === 4) {
+//       audioSequence.push(`/English/1000.mp3`);
+//       if (numString[1] !== "0") {
+//         audioSequence.push(`/English/${numString[1]}00.mp3`);
+//       }
+//       if (numString[2] !== "0") {
+//         if (numString[2] === "1") {
+//           audioSequence.push(`/English/${numString[2]}0.mp3`);
+//         } else {
+//           audioSequence.push(`/English/${numString[2]}0.mp3`);
+//         }
+//       }if ( numString[3] !== "0") {
+//         //audioSequence.push(`/English/na.mp3`);
+//         audioSequence.push(`/English/${numString[3]}.mp3`);
+//       }
+//     } else if (length === 3) {
+//       audioSequence.push(`/English/${numString[0]}00.mp3`);
+//       if (numString[1] !== "0") {
+//         if(numString[2] === "0"){
+//             //audioSequence.push(`/English/na.mp3`);
+//             audioSequence.push(`/English/${numString[1]}0.mp3`);
+//         }else{
+//             audioSequence.push(`/English/${numString[1]}0.mp3`);
+//         }
+//       }
+//       if ( numString[2] !== "0") {
+//         //audioSequence.push(`/English/na.mp3`);
+//         audioSequence.push(`/English/${numString[2]}.mp3`);
+//       }
+//     } else if (length === 2) {
+//         audioSequence.push(`/English/${numString[0]}0.mp3`);
+//         if (numString[1] !== "0") {
+//           //audioSequence.push(`/English/na.mp3`);
+//           audioSequence.push(`/English/${numString[1]}.mp3`);
+//         }
+//     } else if (length === 1) {
+//       audioSequence.push(`/English/${numString}.mp3`);
+//     }
+
+//     return audioSequence;
+//   };
+//   const getCounterSwahili = (number: number): string[] => {
+//     const numString = number.toString();
+//     const length = numString.length;
+//     const audioSequence: string[] = [];
+//     if (length === 4) {
+//       audioSequence.push(`/Edited/1000.mp3`);
+//       if (numString[1] !== "0") {
+//         audioSequence.push(`/Edited/${numString[1]}00.mp3`);
+//       }
+//       if (numString[2] !== "0") {
+//         if (numString[2] === "1") {
+//           audioSequence.push(`/Edited/${numString[2]}0.mp3`);
+//         } else {
+//           audioSequence.push(`/Edited/${numString[2]}0.mp3`);
+//         }
+//       }if ( numString[3] !== "0") {
+//         //audioSequence.push(`/Edited/na.mp3`);
+//         audioSequence.push(`/Edited/${numString[3]}.mp3`);
+//       }
+//     } else if (length === 3) {
+//       audioSequence.push(`/Edited/${numString[0]}00.mp3`);
+//       if (numString[1] !== "0") {
+//         if(numString[2] === "0"){
+//             //audioSequence.push(`/Edited/na.mp3`);
+//             audioSequence.push(`/Edited/${numString[1]}0.mp3`);
+//         }else{
+//             audioSequence.push(`/Edited/${numString[1]}0.mp3`);
+//         }
+//       }
+//       if ( numString[2] !== "0") {
+//         //audioSequence.push(`/Edited/na.mp3`);
+//         audioSequence.push(`/Edited/${numString[2]}.mp3`);
+//       }
+//     } else if (length === 2) {
+//         audioSequence.push(`/Edited/${numString[0]}0.mp3`);
+//         if (numString[1] !== "0") {
+//           //audioSequence.push(`/Edited/na.mp3`);
+//           audioSequence.push(`/Edited/${numString[1]}.mp3`);
+//         }
+//     } else if (length === 1) {
+//       audioSequence.push(`/Edited/${numString}.mp3`);
+//     }
+
+//     return audioSequence;
+//   };
+
+//   // Function to play audio sequentially
+//   const playAudioSequence = async (audioFiles: string[]) => {
+//     for (const file of audioFiles) {
+//       const audio = new Audio(file);
+//       await audio.play();
+//       await new Promise((resolve) => {
+//         audio.onended = resolve;
+//       });
+//     }
+//   };
+
+//   useEffect(() => {
+//     // const audioSequence = getAudioSequence(token);
+//     // playAudioSequence(audioSequence);
+//   }, [token, counter]);
+
+//   const PlayThem = async () => {
+//     setServing(token)
+//     await playAudioSequence(getAudioSequence(token))
+//     await playAudioSequence(getCounterSwahili(counter))
+//     await playAudioSequence(getAudioSequenceEnglish(token))
+//     await playAudioSequence(getCounterEnglish(counter))
+//     setTalking(false)
+//     axios.post("http://192.168.30.246:5000/speaker/delete_play",{id:id}).then((data:any)=> {
+//       console.log(`audio with id ${data.id} deleted successfully`)
+//     })
+//   }
+
+//   return <div className={styles.gpt}>
+//     {/* <button onClick={PlayThem} className={cx(talking && styles.talking)}>{talking
+//     ?<FaPause className={styles.icon} size={30}/>
+//     :<FaPlay className={styles.icon} size={30}/>}
+//     </button> */}
+//     {
+//       isPlaying
+//       ?<button onClick={PlayThem} className={cx((talking && isPlaying) && styles.talking)} id="play-button">{talking
+//         ?<FaPause className={styles.icon} size={30}/>
+//         :<FaPlay className={styles.icon} size={30}/>}
+//         </button>
+//       : <p>waiting..</p>
+//     }
+//   </div>;
+// };
+
+// export default GptPlayer;
+
+
+
 import React, { useEffect, useRef, useState } from "react";
 import { FaPause, FaPlay } from "react-icons/fa6";
 import styles from './gpt.module.scss'
 import cx from 'classnames'
+import axios from "axios";
 
 interface NumberAudioPlayerProps {
   token: number;
   counter: number;
   isPlaying: boolean;
-  stage: string
+  stage: string,
+  id: number
 }
 
-const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying, stage }) => {
+const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying, stage, id }) => {
   const [talking, setTalking] = useState(false)
   const [serving, setServing] = useState(0)
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const button = document.getElementById('play-button')
   const [counting, setCounting] = useState({
     namba: 0,
     token: 0
   })
 
-  useEffect(()=> {
-    console.log('stage is ',stage)
-    if(isPlaying){
-      if(counting.namba <= 1){
+  useEffect(() => {
+    if (isPlaying) {
+      if (counting.namba <= 1) {
         PlayThem()
-        setCounting({...counting,namba: counting.namba + 1, token: token})
-      }else{
+        setCounting({ ...counting, namba: counting.namba + 1, token: token })
+      } else {
         console.log(`token ${token}, serving ${serving}`)
-        if(token !== serving){
-          setCounting({...counting,namba: 0, token: token}) 
+        if (token !== serving) {
+          setCounting({ ...counting, namba: 0, token: token })
         }
       }
     }
-  },[isPlaying,talking, token,counting.namba])
+  }, [isPlaying, talking, token, counting.namba])
 
   const refresh = () => {
-    if(counting.namba > 0){
-      if(counting.token !== token){
-        setCounting({...counting,namba: 0, token: token})
+    if (counting.namba > 0) {
+      if (counting.token !== token) {
+        setCounting({ ...counting, namba: 0, token: token })
         audioRef.current?.pause()
-      }else{
+      } else {
         audioRef.current?.pause()
       }
     }
@@ -54,96 +407,48 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     if (length === 4) {
       audioSequence.push('/Edited/beep.mp3')
       audioSequence.push('/Edited/tiketi.mp3')
-      audioSequence.push(`/Edited/1000.mp3`);
+      audioSequence.push(`/Edited/${numString[0]}000.mp3`);
       if (numString[1] !== "0") {
         audioSequence.push(`/Edited/${numString[1]}00.mp3`);
       }
-      if (numString[2] !== "0") {
-        if (numString[2] === "1") {
-          audioSequence.push(`/Edited/${numString[2]}0.mp3`);
-        } else {
-          audioSequence.push(`/Edited/${numString[2]}0.mp3`);
-        }
-      }if ( numString[3] !== "0") {
+      if (numString[2] !== "0" || numString[3] !== "0") {
         audioSequence.push(`/Edited/na.mp3`);
-        audioSequence.push(`/Edited/${numString[3]}.mp3`);
-        if(stage==="nurse_station"){
-          audioSequence.push(`/Edited/chumba.mp3`);
-        }else{
-          audioSequence.push(`/Edited/dirisha.mp3`);
+        if (numString[2] !== "0") {
+          audioSequence.push(`/Edited/${numString[2]}0.mp3`);
         }
-      }else{
-        if(stage==="nurse_station"){
-          audioSequence.push(`/Edited/chumba.mp3`);
-        }else{
-          audioSequence.push(`/Edited/dirisha.mp3`);
+        if (numString[3] !== "0") {
+          audioSequence.push(`/Edited/${numString[3]}.mp3`);
         }
       }
+      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
     } else if (length === 3) {
       audioSequence.push('/Edited/beep.mp3')
       audioSequence.push('/Edited/tiketi.mp3')
       audioSequence.push(`/Edited/${numString[0]}00.mp3`);
-      if (numString[1] !== "0") {
-        if(numString[2] === "0"){
-            audioSequence.push(`/Edited/na.mp3`);
-            audioSequence.push(`/Edited/${numString[1]}0.mp3`);
-        }else{
-            audioSequence.push(`/Edited/${numString[1]}0.mp3`);
-        }
-      }else{
-        if(numString[1]==="0" && numString[2]==="0"){
-          if(stage==="nurse_station"){
-            audioSequence.push(`/Edited/chumba.mp3`);
-          }else{
-            audioSequence.push(`/Edited/dirisha.mp3`);
-          } 
-        }
-      }
-      if ( numString[2] !== "0") {
+      if (numString[1] !== "0" || numString[2] !== "0") {
         audioSequence.push(`/Edited/na.mp3`);
-        audioSequence.push(`/Edited/${numString[2]}.mp3`);
-        if(stage==="nurse_station"){
-          audioSequence.push(`/Edited/chumba.mp3`);
-        }else{
-          audioSequence.push(`/Edited/dirisha.mp3`);
+        if (numString[1] !== "0") {
+          audioSequence.push(`/Edited/${numString[1]}0.mp3`);
         }
-      }else{
-        if(numString[1] !== "0"){
-          if(stage==="nurse_station"){
-            audioSequence.push(`/Edited/chumba.mp3`);
-          }else{
-            audioSequence.push(`/Edited/dirisha.mp3`);
-          }
+        if (numString[2] !== "0") {
+          audioSequence.push(`/Edited/${numString[2]}.mp3`);
         }
       }
+      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
     } else if (length === 2) {
-        audioSequence.push('/Edited/beep.mp3')
-        audioSequence.push('/Edited/tiketi.mp3')
-        audioSequence.push(`/Edited/${numString[0]}0.mp3`);
-        if (numString[1] !== "0") {
-          audioSequence.push(`/Edited/na.mp3`);
-          audioSequence.push(`/Edited/${numString[1]}.mp3`);
-          if(stage==="nurse_station"){
-            audioSequence.push(`/Edited/chumba.mp3`);
-          }else{
-            audioSequence.push(`/Edited/dirisha.mp3`);
-          }
-        }else{
-            if(stage==="nurse_station"){
-          audioSequence.push(`/Edited/chumba.mp3`);
-        }else{
-          audioSequence.push(`/Edited/dirisha.mp3`);
-        }
-        }
+      audioSequence.push('/Edited/beep.mp3')
+      audioSequence.push('/Edited/tiketi.mp3')
+      audioSequence.push(`/Edited/${numString[0]}0.mp3`);
+      if (numString[1] !== "0") {
+        audioSequence.push(`/Edited/na.mp3`);
+        audioSequence.push(`/Edited/${numString[1]}.mp3`);
+      }
+      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
     } else if (length === 1) {
       audioSequence.push('/Edited/beep.mp3')
       audioSequence.push('/Edited/tiketi.mp3')
       audioSequence.push(`/Edited/${numString}.mp3`);
-      if(stage==="nurse_station"){
-          audioSequence.push(`/Edited/chumba.mp3`);
-        }else{
-          audioSequence.push(`/Edited/dirisha.mp3`);
-        }
+      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
     }
 
     return audioSequence;
@@ -153,220 +458,52 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     const numString = number.toString();
     const length = numString.length;
     const audioSequence: string[] = [];
-  
-    // Add common preamble
+
     audioSequence.push('/English/beep.mp3');
     audioSequence.push('/English/ticket.mp3');
-  
-    if (length === 4) {
-      // Handle thousands
-      audioSequence.push(`/English/${numString[0]}000.mp3`); // Thousand part
-      if (numString[1] !== '0') {
-        audioSequence.push(`/English/${numString[1]}00.mp3`); // Hundred part
-      }
-      if (numString[2] !== '0' || numString[3] !== '0') {
-        audioSequence.push('/English/and.mp3'); // Add "and" before tens/units
-      }
-      if (numString[2] !== '0') {
-        audioSequence.push(`/English/${numString[2]}0.mp3`); // Tens part
-      }
-      if (numString[3] !== '0') {
-        audioSequence.push(`/English/${numString[3]}.mp3`); // Units part
-      }
-    } else if (length === 3) {
-      // Handle hundreds
-      audioSequence.push(`/English/${numString[0]}00.mp3`); // Hundred part
-      if (numString[1] !== '0' || numString[2] !== '0') {
-        audioSequence.push('/English/and.mp3'); // Add "and" before tens/units
-      }
-      if (numString[1] !== '0') {
-        audioSequence.push(`/English/${numString[1]}0.mp3`); // Tens part
-      }
-      if (numString[2] !== '0') {
-        audioSequence.push(`/English/${numString[2]}.mp3`); // Units part
-      }
-    } else if (length === 2) {
-      // Handle tens
-      if (numString[0] === '1') {
-        // Special case for teens
-        audioSequence.push(`/English/${numString}.mp3`);
-      } else {
-        audioSequence.push(`/English/${numString[0]}0.mp3`); // Tens part
-        if (numString[1] !== '0') {
-          audioSequence.push(`/English/${numString[1]}.mp3`); // Units part
-        }
-      }
-    } else if (length === 1) {
-      // Handle single digits
-      audioSequence.push(`/English/${numString}.mp3`);
-    }
-  
-    // Add stage-specific audio
-    if (stage === 'nurse_station') {
-      audioSequence.push('/English/room.mp3');
-    } else {
-      audioSequence.push('/English/counter.mp3');
-    }
-  
-    return audioSequence;
-  };
-  
 
-  // const getAudioSequenceEnglish = (number: number): string[] => {
-  //   const numString = number.toString();
-  //   const length = numString.length;
-  //   const audioSequence: string[] = [];
-  //   if (length === 4) {
-  //     audioSequence.push('/English/beep.mp3')
-  //     audioSequence.push('/English/ticket.mp3')
-  //     audioSequence.push(`/English/1000.mp3`);
-  //     if (numString[1] !== "0") {
-  //       audioSequence.push(`/English/${numString[1]}00.mp3`);
-  //     }
-  //     if (numString[2] !== "0") {
-  //       if (numString[2] === "1") {
-  //         audioSequence.push(`/English/${numString[2]}0.mp3`);
-  //       } else {
-  //         audioSequence.push(`/English/${numString[2]}0.mp3`);
-  //       }
-  //     }if ( numString[3] !== "0") {
-  //       //audioSequence.push(`/English/na.mp3`);
-  //       audioSequence.push(`/English/${numString[3]}.mp3`);
-  //       if(stage==="nurse_station"){
-  //         audioSequence.push('/English/room.mp3')
-  //       }else{
-  //         audioSequence.push('/English/counter.mp3')
-  //       }
-  //     }else{
-  //       if(stage==="nurse_station"){
-  //         audioSequence.push('/English/room.mp3')
-  //       }else{
-  //         audioSequence.push('/English/counter.mp3')
-  //       }
-  //     }
-  //   } else if (length === 3) {
-  //     audioSequence.push('/English/beep.mp3')
-  //     audioSequence.push('/English/ticket.mp3')
-  //     audioSequence.push(`/English/${numString[0]}00.mp3`);
-  //     if (numString[1] !== "0") {
-  //       if(numString[2] === "0"){
-  //           //audioSequence.push(`/English/na.mp3`);
-  //           audioSequence.push(`/English/${numString[1]}0.mp3`);
-  //       }else{
-  //           audioSequence.push(`/English/${numString[1]}0.mp3`);
-  //       }
-  //     }else{
-  //       if(numString[1]==="0" && numString[2]==="0"){
-  //           if(stage==="nurse_station"){
-  //             audioSequence.push('/English/room.mp3')
-  //           }  else{
-  //             audioSequence.push('/English/counter.mp3')
-  //           }
-  //       }
-  //     }
-  //     if ( numString[2] !== "0") {
-  //       //audioSequence.push(`/English/na.mp3`);
-  //       audioSequence.push(`/English/${numString[2]}.mp3`);
-  //       if(stage==="nurse_station"){
-  //         audioSequence.push('/English/room.mp3')
-  //       }else{
-  //         audioSequence.push('/English/counter.mp3')
-  //       }
-  //     }else{
-  //       if(numString[1] !== "0"){
-  //           if(stage==="nurse_station"){
-  //             audioSequence.push('/English/room.mp3')
-  //           }else{
-  //             audioSequence.push('/English/counter.mp3')
-  //           }
-  //       }
-  //     }
-  //   } else if (length === 2) {
-  //       audioSequence.push('/English/beep.mp3')
-  //       audioSequence.push('/English/ticket.mp3')
-  //       if(numString[0] === "1"){
-  //         audioSequence.push(`/English/${numString}.mp3`);
-  //         if(stage==="nurse_station"){
-  //           audioSequence.push('/English/room.mp3')
-  //         }else{
-  //           audioSequence.push('/English/counter.mp3')
-  //         }
-  //       }else{
-  //         audioSequence.push(`/English/${numString[0]}0.mp3`);
-  //         if (numString[1] !== "0") {
-  //           //audioSequence.push(`/English/na.mp3`);
-  //           audioSequence.push(`/English/${numString[1]}.mp3`);
-  //           if(stage==="nurse_station"){
-  //             audioSequence.push('/English/room.mp3')
-  //           }else{
-  //             audioSequence.push('/English/counter.mp3')
-  //           }
-  //         }else{
-  //             if(stage==="nurse_station"){
-  //               audioSequence.push('/English/room.mp3')
-  //             }else{
-  //               audioSequence.push('/English/counter.mp3')
-  //             }
-  //         }
-  //       }
-  //   } else if (length === 1) {
-  //     audioSequence.push('/English/beep.mp3')
-  //     audioSequence.push('/English/ticket.mp3')
-  //     audioSequence.push(`/English/${numString}.mp3`);
-  //     if(stage==="nurse_station"){
-  //       audioSequence.push('/English/room.mp3')
-  //     }else{
-  //       audioSequence.push('/English/counter.mp3')
-  //     }
-  //   }
-
-  //   return audioSequence;
-  // };
-  const getCounterEnglish = (number: number): string[] => {
-    const numString = number.toString();
-    const length = numString.length;
-    const audioSequence: string[] = [];
     if (length === 4) {
-      audioSequence.push(`/English/1000.mp3`);
+      audioSequence.push(`/English/${numString[0]}000.mp3`);
       if (numString[1] !== "0") {
         audioSequence.push(`/English/${numString[1]}00.mp3`);
       }
-      if (numString[2] !== "0") {
-        if (numString[2] === "1") {
-          audioSequence.push(`/English/${numString[2]}0.mp3`);
-        } else {
+      if (numString[2] !== "0" || numString[3] !== "0") {
+        audioSequence.push('/English/and.mp3');
+        if (numString[2] !== "0") {
           audioSequence.push(`/English/${numString[2]}0.mp3`);
         }
-      }if ( numString[3] !== "0") {
-        //audioSequence.push(`/English/na.mp3`);
-        audioSequence.push(`/English/${numString[3]}.mp3`);
+        if (numString[3] !== "0") {
+          audioSequence.push(`/English/${numString[3]}.mp3`);
+        }
       }
     } else if (length === 3) {
       audioSequence.push(`/English/${numString[0]}00.mp3`);
-      if (numString[1] !== "0") {
-        if(numString[2] === "0"){
-            //audioSequence.push(`/English/na.mp3`);
-            audioSequence.push(`/English/${numString[1]}0.mp3`);
-        }else{
-            audioSequence.push(`/English/${numString[1]}0.mp3`);
+      if (numString[1] !== "0" || numString[2] !== "0") {
+        audioSequence.push('/English/and.mp3');
+        if (numString[1] !== "0") {
+          audioSequence.push(`/English/${numString[1]}0.mp3`);
         }
-      }
-      if ( numString[2] !== "0") {
-        //audioSequence.push(`/English/na.mp3`);
-        audioSequence.push(`/English/${numString[2]}.mp3`);
+        if (numString[2] !== "0") {
+          audioSequence.push(`/English/${numString[2]}.mp3`);
+        }
       }
     } else if (length === 2) {
+      if (numString[0] === '1' && numString[1] !== '0') {
+        audioSequence.push(`/English/${numString}.mp3`);
+      } else {
         audioSequence.push(`/English/${numString[0]}0.mp3`);
         if (numString[1] !== "0") {
-          //audioSequence.push(`/English/na.mp3`);
           audioSequence.push(`/English/${numString[1]}.mp3`);
         }
+      }
     } else if (length === 1) {
       audioSequence.push(`/English/${numString}.mp3`);
     }
 
+    audioSequence.push(stage === 'clinic' ? '/English/room.mp3' : '/English/counter.mp3');
     return audioSequence;
   };
+
   const getCounterSwahili = (number: number): string[] => {
     const numString = number.toString();
     const length = numString.length;
@@ -376,36 +513,32 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
       if (numString[1] !== "0") {
         audioSequence.push(`/Edited/${numString[1]}00.mp3`);
       }
-      if (numString[2] !== "0") {
-        if (numString[2] === "1") {
-          audioSequence.push(`/Edited/${numString[2]}0.mp3`);
-        } else {
+      if (numString[2] !== "0" || numString[3] !== "0") {
+        audioSequence.push(`/Edited/na.mp3`);
+        if (numString[2] !== "0") {
           audioSequence.push(`/Edited/${numString[2]}0.mp3`);
         }
-      }if ( numString[3] !== "0") {
-        //audioSequence.push(`/Edited/na.mp3`);
-        audioSequence.push(`/Edited/${numString[3]}.mp3`);
+        if (numString[3] !== "0") {
+          audioSequence.push(`/Edited/${numString[3]}.mp3`);
+        }
       }
     } else if (length === 3) {
       audioSequence.push(`/Edited/${numString[0]}00.mp3`);
-      if (numString[1] !== "0") {
-        if(numString[2] === "0"){
-            //audioSequence.push(`/Edited/na.mp3`);
-            audioSequence.push(`/Edited/${numString[1]}0.mp3`);
-        }else{
-            audioSequence.push(`/Edited/${numString[1]}0.mp3`);
+      if (numString[1] !== "0" && numString[2] !== "0") {
+        audioSequence.push(`/Edited/na.mp3`);
+        if (numString[1] !== "0") {
+          audioSequence.push(`/Edited/${numString[1]}0.mp3`);
         }
-      }
-      if ( numString[2] !== "0") {
-        //audioSequence.push(`/Edited/na.mp3`);
-        audioSequence.push(`/Edited/${numString[2]}.mp3`);
+        if (numString[2] !== "0") {
+          audioSequence.push(`/Edited/${numString[2]}.mp3`);
+        }
       }
     } else if (length === 2) {
-        audioSequence.push(`/Edited/${numString[0]}0.mp3`);
-        if (numString[1] !== "0") {
-          //audioSequence.push(`/Edited/na.mp3`);
-          audioSequence.push(`/Edited/${numString[1]}.mp3`);
-        }
+      audioSequence.push(`/Edited/${numString[0]}0.mp3`);
+      if (numString[1] !== "0") {
+        audioSequence.push(`/Edited/na.mp3`);
+        audioSequence.push(`/Edited/${numString[1]}.mp3`);
+      }
     } else if (length === 1) {
       audioSequence.push(`/Edited/${numString}.mp3`);
     }
@@ -413,7 +546,47 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     return audioSequence;
   };
 
-  // Function to play audio sequentially
+  const getCounterEnglish = (number: number): string[] => {
+    const numString = number.toString();
+    const length = numString.length;
+    const audioSequence: string[] = [];
+    if (length === 4) {
+      audioSequence.push(`/English/1000.mp3`);
+      if (numString[1] !== "0") {
+        audioSequence.push(`/English/${numString[1]}00.mp3`);
+      }
+      if (numString[2] !== "0" || numString[3] !== "0") {
+        audioSequence.push(`/English/and.mp3`);
+        if (numString[2] !== "0") {
+          audioSequence.push(`/English/${numString[2]}0.mp3`);
+        }
+        if (numString[3] !== "0") {
+          audioSequence.push(`/English/${numString[3]}.mp3`);
+        }
+      }
+    } else if (length === 3) {
+      audioSequence.push(`/English/${numString[0]}00.mp3`);
+      if (numString[1] !== "0" || numString[2] !== "0") {
+        audioSequence.push(`/English/and.mp3`);
+        if (numString[1] !== "0") {
+          audioSequence.push(`/English/${numString[1]}0.mp3`);
+        }
+        if (numString[2] !== "0") {
+          audioSequence.push(`/English/${numString[2]}.mp3`);
+        }
+      }
+    } else if (length === 2) {
+      audioSequence.push(`/English/${numString[0]}0.mp3`);
+      if (numString[1] !== "0") {
+        audioSequence.push(`/English/${numString[1]}.mp3`);
+      }
+    } else if (length === 1) {
+      audioSequence.push(`/English/${numString}.mp3`);
+    }
+
+    return audioSequence;
+  };
+
   const playAudioSequence = async (audioFiles: string[]) => {
     for (const file of audioFiles) {
       const audio = new Audio(file);
@@ -424,11 +597,6 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     }
   };
 
-  useEffect(() => {
-    // const audioSequence = getAudioSequence(token);
-    // playAudioSequence(audioSequence);
-  }, [token, counter]);
-
   const PlayThem = async () => {
     setServing(token)
     await playAudioSequence(getAudioSequence(token))
@@ -436,21 +604,19 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     await playAudioSequence(getAudioSequenceEnglish(token))
     await playAudioSequence(getCounterEnglish(counter))
     setTalking(false)
-    console.log('serving token is ',token)
+    axios.post("http://192.168.30.246:5000/speaker/delete_play", { id: id }).then((data: any) => {
+      console.log(`audio with id ${data.id} deleted successfully`)
+    })
   }
 
   return <div className={styles.gpt}>
-    {/* <button onClick={PlayThem} className={cx(talking && styles.talking)}>{talking
-    ?<FaPause className={styles.icon} size={30}/>
-    :<FaPlay className={styles.icon} size={30}/>}
-    </button> */}
     {
       isPlaying
-      ?<button onClick={PlayThem} className={cx((talking && isPlaying) && styles.talking)} id="play-button">{talking
-        ?<FaPause className={styles.icon} size={30}/>
-        :<FaPlay className={styles.icon} size={30}/>}
+        ? <button onClick={PlayThem} className={cx((talking && isPlaying) && styles.talking)} id="play-button">{talking
+          ? <FaPause className={styles.icon} size={30} />
+          : <FaPlay className={styles.icon} size={30} />}
         </button>
-      : <p>waiting..</p>
+        : <p>waiting..</p>
     }
   </div>;
 };

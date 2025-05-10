@@ -191,6 +191,7 @@ export default function Layout({children}: any) {
     reloadAtMidnight();
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      console.log(event.key)
       if (event.key === 'p') {
         setUser(prev => !prev);
       } else if (event.key === "<") {

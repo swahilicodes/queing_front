@@ -13,6 +13,10 @@ import { CiMicrophoneOff, CiMicrophoneOn } from "react-icons/ci";
 import { TbHeartHandshake } from "react-icons/tb";
 import deviceState from "@/store/atoms/device";
 import messageState from "@/store/atoms/message";
+import CurrentServing from "@/components/current_serving/current_serving";
+import CurrentTime from "@/components/current_time/current_time";
+import { SlDirection } from "react-icons/sl";
+import { RiDirectionLine } from "react-icons/ri";
 
 export default function Home() {
   const [tickets, setTickets] = useState<any>([]);
@@ -39,9 +43,11 @@ export default function Home() {
   const amPm = hours >= 12 ? "PM" : "AM";
   const [isRest, setRest] = useState<boolean>(true)
   const [serving, setServing] = useState<any>({})
+  const [savs, setSavs] = useState<any>([])
   const device = useRecoilValue(deviceState)
   const setMessage = useSetRecoilState(messageState)
   const [video, setVideo] = useState("")
+  const [doktas, setDoktas] = useState([])
   const [nextServe, setNextServe] = useState({
     id: 0,
     window: 0
@@ -58,86 +64,173 @@ export default function Home() {
   ]
   const [currentText, setCurrentText] = useState(0)
 
-  useEffect(() => {
+  useEffect(()=> {
+    getAdverts()
     if(Object.keys(device).length > 0 && (device.clinics !== undefined && Object.keys(device.clinics).length > 0)){
-      getTickets();
+          getTickets();
     }
-    getAdverts();
-    getActive();
-    getServing()
-    const intervalId = setInterval(() => {
-      setTime((prevTime) => prevTime + 1);
-      setBlink(!blink);
-      getActive();
-      getServing()
-      if(currentText === 0){
-        setCurrentText(1)
-      }else{
-        setCurrentText(0)
+    const tickInterval = setInterval(()=> {
+      if(Object.keys(device).length > 0 && (device.clinics !== undefined && Object.keys(device.clinics).length > 0)){
+        getTickets();
+        getAdverts()
       }
-    }, 1000);
+    },2000)
+    return () => {
+      clearInterval(tickInterval)
+    }
+  },[device])
 
-    const timer = setInterval(() => {
-      setSeconds((prevSeconds) => {
-        if (prevSeconds === 59) {
-          setMinutes((prevMinutes) => {
-            if (prevMinutes === 59) {
-              setHours((prevHours) => prevHours + 1);
-              return 0;
-            }
-            return prevMinutes + 1;
-          });
-          return 0;
-        }
-        return prevSeconds + 1;
-      });
-    }, 1000);
+  useEffect(()=> {
+    const timeInterval = setInterval(()=> {
+      if(language==="Swahili"){
+        setLanguage("English")
+      }else{
+        setLanguage("Swahili")
+      }
+    },4000)
 
-    const restId = setInterval(() => {
+       const restId = setInterval(() => {
       if(isRest){
         setRest(false)
       }else{
         setRest(true)
       }
     }, 10000);
-
     return () => {
-      clearInterval(intervalId);
-      clearInterval(timer);
-      setTimeout(()=> {
-        clearInterval(restId);
-      },10000)
-    };
-  }, [condition, blink,token, serveId,isRest, language, device]);
-
-  useEffect(()=> {
-    const langId = setInterval(() => {
-      if(language==="Swahili"){
-        setLanguage("English")
-      }else{
-        setLanguage("Swahili")
-      }
-    }, 5000);
-    return () => {
-      clearInterval(langId);
-    };
+      clearInterval(timeInterval)
+      clearInterval(restId)
+    }
   },[language])
 
-  const getServing = () => {
-    if(tickets.length > 0){
-      const sava = tickets.find((item:any)=> item.ticket.serving===true)
-      if(sava){
-        setServing(sava)
-        handleToken(sava.ticket.ticket_no,sava)
-        const selectedIndex = tickets.findIndex((item:any) => item.id === sava.id);
-        if(selectedIndex !== -1 && selectedIndex < tickets.length - 1){
-          setNextServe({...nextServe,id:tickets[selectedIndex + 1].ticket.id,window: tickets[selectedIndex + 1].counter.namba})
-        }
-      }else{
-        setServing({})
-      }
+  useEffect(()=> {
+    getActive();
+    getDoktas()
+
+    const restId = setInterval(()=> {
+      getActive()
+    },1000)
+    return () => {
+      clearInterval(restId)
+    }
+  },[])
+
+  const displayRoom = (id:string) => {
+    if(id==null){
+      return "N/A"
+    }else{
+      const room:any = doktas.find((item:any)=> item.id == id)
+      return room.room
     }
   }
+  function getNextTicket(savs:any, tickets:any) {
+    const maxId = Math.max(...savs.map((item:any) => item.ticket.id));
+    const next = tickets.find((ticket:any) => ticket.ticket.id < maxId)
+    if(next){
+      return next.ticket.ticket_no
+    }else{
+      return "00"
+    }
+    //return  || null;
+  }
+
+  const getDoktas = () => {
+    axios.get("http://192.168.30.246:5000/doktas/get_all_doktas").then((data)=> {
+      setDoktas(data.data)
+      console.log('doctors are ',data.data)
+    }).catch((error)=> {
+      console.log(error)
+    })
+  }
+  
+
+  // useEffect(() => {
+  //   if(Object.keys(device).length > 0 && (device.clinics !== undefined && Object.keys(device.clinics).length > 0)){
+  //     getTickets();
+  //   }
+
+  //   const ticksInterval = setInterval(()=> {
+  //     if(Object.keys(device).length > 0 && (device.clinics !== undefined && Object.keys(device.clinics).length > 0)){
+  //       getTickets();
+  //       console.log(tickets.map((item:any)=> item.ticket.serving))
+  //     }
+  //   },1000)
+  //   getAdverts();
+  //   getActive();
+  //   getServing()
+  //   const intervalId = setInterval(() => {
+  //     setTime((prevTime) => prevTime + 1);
+  //     setBlink(!blink);
+  //     getActive();
+  //     getServing()
+  //     if(currentText === 0){
+  //       setCurrentText(1)
+  //     }else{
+  //       setCurrentText(0)
+  //     }
+  //   }, 1000);
+
+  //   const timer = setInterval(() => {
+  //     setSeconds((prevSeconds) => {
+  //       if (prevSeconds === 59) {
+  //         setMinutes((prevMinutes) => {
+  //           if (prevMinutes === 59) {
+  //             setHours((prevHours) => prevHours + 1);
+  //             return 0;
+  //           }
+  //           return prevMinutes + 1;
+  //         });
+  //         return 0;
+  //       }
+  //       return prevSeconds + 1;
+  //     });
+  //   }, 1000);
+
+  //   const restId = setInterval(() => {
+  //     if(isRest){
+  //       setRest(false)
+  //     }else{
+  //       setRest(true)
+  //     }
+  //   }, 10000);
+
+  //   return () => {
+  //     clearInterval(intervalId);
+  //     clearInterval(timer);
+  //     clearInterval(ticksInterval);
+  //     setTimeout(()=> {
+  //       clearInterval(restId);
+  //     },10000)
+  //   };
+  // }, [condition, blink,token, serveId,isRest, language, device,tickets]);
+
+  // useEffect(()=> {
+  //   const langId = setInterval(() => {
+  //     if(language==="Swahili"){
+  //       setLanguage("English")
+  //     }else{
+  //       setLanguage("Swahili")
+  //     }
+  //   }, 5000);
+  //   return () => {
+  //     clearInterval(langId);
+  //   };
+  // },[language,tickets])
+
+  // const getServing = () => {
+  //   if(tickets.length > 0){
+  //     const sava = tickets.find((item:any)=> item.ticket.serving===true)
+  //     if(sava){
+  //       setServing(sava)
+  //       handleToken(sava.ticket.ticket_no,sava)
+  //       const selectedIndex = tickets.findIndex((item:any) => item.id === sava.id);
+  //       if(selectedIndex !== -1 && selectedIndex < tickets.length - 1){
+  //         setNextServe({...nextServe,id:tickets[selectedIndex + 1].ticket.id,window: tickets[selectedIndex + 1].counter.namba})
+  //       }
+  //     }else{
+  //       setServing({})
+  //     }
+  //   }
+  // }
 
   function formatNumber(num: string) {
     const numStr = num.toString();
@@ -169,26 +262,42 @@ export default function Home() {
     // },2000)
   }
 
+  function getCurrentDay() {
+    const days = [
+      { english: "Sunday", swahili: "Jumapili" },
+      { english: "Monday", swahili: "Jumatatu" },
+      { english: "Tuesday", swahili: "Jumanne" },
+      { english: "Wednesday", swahili: "Jumatano" },
+      { english: "Thursday", swahili: "Alhamisi" },
+      { english: "Friday", swahili: "Ijumaa" },
+      { english: "Saturday", swahili: "Jumamosi" }
+    ];
+
+    const today = new Date();
+    return days[today.getDay()];
+  }
+
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: "/clinic_queue" } })
+      .get(`http://192.168.30.246:5000/active/get_active`, { params: { page: "/clinic_queue" } })
       .then((data) => {
-        setActive(data.data.isActive);
+        //setActive(data.data.isActive && localStorage.getItem('device_id')?true:false);
+        setActive(data.data.isActive?true:false);
         setVideo(data.data.video)
       })
       .catch((error) => {
-        console.log(error.response);
-        if (error.response && error.response.status === 400) {
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-        } else {
-          setMessage({...onmessage,title:error.message,category: "error"})
-        }
+        //console.log(error.response);
+        // if (error.response && error.response.status === 400) {
+        //   setMessage({...onmessage,title:error.response.data.error,category: "error"})
+        // } else {
+        //   setMessage({...onmessage,title:error.message,category: "error"})
+        // }
       });
   };
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.246:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -200,15 +309,24 @@ export default function Home() {
       });
   };
 
-  const getTickets = () => {
+  const getTickets = async () => {
     setLoading(true);
-    axios
-      .get("http://localhost:5000/tickets/pata_clinic", {
-        params: { stage: "nurse_station", clinics: device.clinics.map((item:any)=> item.clinic_code) },
+    await axios
+      .get("http://192.168.30.246:5000/tickets/pata_clinic", {
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+        params: { 
+          stage: "nurse_station", 
+          clinics: device.clinics.map((item:any)=> item.clinic_code),
+          ts: Date.now()
+        },
       })
       .then((data) => {
-        setTickets(data.data);
         setLoading(false);
+        setTickets([...data.data]);
+        const sava = data.data.filter((item:any)=> item.ticket.serving===true)
+        setSavs(sava)
       })
       .catch((error) => {
         setLoading(false);
@@ -246,23 +364,24 @@ export default function Home() {
           )}
             <div className={cx(styles.left_wrap,active && styles.none)}>
               {
-                Object.keys(serving).length> 0 
+                savs.length > 0 
                 ? <div className={styles.servicer}>
                 <div className={styles.title}>
                 <h3>{language==="English"?"SERVING NOW":"ANAYE HUDUMIWA SASA"}</h3>
                 </div>
                 <div className={styles.namba}>
-                  <h1>{serving.ticket.ticket_no}</h1>
+                  <CurrentServing savs={savs}/>
                 </div>
                 <div className={styles.counter}>
-                  <div className={styles.stop}>
+                <CurrentTime savs={tickets.filter((item: any) => item.ticket.serving === true)}/>
+                  {/* <div className={styles.stop}>
                     <div className={styles.stopa_wrap}>
                     <BsStopwatch size={45} className={styles.stop_watch}/>
                     </div>
                   </div>
                   <div className={styles.stopa_time}>
                   {`${formatTime(hours.toString())}:${formatTime(minutes.toString())}:${formatTime(seconds.toString())}`}
-                  </div>
+                  </div> */}
                 </div>
               </div>
                 : <div className={styles.servicer}>
@@ -283,7 +402,8 @@ export default function Home() {
                       <video src="/videos/stomach.mp4" autoPlay muted loop/>
                     </div>
                     : <div className={styles.tiketi}>
-                      <p>{formatNumber(nextServe.id.toString())}</p>
+                      {/* <p>{formatNumber(nextServe.id.toString())}</p> */}
+                      <p>{getNextTicket(savs,tickets)}</p>
                       <TbHeartHandshake className={styles.icon} size={50}/>
                       <p>{nextServe.window}</p>
                     </div>
@@ -327,7 +447,14 @@ export default function Home() {
               ? <div className={styles.new_queue}>
               <div className={styles.top}>
                 <div className={styles.namba}>{language==="Swahili"?"TIKETI":"TICKET"}</div>
-                <div className={styles.namba}>{language==="Swahili"?"DIRISHA":"WINDOW"}</div>
+                <div className={styles.window}>
+                  <div className={styles.window_item}>
+                  {language==="Swahili"?"DIRISHA":"WINDOW"}
+                  </div>
+                  <div className={styles.window_item}>
+                  {language==="Swahili"?"CHUMBA":"ROOM"}
+                  </div>
+                </div>
               </div>
               <div className={styles.body}>
                 {
@@ -341,17 +468,26 @@ export default function Home() {
                       {
                         item.ticket.serving===false
                         ? <FaArrowTrendUp className={styles.con} size={40} />
-                        :<FaArrowsAltH
-                        className={cx(styles.cona, blink && styles.blink)}
-                        size={40}
-                        />
+                        : <FaArrowTrendUp className={styles.cona} size={40}/>
+                        // :<FaArrowsAltH
+                        // className={cx(styles.cona, blink && styles.blink)}
+                        // size={40}
+                        // />
                       }
                       </div>
                       <div className={styles.right}>
-                      {item.counter === undefined
-                              ? "000"
-                              : item.counter.namba
-                      }
+                        <div className={styles.right_item}>
+                        {item.ticket.counter === undefined
+                                ? "N/A"
+                                : item.ticket.counter
+                        }
+                        </div>
+                        <div className={styles.right_item}>
+                        <RiDirectionLine className={cx(styles.con,displayRoom(item.ticket.doctor_id) !=="N/A" && styles.active)} size={40}/>
+                        </div>
+                        <div className={styles.right_item}>
+                        <div className={styles.room}>{displayRoom(item.ticket.doctor_id)}</div>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -540,9 +676,13 @@ export default function Home() {
             {adverts.length > 0 && <AdvertScroller adverts={adverts} />}
           </div>
           {/* <div className={styles.time}>MATANGAZO</div> */}
-          <div className={styles.time}>
+          {/* <div className={styles.time}>
             <div className={styles.timer}>{hour}:{minute} {amPm}</div>
             <div className={styles.date}>{day}/{month}/{year}</div>
+          </div> */}
+          <div className={styles.time}>
+            <div className={styles.timer}>{hour}:{minute} {amPm}</div>
+            <div className={styles.date}>{language == "English" ? getCurrentDay().english : getCurrentDay().swahili} <div className={cx(styles.break, language == "Swahili" && styles.swahili)}></div> {day}/{month}/{year}</div>
           </div>
         </div>
       </div>

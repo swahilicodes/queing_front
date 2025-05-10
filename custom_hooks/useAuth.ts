@@ -21,7 +21,7 @@ const useAuth = () => {
     checkAuth();
   }, []);
 
-
+  
   const checkAuth = () => {
     const token:any = localStorage.getItem("token")
     if (isTokenExpired(token)) {
@@ -33,15 +33,61 @@ const useAuth = () => {
         if(decoded.role==="admin"){
             router.replace(router.pathname)
         }else{
-            if(decoded.role==="medical_recorder"){
-                router.replace('/recorder')
-            }else if(decoded.role==="accountant"){
-                router.replace("/accounts")
-            }else if(decoded.role==="nurse"){
-                router.replace("/clinic")
-            }else if(decoded.role==="doctor"){
-                router.replace("/doctor_patient")
-            }
+          const allowedPages = {
+            medical_recorder: ['/', '/accounts_queue', '/clinic_queue', '/recorder'],
+            accountant: ['/', '/accounts_queue', '/clinic_queue', '/accounts'],
+            nurse: ['/', '/accounts_queue', '/clinic_queue', '/clinic'],
+            doctor: ['/', '/accounts_queue', '/clinic_queue', '/doctor_patient'],
+            pro: ['/', '/accounts_queue', '/clinic_queue', '/videos', '/adverts'],
+        };
+        if(decoded.role === "medical_recorder"){
+          router.replace("/recorder");
+          // if(allowedPages.medical_recorder.includes(router.pathname)){
+          //   router.replace(router.pathname)
+          // }else {
+          //   router.replace("/recorder");
+          // }
+        }else if(decoded.role==="accountant"){
+          router.replace("/accounts");
+          // if(allowedPages.accountant.includes(router.pathname)){
+          //   router.replace(router.pathname)
+          // }else {
+          //   router.replace("/accounts");
+          // }
+        }else if(decoded.role==="nurse"){
+          router.replace("/clinic");
+          // if(allowedPages.nurse.includes(router.pathname)){
+          //   router.replace(router.pathname)
+          // }else {
+          //   router.replace("/clinic");
+          // }
+        }else if(decoded.role==="doctor"){
+          router.replace("/doctor_patient");
+          // if(allowedPages.doctor.includes(router.pathname)){
+          //   router.replace(router.pathname)
+          // }else {
+          //   router.replace("/doctor_patient");
+          // }
+        }else if(decoded.role==="pro"){
+          if(allowedPages.pro.includes(router.pathname)){
+            router.replace(router.pathname)
+          }else {
+            router.replace(allowedPages.pro[4]);
+          }
+        }else{
+          router.replace("/login")
+        }
+          //   if(decoded.role==="medical_recorder"){
+          //       router.replace('/recorder')
+          //   }else if(decoded.role==="accountant"){
+          //       router.replace("/accounts")
+          //   }else if(decoded.role==="nurse"){
+          //       router.replace("/clinic")
+          //   }else if(decoded.role==="doctor"){
+          //       router.replace("/doctor_patient")
+          //   }else if(decoded.role==="pro"){
+          //     router.replace("/adverts")
+          // }
         }
     }
 }
@@ -50,7 +96,7 @@ const validRoutes = (piga: string) => {
       if(piga){
         router.replace(piga)
       }else{
-        router.replace("/")
+        router.replace("/login")
           // if(defaultPage !== null || defaultPage !== ""){
           //     if(path==="/login"){
           //         page = path
@@ -65,7 +111,7 @@ const validRoutes = (piga: string) => {
 }
 const getAdmin = (phone: string) => {
   const user = localStorage.getItem('user_service')
-  axios.get('http://localhost:5000/users/get_user',{params: {phone}}).then((data) => {
+  axios.get('http://192.168.30.246:5000/users/get_user',{params: {phone}}).then((data) => {
       setCurrentUser(data.data)
       if(user){
         localStorage.removeItem('user_service')
@@ -93,7 +139,7 @@ const getAdmin = (phone: string) => {
 const getMac = async () => {
   if(typeof window !== "undefined"){
     if(id){
-      await axios.post("http://localhost:5000/network/create_update",{macAddress: `${localStorage.getItem('unique_id')}`,deviceName:"Null",deviceModel:id.type,manufacturer: "Null"}).then((dita)=> {
+      await axios.post("http://192.168.30.246:5000/network/create_update",{macAddress: `${localStorage.getItem('unique_id')}`,deviceName:"Null",deviceModel:id.type,manufacturer: "Null"}).then((dita)=> {
         setDeviceState(dita.data)
         validRoutes(dita.data.default_page)
       }).catch((error)=> {

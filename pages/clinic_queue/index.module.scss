@@ -1174,10 +1174,10 @@
                         }
                     }
                     .namba{
-                        h1{
-                            color: $secondColor;
-                            font-size: 200px;
-                        }
+                        color: $secondColor;
+                        font-size: 200px;
+                        font-weight: 600;
+                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                     }
                     .counter{
                         position: absolute;
@@ -1568,6 +1568,23 @@
                                 border-right: 4px solid $secondColor;
                             }
                         }
+                        .window{
+                            width: 49%;
+                            height: 95%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            font-size: 30px;
+                            color: white;
+                            font-weight: 600;
+                            box-shadow: rgba(0, 0, 0, 0.5);
+                            &:nth-child(1){
+                                border-right: 4px solid $secondColor;
+                            }
+                            .window_item{
+                                width: 40%;
+                            }
+                        }
                     }
                     .body{
                         width: 100%;
@@ -1584,31 +1601,46 @@
                             justify-content: space-between;
                             padding: 0 10px;
                             position: relative;
-                            padding: 0 20%;
+                            //padding: 0 20%;
                             &.disabled{
                                 border-bottom: 3px solid red;
                             }
                             .left{
+                                padding: 0 20%;
+                                width: 40%;
                                 font-size: 30px;
                                 font-weight: 600;
                                 color: white;
                             }
                             .right{
+                                width: 40%;
                                 font-size: 30px;
                                 font-weight: 600;
                                 color: white;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                .right_item{
+                                    width: 45%;
+                                    .con{
+                                        color: $secondColor;
+                                        &.active{
+                                            color: #01d401;
+                                        }
+                                    }
+                                    .room{
+                                        font-weight: 600;
+                                        font-size: 25px;
+                                    }
+                                }
                             }
                             .middle{
                                 .con{
                                     color: $secondColor;
                                 }
                                 .cona{
-                                    color: $secondColor;
+                                    color: #01d401;
                                     transition: all .5s ease-in-out;
-                                    opacity: 0;
-                                    &.blink{
-                                        opacity: 1;
-                                    }
                                 }
                             }
                             .absa{
@@ -2021,9 +2053,25 @@
                 justify-content: center;
                 font-weight: 600;
                 font-family: "Roboto";
-                .date,.timer{
+                .timer{
                     font-size: 15px;
                     font-weight: 500;
+                }
+                .date{
+                    font-size: 12px;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .break{
+                        width: 10px;
+                        height: 10px;
+                        background: crimson;
+                        margin: 5px;
+                        &.swahili{
+                            background: #01d401;
+                        }
+                    }
                 }
             }
         }

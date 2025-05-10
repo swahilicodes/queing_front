@@ -11,6 +11,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 5;
         .contents{
             background: white;
             position: absolute;
@@ -401,7 +402,10 @@
                                 justify-content: center;
                                 transition: all .5s ease-in-out;
                                 &.active{
-                                    background: #2bf72b;
+                                    background: #68b968; 
+                                }
+                                &.owner{
+                                    background: #2bf72b;   
                                 }
                                 &.prioritya{
                                     background: red;

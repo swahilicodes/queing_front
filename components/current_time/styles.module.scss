@@ -1,0 +1,49 @@
+@import '../../global.scss';
+.current_serving{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .counter{
+        display: none;
+        width: 100%;
+        &.active{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            .stop{
+                height: 100%;
+                width: 20%;
+                position: inherit;
+                right: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .stopa_wrap{
+                    width: 90%;
+                    height: 90%;
+                    background: $secondColor;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .stop_watch{
+                        color: white;
+                    }
+                }
+            }
+            .stopa_time{
+                width: 100%;
+                height: 100%;
+                font-size: 20px;
+                background: $mainBold;
+                color: white;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+}

@@ -19,10 +19,14 @@ import { TiArrowRepeat } from "react-icons/ti";
 import { TbHeartHandshake } from "react-icons/tb";
 import Cubes from "@/components/loaders/cubes/cubes";
 import messageState from "@/store/atoms/message";
+import LazyVideo from "@/components/lazyVideo/lazy_video";
+import DisplayCounter from "@/components/display_counter/display_counter";
+import CurrentServing from "@/components/current_serving/current_serving";
+import CurrentTime from "@/components/current_time/current_time";
 
 export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+  //const {data:queue,loading,error} = useFetchData("http://192.168.30.246:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
@@ -35,7 +39,7 @@ export default function Home() {
   const [language, setLanguage] = useState("Swahili");
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://localhost:5000/socket/display_tokens_stream');
+  //const eventSource = new EventSource('http://192.168.30.246:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -161,6 +165,21 @@ export default function Home() {
     }
   }
 
+  function getCurrentDay() {
+    const days = [
+      { english: "Sunday", swahili: "Jumapili" },
+      { english: "Monday", swahili: "Jumatatu" },
+      { english: "Tuesday", swahili: "Jumanne" },
+      { english: "Wednesday", swahili: "Jumatano" },
+      { english: "Thursday", swahili: "Alhamisi" },
+      { english: "Friday", swahili: "Ijumaa" },
+      { english: "Saturday", swahili: "Jumamosi" }
+    ];
+
+    const today = new Date();
+    return days[today.getDay()];
+  }
+
   const formatTime = (unit:string) => {
     return String(unit).padStart(2, '0')
   }
@@ -181,7 +200,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: router.pathname } })
+      .get(`http://192.168.30.246:5000/active/get_active`, { params: { page: router.pathname } })
       .then((data) => {
         setActive(data.data.isActive);
         setVideo(data.data.video)
@@ -198,7 +217,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.246:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -209,7 +228,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/get_display_tokens", {
+      .get("http://192.168.30.246:5000/tickets/get_display_tokens", {
         params: { stage: "accounts", clinic_code: "" },
       })
       .then((data) => {
@@ -247,17 +266,15 @@ export default function Home() {
         <div className={styles.new_look}>
           <div className={styles.new_left}>
           {active && (
-            <div className={styles.vid}>
-              <div className={styles.mute} onClick={()=> setMuted(!muted)}>
-                {
-                  muted
-                  ? <CiMicrophoneOn className={styles.icon} size={40}/>
-                  : <CiMicrophoneOff className={styles.icon} size={40}/>
-                }
+              <div className={styles.vid}>
+                <LazyVideo video={video}/>
+                {/* <video src={video} autoPlay loop muted={muted} /> */}
+                {/* <video autoPlay loop muted={muted}>
+                <source src="/videos/mnh.mp4" type="video/mp4"/>
+                Your browser does not support the video tag.
+              </video> */}
               </div>
-              <video src={video} autoPlay loop muted={muted} />
-            </div>
-          )}
+            )}
             <div className={cx(styles.left_wrap,active && styles.none)}>
               {
                 Object.keys(serving).length> 0 
@@ -266,6 +283,12 @@ export default function Home() {
                 <h3>{language==="English"?"SERVING NOW":"ANAYE HUDUMIWA SASA"}</h3>
                 </div>
                 <div className={styles.namba}>
+                    <CurrentServing savs={tickets.filter((item: any) => item.ticket.serving === true)}/>
+                  </div>
+                  <div className={styles.counter}>
+                  <CurrentTime savs={tickets.filter((item: any) => item.ticket.serving === true)}/>
+                  </div>
+                {/* <div className={styles.namba}>
                   <h1>{serving.ticket.ticket_no}</h1>
                 </div>
                 <div className={styles.counter}>
@@ -277,7 +300,7 @@ export default function Home() {
                   <div className={styles.stopa_time}>
                   {`${formatTime(hours.toString())}:${formatTime(minutes.toString())}:${formatTime(seconds.toString())}`}
                   </div>
-                </div>
+                </div> */}
               </div>
                 : <div className={styles.servicer}>
                   <div className={styles.jina}>
@@ -347,7 +370,14 @@ export default function Home() {
                 {
                   tickets.map((item:any,index:number)=> (
                     <div className={cx(styles.item,item.ticket.disabled===true && styles.disabled)} key={index} onLoad={()=> setServeId(index+1)}>
-                      <div className={cx(styles.absa,item.ticket.serving===true && styles.serving, (nextServe.id !==0 && nextServe.id===Number(item.ticket.id)) && styles.next)} onLoad={()=> handleToken(item.ticket.ticket_no,item)}>{index+1}</div>
+                      <div 
+                      className={
+                        cx(styles.absa, item.ticket.serving === true && styles.serving, 
+                          (nextServe.id !== 0 && nextServe.id === Number(item.ticket.id) && item.ticket.serving) && styles.serving,
+                        (nextServe.id !==0 && nextServe.id === Number(item.ticket.id) && item.ticket.serving===false) && styles.next)
+                        
+                      } 
+                       onLoad={()=> handleToken(item.ticket.ticket_no,item)}>{index+1}</div>
                       <div className={styles.left}>
                       <p>{item.ticket.ticket_no}</p>
                       </div>
@@ -362,10 +392,7 @@ export default function Home() {
                       }
                       </div>
                       <div className={styles.right}>
-                      {item.counter === undefined
-                              ? "000"
-                              : item.counter.namba
-                      }
+                      <DisplayCounter ticket_counter={item.ticket.counter} counter_counter={item.counter.namba} serving={item.ticket.serving} />
                       </div>
                     </div>
                   ))
@@ -553,10 +580,9 @@ export default function Home() {
           <div className={styles.ad}>
             {adverts.length > 0 && <AdvertScroller adverts={adverts} />}
           </div>
-          {/* <div className={styles.time}>MATANGAZO</div> */}
           <div className={styles.time}>
             <div className={styles.timer}>{hour}:{minute} {amPm}</div>
-            <div className={styles.date}>{day}/{month}/{year}</div>
+            <div className={styles.date}>{language == "English" ? getCurrentDay().english : getCurrentDay().swahili} <div className={cx(styles.break, language == "Swahili" && styles.swahili)}></div> {day}/{month}/{year}</div>
           </div>
         </div>
       </div>

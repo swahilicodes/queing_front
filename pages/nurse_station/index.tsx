@@ -20,7 +20,7 @@ import messageState from "@/store/atoms/message";
 
 export default function CashierQueue() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  //const {data:queue,loading,error} = useFetchData("http://localhost:5000/tickets/getTickets")
+  //const {data:queue,loading,error} = useFetchData("http://192.168.30.246:5000/tickets/getTickets")
   const [tickets, setTickets] = useState<any>([]);
   const [adverts, setAdverts] = useState([]);
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function CashierQueue() {
   const [language] = useRecoilState(LanguageState);
   const [blink, setBlink] = useState(false);
   const [active, setActive] = useState(false);
-  //const eventSource = new EventSource('http://localhost:5000/socket/display_tokens_stream');
+  //const eventSource = new EventSource('http://192.168.30.246:5000/socket/display_tokens_stream');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -82,7 +82,7 @@ export default function CashierQueue() {
   }
 
   const getVideos = () => {
-    axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
+    axios.get("http://192.168.30.246:5000/uploads/get_videos").then((data)=> {
     setVideos(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -102,7 +102,7 @@ export default function CashierQueue() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: "/nurse_station" } })
+      .get(`http://192.168.30.246:5000/active/get_active`, { params: { page: "/nurse_station" } })
       .then((data) => {
         setActive(data.data.isActive);
       })
@@ -124,7 +124,7 @@ export default function CashierQueue() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://192.168.30.246:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -138,7 +138,7 @@ export default function CashierQueue() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/get_clinic_tokens", {
+      .get("http://192.168.30.246:5000/tickets/get_clinic_tokens", {
         params: { selected_clinic: "", clinics: device.clinics.map((item:any)=> item.clinic_code) },
       })
       .then((data) => {

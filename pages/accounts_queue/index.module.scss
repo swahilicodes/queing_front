@@ -1173,10 +1173,13 @@
                         }
                     }
                     .namba{
-                        h1{
-                            color: $secondColor;
-                            font-size: 200px;
-                        }
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: $secondColor;
+                        font-size: 200px;
+                        font-weight: 600;
+                        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
                     }
                     .counter{
                         position: absolute;
@@ -1258,6 +1261,7 @@
                         .video{
                             width: 100%;
                             height: 100%;
+                            background: white;
                             video{
                                 width: 100%;
                                 height: 100%;
@@ -2023,6 +2027,15 @@
                 .date,.timer{
                     font-size: 15px;
                     font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .break{
+                        width: 10px;
+                        height: 10px;
+                        margin: 10px;
+                        background: red;
+                    }
                 }
             }
         }

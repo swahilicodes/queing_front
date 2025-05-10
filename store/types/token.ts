@@ -19,7 +19,9 @@ interface Token{
         med_time: Date,
         account_time: Date,
         updatedAt: Date,
-        serving: boolean
+        serving: boolean,
+        serving_id: string,
+        doctor_id: string
     },
     counter: {
         id: number,

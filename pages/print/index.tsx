@@ -50,7 +50,7 @@ export default function QueueAdd() {
       if (seleccted.index > 0 && seleccted.type !== "") {
         setTimeout(()=> {
             setSubLoading(true)
-        axios.post("http://localhost:5000/suggestion/create_suggestion", {
+        axios.post("http://192.168.30.246:5000/suggestion/create_suggestion", {
           type: seleccted.type,
           reason: seleccted.reason
         }).then(() => {
@@ -126,7 +126,7 @@ export default function QueueAdd() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
+    axios.post("http://192.168.30.246:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
