@@ -17,13 +17,16 @@ function Player() {
 
  useEffect(()=> {
     getPlays()
-    setInterval(()=> {
+    const playInterval = setInterval(()=> {
         getPlays()
     },2000)
+    return () => {
+      clearInterval(playInterval);
+    };
  },[currentPlaying])
 
  const getPlays = () => {
-    axios.get("http://192.168.30.246:5000/speaker/get_speakers",{params: {station: "M02"}}).then((data)=> {
+    axios.get("http://localhost:5000/speaker/get_speakers",{params: {station: "M02"}}).then((data)=> {
         const sortedTickets = data.data.sort((a:any, b:any) => a.id - b.id);
         setPlays(sortedTickets)
         if(data.data.length>0){

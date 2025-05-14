@@ -21,6 +21,7 @@ export default function QueueAdd() {
   const [cat,setcat] = useState("")
   const [clicked,setClicked] = useState(false)
   const [isQr,setQr] = useState(false)
+  const [category, setCategory] = useState("")
   const keys = [1,2,3,4,5,6,7,8,9,0];
   const [numberString, setNumberString] = useState('');
   const [qr,setQrState] = useRecoilState<any>(qrState)
@@ -50,7 +51,7 @@ export default function QueueAdd() {
       if (seleccted.index > 0 && seleccted.type !== "") {
         setTimeout(()=> {
             setSubLoading(true)
-        axios.post("http://192.168.30.246:5000/suggestion/create_suggestion", {
+        axios.post("http://localhost:5000/suggestion/create_suggestion", {
           type: seleccted.type,
           reason: seleccted.reason
         }).then(() => {
@@ -104,6 +105,11 @@ export default function QueueAdd() {
     setSelected({...seleccted,index:index+1,type: language==="English"?item.english:item.swahili})
   };
 
+  const handleCategory = (category:string) => {
+    setCategory(category)
+    setClicked(true)
+  }
+
   const enterNumber = () => {
     setcat(cat)
     setClicked(true)
@@ -126,7 +132,7 @@ export default function QueueAdd() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.246:5000/tickets/create_ticket",{disability: disabled,phone:numberString})
+    axios.post("http://localhost:5000/tickets/create_ticket",{phone:numberString,category: category})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
@@ -308,8 +314,12 @@ function printImage(src: string) {
             )
         }
         <div className={styles.items}>
-            <div className={styles.item} onClick={()=> enterNumber()}>
-                <p>{language==="English"?"Take Ticket":"Chukua Tiketi"}</p>
+            {/* <div className={styles.item} onClick={()=> enterNumber()}> */}
+            <div className={styles.item} onClick={()=> handleCategory("insurance")}>
+                <p>{language==="English"?"Insurance":"Bima"}</p>
+            </div>
+            <div className={styles.item} onClick={()=> handleCategory("cash")}>
+                <p>{language==="English"?"Cash":"Keshi"}</p>
             </div>
             <div className={styles.suggestions}>
                 <div className={styles.title}>

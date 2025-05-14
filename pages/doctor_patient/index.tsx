@@ -16,11 +16,14 @@ import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from 'react-icons/hi2'
 import useCreateItem from '@/custom_hooks/useCreateItem'
 import isSpeakerState from '@/store/atoms/isSpeaker'
 import isUserState from '@/store/atoms/isUser'
+import { FaUserEdit } from 'react-icons/fa'
+import DisplayCounter from '@/components/display_counter/display_counter'
 
 export default function DoctorPatient() {
     const [currentUser, setCurrentUser] = useRecoilState<any>(currentUserState)
     const [pat, setPat] = useState<any>([])
     //const [loading, setLoading] = useState(false)
+    const [isEdit, setEdit] = useState(false)
     const router = useRouter()
     const [finish, setFinish] = useState(false)
     const [finLoading, setFinLoading] = useState(false)
@@ -28,7 +31,7 @@ export default function DoctorPatient() {
     const [isAdd, setAdd] = useState(false)
     const [jeevaClinics, setJeevaClinics] = useState([])
     const [attendantClinics, setAttendantClinics] = useState([])
-    const { data } = useFetchData("http://192.168.30.246:5000/clinic/get_clinics")
+    const { data } = useFetchData("http://localhost:5000/clinic/get_clinics")
     const { createItem, loading } = useCreateItem()
     const [fetchLoading, setFetchLoading] = useState(false);
     const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
@@ -40,19 +43,29 @@ export default function DoctorPatient() {
     const [mr_no,setMrNo] = useState("")
     const [fields, setFields] = useState({
         clinic: "",
-        clinic_code: ""
+        clinic_code: "",
+        name: "",
+        room: "",
+        password: "",
     })
     useEffect(() => {
         getDoktas()
         if (Object.keys(currentUser).length > 0) {
             getDocPat()
             getDocClinics()
+            setFields({...fields,name:currentUser.name,clinic:currentUser.clinic})
         }
     }, [currentUser, status])
 
+    const changeClinic = (e:string) => {
+        const code:any = data.find((item:any)=> item.cliniciname===e)
+        setFields({...fields,clinic:e.toString(),clinic_code: code.clinicicode})
+
+    }
+
 
     const getDoktas = () => {
-        axios.get("http://192.168.30.246:5000/doktas/get_all_doktas")
+        axios.get("http://localhost:5000/doktas/get_all_doktas")
             .then((data) => {
                 setDoktas(data.data);
                 console.log('doktas are ', data.data)
@@ -69,6 +82,25 @@ export default function DoctorPatient() {
             });
     };
 
+    const editDoctor = (e:React.FormEvent) => {
+        e.preventDefault()
+        axios.post("http://localhost:5000/doktas/edit_doctor",{
+            name: fields.name, 
+            clinic: fields.clinic,
+            clinic_code: fields.clinic_code, 
+            room: fields.room,
+        },{
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            }
+        }).then((data)=> {
+            location.reload()
+        }).catch((error)=> {
+            console.log(error)
+        })
+    }
+
     const getRoom = (id: number) => {
         console.log(doktas)
         const room: any = doktas.find((item: any) => item.id === id)
@@ -76,7 +108,7 @@ export default function DoctorPatient() {
     }
     const editTicket = (id: number, status: string) => {
         setFetchLoading(true);
-        axios.put(`http://192.168.30.246:5000/tickets/edit_ticket/${id}`, { status: status })
+        axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, { status: status })
             .then(() => {
                 setInterval(() => {
                     setFetchLoading(false);
@@ -102,7 +134,7 @@ export default function DoctorPatient() {
 
     const priotize = (ticket_no: string, data: string, counter: number) => {
         setFetchLoading(true);
-        axios.get(`http://192.168.30.246:5000/tickets/priority`, {
+        axios.get(`http://localhost:5000/tickets/priority`, {
             params: { ticket_no, data, stage: "nurse_station", counter: counter }, headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
@@ -127,7 +159,7 @@ export default function DoctorPatient() {
 
     const getDocPat = () => {
         setFetchLoading(true)
-        axios.get(`http://192.168.30.246:5000/doktas/get_doc_patients`, {
+        axios.get(`http://localhost:5000/doktas/get_doc_patients`, {
             params: { status: status },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -151,7 +183,7 @@ export default function DoctorPatient() {
         })
     }
     const createClinic = () => {
-        axios.post(`http://192.168.30.246:5000/attendant_clinics/create_attendant_clinic`, { clinic_code: fields.clinic_code, clinic: fields.clinic, attendant_id: currentUser.phone }).then((data) => {
+        axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`, { clinic_code: fields.clinic_code, clinic: fields.clinic, attendant_id: currentUser.phone }).then((data) => {
             //setPat(data.data)
             setAddittion(!isAddittion)
             getDocClinics()
@@ -174,7 +206,7 @@ export default function DoctorPatient() {
         })
     }
     const deleteClinic = (clinic_code: string) => {
-        axios.get(`http://192.168.30.246:5000/attendant_clinics/delete_clinic`, { params: { clinic_code: clinic_code, attendant_id: currentUser.phone } }).then((data) => {
+        axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`, { params: { clinic_code: clinic_code, attendant_id: currentUser.phone } }).then((data) => {
             const updatedItems = attendantClinics.filter((item: any) => item.clinic_code !== clinic_code);
             setAttendantClinics(updatedItems.map((item) => item));
         }).catch((error) => {
@@ -192,7 +224,7 @@ export default function DoctorPatient() {
         })
     }
     const getDocClinics = () => {
-        axios.get(`http://192.168.30.246:5000/attendant_clinics/get_clinics`, { params: { attendant_id: currentUser.phone } }).then((data) => {
+        axios.get(`http://localhost:5000/attendant_clinics/get_clinics`, { params: { attendant_id: currentUser.phone } }).then((data) => {
             setAttendantClinics(data.data)
         }).catch((error) => {
             if (error.response && error.response.status === 400) {
@@ -215,13 +247,14 @@ export default function DoctorPatient() {
     }
 
     const finishToken = (patient_id: string) => {
+        console.log('finishing patient')
         setFinLoading(true)
-        axios.post("http://192.168.30.246:5000/doktas/finish_patient", { doctor_id: currentUser.id, patient_id: patient_id }).then((data) => {
+        axios.post("http://localhost:5000/doktas/finish_patient", { doctor_id: currentUser.id, patient_id: patient_id }).then((data) => {
             console.log(data)
             setInterval(() => {
                 setFinLoading(false)
                 setFinish(false)
-                router.reload()
+                //router.reload()
             }, 2000)
         }).catch((error) => {
             console.log(error)
@@ -236,13 +269,57 @@ export default function DoctorPatient() {
     return (
         <div className={styles.patient_doc}>
             {
+                isEdit && (
+                    <div className={styles.edit_overlay}>
+                        <div className={styles.edit_content}>
+                            <div className={styles.close} onClick={()=> setEdit(false)}>close</div>
+                            <form onSubmit={editDoctor}>
+                                <div className={styles.input_item}>
+                                    <label>Name:</label>
+                                    <input 
+                                    type="text" 
+                                    placeholder='Enter Name'
+                                    value={fields.name}
+                                    onChange={e => setFields({...fields,name:e.target.value})}
+                                    />
+                                </div>
+                                <div className={styles.input_item}>
+                                    <label>Room:</label>
+                                    <input 
+                                    type="text" 
+                                    placeholder='Enter Room'
+                                    value={fields.room}
+                                    onChange={e => setFields({...fields,room:e.target.value})}
+                                    />
+                                </div>
+                                <div className={styles.input_item}>
+                                    <label>Clinic:</label>
+                                    <select
+                                    value={fields.clinic}
+                                    onChange={e => changeClinic(e.target.value)}
+                                    >
+                                        <option value="" selected disabled>--Select--</option>
+                                        {
+                                            data.map((item:any,index:any)=> (
+                                                <option value={item.cliniciname}>{item.cliniciname}</option>
+                                            ))
+                                        }
+                                    </select>
+                                </div>
+                                <button type='submit'>Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                )
+            }
+            {
                 isSure && (
                     <div className={styles.finOverlay}>
                         <div className={styles.content}>
                             <div className={styles.wrap}>
                             <div className={styles.title}>Are You Sure</div>
                             <div className={styles.actions}>
-                                <div className={styles.action}>Cancel</div>
+                                <div className={styles.action} onClick={()=> setSure(false)}>Cancel</div>
                                 <div className={cx(styles.action,styles.active)} onClick={()=> finishToken(mr_no)}>Finish</div>
                             </div>
                             </div>
@@ -334,6 +411,11 @@ export default function DoctorPatient() {
                             <GiPowerButton className={styles.icon_} />
                         </div>
                     </div>
+                    <div className={styles.side} onClick={()=> setEdit(true)}>
+                        <div className={styles.edit_icon}>
+                            <FaUserEdit className={styles.icon__}/>
+                        </div>
+                    </div>
                     <div className={styles.side}>
                         <div className={styles.image} style={{ width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer" }} onClick={() => setUser(true)}>
                             <img src="/place_holder.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
@@ -390,7 +472,7 @@ export default function DoctorPatient() {
                                     )}
                                 >
                                     <div className={cx(styles.spika, loading && styles.active)} onClick={() => setSpeaker(!isSpeaker)}>
-                                        <div className={styles.rounder} onClick={() => createItem(item.ticket_no.toString(), "clinic", "m02", "http://192.168.30.246:5000/speaker/create_speaker", getRoom(currentUser.id))}>
+                                        <div className={styles.rounder} onClick={() => createItem(item.ticket_no.toString(), "clinic", "m02", "http://localhost:5000/speaker/create_speaker", getRoom(currentUser.id))}>
                                             {
                                                 !loading
                                                     ? <HiOutlineSpeakerWave className={styles.icon} size={30} />

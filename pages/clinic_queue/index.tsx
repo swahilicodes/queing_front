@@ -17,6 +17,7 @@ import CurrentServing from "@/components/current_serving/current_serving";
 import CurrentTime from "@/components/current_time/current_time";
 import { SlDirection } from "react-icons/sl";
 import { RiDirectionLine } from "react-icons/ri";
+import ClinicCounter from "@/components/display_clinic_counter/clinic_counter";
 
 export default function Home() {
   const [tickets, setTickets] = useState<any>([]);
@@ -134,7 +135,7 @@ export default function Home() {
   }
 
   const getDoktas = () => {
-    axios.get("http://192.168.30.246:5000/doktas/get_all_doktas").then((data)=> {
+    axios.get("http://localhost:5000/doktas/get_all_doktas").then((data)=> {
       setDoktas(data.data)
       console.log('doctors are ',data.data)
     }).catch((error)=> {
@@ -279,7 +280,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.246:5000/active/get_active`, { params: { page: "/clinic_queue" } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/clinic_queue" } })
       .then((data) => {
         //setActive(data.data.isActive && localStorage.getItem('device_id')?true:false);
         setActive(data.data.isActive?true:false);
@@ -297,7 +298,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.246:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -312,7 +313,7 @@ export default function Home() {
   const getTickets = async () => {
     setLoading(true);
     await axios
-      .get("http://192.168.30.246:5000/tickets/pata_clinic", {
+      .get("http://localhost:5000/tickets/pata_clinic", {
         headers: {
           'Cache-Control': 'no-cache',
         },
@@ -477,10 +478,11 @@ export default function Home() {
                       </div>
                       <div className={styles.right}>
                         <div className={styles.right_item}>
-                        {item.ticket.counter === undefined
-                                ? "N/A"
+                          <ClinicCounter/>
+                        {/* {item.ticket.counter === undefined
+                                ? <ClinicCounter/>
                                 : item.ticket.counter
-                        }
+                        } */}
                         </div>
                         <div className={styles.right_item}>
                         <RiDirectionLine className={cx(styles.con,displayRoom(item.ticket.doctor_id) !=="N/A" && styles.active)} size={40}/>

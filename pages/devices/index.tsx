@@ -27,13 +27,13 @@ export default function Admins() {
   const [id, setId] = useState("");
   const setMessage = useSetRecoilState(messageState)
   const { data } = useFetchData(
-    "http://192.168.30.246:5000/services/get_all_services"
+    "http://localhost:5000/services/get_all_services"
   );
   const [isFull, setFull] = useState(false);
   const [desc, setDesc] = useState("");
   const [pages, setPages] = useState([]);
   const { data: clinics } = useFetchData(
-    "http://192.168.30.246:5000/clinic/get_clinics"
+    "http://localhost:5000/clinic/get_clinics"
   );
   const [isAddittion, setAddittion] = useState(false);
   const [attendantClinics, setAttendantClinics] = useState([]);
@@ -43,7 +43,8 @@ export default function Admins() {
     deviceName: "",
     deviceModel: "",
     manufucturer: "",
-    page: ""
+    page: "",
+    window: ""
   })
   const [fields, setFields] = useState({
     page: "",
@@ -77,7 +78,7 @@ export default function Admins() {
 
   const createClinic = (deviceId: string) => {
     axios
-      .post(`http://192.168.30.246:5000/attendant_clinics/create_attendant_clinic`, {
+      .post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`, {
         clinic_code: fields.clinic_code,
         clinic: fields.clinic,
         attendant_id: deviceId,
@@ -108,7 +109,7 @@ export default function Admins() {
   };
   const deleteClinic = (clinic_code: string, device_id: string) => {
     axios
-      .get(`http://192.168.30.246:5000/attendant_clinics/delete_clinic`, {
+      .get(`http://localhost:5000/attendant_clinics/delete_clinic`, {
         params: { clinic_code: clinic_code, attendant_id: device_id },
       })
       .then((data) => {
@@ -135,7 +136,7 @@ export default function Admins() {
   };
   const getDocClinics = (device_id: string) => {
     axios
-      .get(`http://192.168.30.246:5000/attendant_clinics/get_clinics`, {
+      .get(`http://localhost:5000/attendant_clinics/get_clinics`, {
         params: { attendant_id: device_id },
       })
       .then((data) => {
@@ -163,8 +164,8 @@ export default function Admins() {
     console.log(inputs)
     e.preventDefault();
     axios
-      .get(`http://192.168.30.246:5000/network/edit_device`, {
-        params: { page: inputs.page, id: id, deviceName: inputs.deviceName, deviceModel: inputs.deviceModel, manufucturer: inputs.manufucturer },
+      .get(`http://localhost:5000/network/edit_device`, {
+        params: { page: inputs.page, id: id, deviceName: inputs.deviceName, deviceModel: inputs.deviceModel, manufucturer: inputs.manufucturer, window: inputs.window },
       })
       .then(() => {
         setEdit(false);
@@ -188,7 +189,7 @@ export default function Admins() {
   };
   const deleteService = () => {
     axios
-      .get(`http://192.168.30.246:5000/network/delete_device`, {
+      .get(`http://localhost:5000/network/delete_device`, {
         params: { id: id },
       })
       .then(() => {
@@ -226,13 +227,14 @@ export default function Admins() {
         deviceName: data.deviceName,
         manufucturer: data.manufucturer,
         deviceModel: data.deviceModel,
-        page: data.default_page
+        page: data.default_page,
+        window: data.window
     })
   };
 
   const getPages = () => {
     axios
-      .get("http://192.168.30.246:3000/api/getPages")
+      .get("http://localhost:3000/api/getPages")
       .then((data) => {
         const pags = data.data.pages.map((page: string) =>
           getFirstPathSegment(page)
@@ -251,13 +253,14 @@ export default function Admins() {
   const getAttendants = () => {
     setFetchLoading(true);
     axios
-      .get("http://192.168.30.246:5000/network/get_devices", {
+      .get("http://localhost:5000/network/get_devices", {
         params: { page, pagesize },
       })
       .then((data) => {
         setServices(data.data.data);
         setFetchLoading(false);
         setTotalItems(data.data.totalItems);
+        console.log(data.data.data)
       })
       .catch((error: any) => {
         setFetchLoading(false);
@@ -399,7 +402,7 @@ export default function Admins() {
               <option value="/devices">devices</option>
               <option value="/doctor_patient">doctor_patient</option>
               <option value="/doktas">doktas</option>
-              <option value="/graph">graph</option>
+              <option value="/analytics">analytics</option>
               <option value="/nurse_station">nurse_station</option>
               <option value="/nurses">nurses</option>
               <option value="/print">print</option>
@@ -407,7 +410,7 @@ export default function Admins() {
               <option value="/rooms">rooms</option>
               <option value="/services">services</option>
               <option value="/settings">settings</option>
-              <option value="/speaker">speaker</option>
+              <option value="/player">player</option>
               <option value="/">home</option>
               {/* {pages.map((item, index) => (
                 <option value={item} key={index}>
@@ -443,6 +446,15 @@ export default function Admins() {
                 placeholder="Device Model"
                 />
             </div>
+            <div className={styles.item}>
+                <label>Window</label>
+                <input 
+                value={inputs.window}
+                onChange={e => setInputs({...inputs,window: e.target.value})}
+                type="text" 
+                placeholder="Window Number"
+                />
+            </div>
           </div>
           <div className={styles.action}>
               <button onClick={editService}>submit</button>
@@ -458,8 +470,8 @@ export default function Admins() {
           <form>
             <h4>Are You Sure?</h4>
             <div className={styles.action}>
-              <div onClick={() => deleteService()} className={styles.button}>
-                Yes
+              <div onClick={() => deleteService()} className={styles.delete}>
+                <p>Delete</p>
               </div>
               <div className={styles.clear} onClick={() => setDelete(false)}>
                 <MdOutlineClear className={styles.icon} />
@@ -485,6 +497,7 @@ export default function Admins() {
                       <th className={styles.name}>Manufucturer</th>
                       <th className={styles.name}>Clinics</th>
                       <th className={styles.name}>Page</th>
+                      <th className={styles.name}>Window</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -501,6 +514,7 @@ export default function Admins() {
                         <td className={styles.name}>{data.manufucturer}</td>
                         <td className={styles.name}>{data.clinics.length}</td>
                         <td className={styles.name}>{data.default_page}</td>
+                        <td className={styles.name}>{data.window}</td>
                         <td>
                           <div
                             className={styles.delete}

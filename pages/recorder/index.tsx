@@ -48,6 +48,8 @@ function Recorder() {
   const [activeVideo, setActiveVideo] = useState("")
   const [isVideo, setVideo] = useState(false)
   const setUser = useSetRecoilState(isUserState)
+  const [insurance, setInsurance] = useState(5)
+  const [isInsurance,setIsinsurance] = useState(false)
   const [fields, setFields] = useState({
     finish_id: "",
     patName: "",
@@ -66,11 +68,30 @@ function Recorder() {
   useEffect(() => {
     getTicks();
     getActive()
+    getRest()
     getVideos()
   }, [status, disable, ticket, active]);
 
+  const createRest = (e:React.FormEvent) => {
+    e.preventDefault()
+    axios.post("http://localhost:5000/rest/create_rest",{time:insurance}).then((data)=> {
+      location.reload()
+    }).catch((error)=> {
+      console.log("rest error ",error)
+    })
+  }
+  const getRest = () => {
+    console.log('getting rest')
+    axios.get("http://localhost:5000/rest/get_rest").then((data)=> {
+      setInsurance(data.data.time)
+      console.log('rest data is ',data.data.time)
+    }).catch((error)=> {
+      console.log("rest error ",error)
+    })
+  }
+
   const getVideos = () => {
-    axios.get("http://192.168.30.246:5000/uploads/get_videos").then((data)=> {
+    axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
     setVideos(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -97,7 +118,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://192.168.30.246:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
+    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -130,7 +151,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://192.168.30.246:5000/tickets/getMedsTickets", {
+    axios.get("http://localhost:5000/tickets/getMedsTickets", {
         params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
       })
       .then((data) => {
@@ -165,7 +186,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.246:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -192,7 +213,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.246:5000/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -218,7 +239,7 @@ function Recorder() {
   };
   const priotize = (ticket_no:string, data:string, stage: string, reason:string,counter:number) => {
     setFetchLoading(true);
-    axios.get(`http://192.168.30.246:5000/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
+    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -244,7 +265,7 @@ function Recorder() {
   };
   const activate = (page:string,video:string) => {
     setFetchLoading(true);
-    axios.post(`http://192.168.30.246:5000/active/activate`,{page: page,video:video})
+    axios.post(`http://localhost:5000/active/activate`,{page: page,video:video})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -270,7 +291,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://192.168.30.246:5000/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -295,7 +316,7 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://192.168.30.246:5000/tickets/next_stage", {
+    axios.get("http://localhost:5000/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -332,6 +353,34 @@ function Recorder() {
   }
   return (
     <div className={styles.recorder}>
+     <div className={styles.insurance} onClick={()=> setIsinsurance(true)}>
+      <p>{insurance}</p>
+     </div>
+     {
+      isInsurance && (
+        <div className={styles.overlay01}>
+          <div className={styles.insurance_content}>
+            <div className={styles.close} onClick={()=> setIsinsurance(false)}>close</div>
+            <div className={styles.title}>Insurance Wait Time</div>
+            <form onSubmit={createRest}>
+              <select
+              value={insurance}
+              onChange={e => setInsurance(Number(e.target.value))}
+              >
+                <option value="" selected disabled>--select--</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+              </select>
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+        </div>
+      )
+     }
       {
         isVideo && (
           <div className={styles.overlay01}>
@@ -524,7 +573,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://192.168.30.246:5000/speaker/create_speaker",currentUser.counter)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://localhost:5000/speaker/create_speaker",currentUser.counter)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>

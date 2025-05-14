@@ -7,6 +7,7 @@ import cx from 'classnames'
 import useFetchData from '@/custom_hooks/fetch'
 import { useSetRecoilState } from 'recoil'
 import messageState from '@/store/atoms/message'
+import { FiEdit2 } from 'react-icons/fi'
 
 export default function Attendants() {
 const [isAdd, setAdd] = useState(false)
@@ -20,8 +21,8 @@ const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
 const setMessage = useSetRecoilState(messageState)
-const {data} = useFetchData("http://192.168.30.246:5000/services/get_all_services")
-const {data:counters} = useFetchData("http://192.168.30.246:5000/counters/get_all_counters")
+const {data} = useFetchData("http://localhost:5000/services/get_all_services")
+const {data:counters} = useFetchData("http://localhost:5000/counters/get_all_counters")
 const [fields, setFields] = useState({
     name: "",
     role: "",
@@ -29,7 +30,8 @@ const [fields, setFields] = useState({
     counter: "",
     clinic: "",
     clinic_code: "",
-    phone: ""
+    phone: "",
+    ispass: "false"
 })
 
 useEffect(()=> {
@@ -38,7 +40,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.246:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
+    axios.post("http://localhost:5000/doctors/create_doctor",{name:fields.name,phone:fields.phone,service:fields.service,room:fields.counter,clinic: fields.clinic,clinic_code: fields.clinic_code}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
@@ -56,7 +58,7 @@ useEffect(()=> {
     console.log(name,code.code)
  }
  const deleteService  = (id:string) => {
-    axios.put(`http://192.168.30.246:5000/doctors/delete_doctor/${id}`).then(()=> {
+    axios.put(`http://localhost:5000/doctors/delete_doctor/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -68,7 +70,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://192.168.30.246:5000/doctors/edit_doctor/${id}`,{fields}).then((data:any)=> {
+    axios.put(`http://localhost:5000/doctors/edit_doctor/${id}`,{fields}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
@@ -86,7 +88,7 @@ useEffect(()=> {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (namba:string,doctor:Doctor) => {
+ const handleEdit = (namba:string,doctor:any) => {
     setId(namba);
     setEdit(true)
     setFields({
@@ -94,12 +96,14 @@ useEffect(()=> {
         name: doctor.name,
         phone: doctor.phone,
         service: doctor.service,
-        counter: doctor.room
+        counter: doctor.counter,
+        clinic: doctor.clinic,
+        clinic_code: doctor.clinic_code
     })
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://192.168.30.246:5000/doctors/get_doctors",{params: {page,pagesize}}).then((data)=> {
+    axios.get("http://localhost:5000/doctors/get_doctors",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -129,8 +133,12 @@ useEffect(()=> {
             </div>
         </div>
         {
-            isAdd && ( <div className={styles.add_service}>
-                <form onSubmit={submit}>
+            (isAdd || isEdit) && ( 
+            <div className={styles.add_service}>
+                <form onSubmit={isAdd?submit:editService}>
+                     <div className={styles.title}>
+                        <h1>{isEdit?`Edit ${fields.name}`:"Add New User"}</h1>
+                     </div>
                     <div className={styles.add_items}>
                     <div className={styles.add_item}>
                     <label htmlFor="name">Enter name:</label>
@@ -167,119 +175,51 @@ useEffect(()=> {
                     </select>
                     </div>
                     {
-                        fields.service === "nurse_station" && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select Clinic:</label>
-                            <select value={fields.clinic}
-                            // onChange={e => setFields({...fields,clinic: e.target.value})}>
-                            onChange={e => handleCounter(e.target.value)}>
-                                <option selected disabled>Select Clinic</option>
-                                {
-                                    Array.from(new Set(counters.map((item:Counter) => item.clinic))).map(name => counters.find((item:Counter) => item.clinic === name)).map((data01,index)=> (
-                                        <option value={data01.clinic} key={index}>{data01.clinic}</option>
-                                    ))
-                                }
-                                {/* {
-                                    counters.filter((data:any)=> data.subservice !== null).map((item:any,index:number)=> (
-                                        <option value={item.subservice} key={index}>{item.subservice}</option>
-                                    ))
-                                } */}
-                            </select>
-                            </div>)
+                        fields.service == "nurse_station" && (
+                            <div className={styles.add_item}>
+                              <label htmlFor="counter">Enter Clinic:</label> 
+                               <input 
+                                type="text" 
+                                value={fields.clinic}
+                                onChange={e => setFields({...fields,clinic:e.target.value})}
+                                placeholder='clinic*'
+                                id="clinic" 
+                                name="clinic"
+                                />
+                            </div>
+                        )
                     }
                     {
-                        (fields.service === "nurse_station" && fields.clinic !== '') && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select Counter:</label>
-                            <select value={fields.counter}
-                            onChange={e => setFields({...fields,counter: e.target.value})}>
-                                <option selected>Select Counter</option>
-                                {
-                                    counters.filter((data:Counter)=> data.clinic === fields.clinic).map((item:Counter,index:number)=> (
-                                        <option value={item.namba} key={index}>{item.namba}</option>
-                                    ))
-                                }
-                            </select>
-                            </div>)
+                        (fields.clinic !== "" || fields.service !== "") && (
+                            <div className={styles.add_item}>
+                              <label htmlFor="counter">Enter Counter:</label> 
+                               <input 
+                                type="text" 
+                                value={fields.counter}
+                                onChange={e => setFields({...fields,counter:e.target.value})}
+                                placeholder='counter*'
+                                id="counter" 
+                                name="counter"
+                                />
+                            </div>
+                        )
                     }
                     {
-                        (fields.service !== "" && fields.service !== "nurse_station") && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select counter:</label>
-                            <select value={fields.counter}
-                            onChange={e => setFields({...fields,counter: e.target.value})}>
-                                <option selected disabled>Select Counter</option>
-                                {
-                                    fields.service !== "nurse_station" && (<option selected value={counters[0].namba}>Select Counter</option>)
-                                }
-                                {
-                                    counters.filter((data:Counter)=> data.service === fields.service).map((item:Counter,index:number)=> (
-                                        <option value={item.namba} key={index}>{item.namba}</option>
-                                    ))
-                                }
-                            </select>
-                            </div>)
+                        isEdit && (<div className={styles.add_item}>
+                        <label htmlFor="counter">Reset Password?</label> 
+                        <select
+                        value={fields.ispass}
+                        onChange={e => setFields({...fields,ispass:e.target.value})}
+                        >
+                            <option value="" selected disabled>--select--</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>)
                     }
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
-                    <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>
-                    </div>
-                    </div>
-                </form>
-            </div> )
-        }
-        {
-            isEdit && ( <div className={styles.add_service}>
-                <form onSubmit={submit}>
-                    <div className={styles.add_items}>
-                    <div className={styles.add_item}>
-                    <label htmlFor="name">Enter name:</label>
-                    <input 
-                    type="text" 
-                    value={fields.name}
-                    onChange={e => setFields({...fields,name: e.target.value})}
-                    placeholder='name*'
-                    id="name" 
-                    name="name"
-                    />
-                    </div>
-                    <div className={styles.add_item}>
-                    <label htmlFor="phone">Enter phone:</label>
-                    <input 
-                    type="text" 
-                    value={fields.phone}
-                    onChange={e => setFields({...fields,phone: e.target.value})}
-                    placeholder='phone*'
-                    id="phone" 
-                    name="phone"
-                    />
-                    </div>
-                    <div className={styles.add_item}>
-                    <label htmlFor="service">Select service:</label>
-                    <select value={fields.service}
-                    onChange={e => setFields({...fields,service:e.target.value})}>
-                        <option selected disabled defaultValue="Select Service">Select Service</option>
-                        {
-                            Array.from(new Set(counters.map((item:Counter) => item.name))).map(name => counters.find((item:Counter) => item.name === name)).map((data01:Counter,index)=> (
-                                <option value={data01.name} key={index}>{data01.name}</option>
-                            ))
-                        }
-                    </select>
-                    </div>
-                    {
-                        fields.service !== "" && (<div className={styles.add_item}>
-                            <label htmlFor="counter">Select counter:</label>
-                            <select value={fields.counter}
-                            onChange={e => setFields({...fields,counter: e.target.value })}>
-                                <option selected disabled>Select Counter</option>
-                                {
-                                    counters.filter((data:Counter)=> data.name === fields.service).map((item:Counter,index:number)=> (
-                                        <option value={item.namba} key={index}>{item.namba}</option>
-                                    ))
-                                }
-                            </select>
-                            </div>)
-                    }
-                    <div className={styles.action}>
-                    <button onClick={editService}>submit</button>
-                    <div className={styles.clear} onClick={()=> setEdit(false)}><MdOutlineClear className={styles.icon}/></div>
+                    <div className={styles.clear} onClick={()=> isAdd?setAdd(false): setEdit(false)}><MdOutlineClear className={styles.icon}/></div>
                     </div>
                     </div>
                 </form>
@@ -328,7 +268,7 @@ useEffect(()=> {
                                     <td>{item.role}</td>
                                     <td>
                                         <div className={styles.delete} onClick={()=> handleDelete(item.id)}><MdDelete className={styles.icon}/></div> 
-                                        {/* <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div>  */}
+                                        <div className={styles.edit} onClick={()=>  handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div> 
                                         {/* <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div>  */}
                                     </td>
                                 </tr>

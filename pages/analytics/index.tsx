@@ -13,7 +13,7 @@ const AnalyticsDashboard = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.30.246:5000/new_analytics/token_stats', {
+        const response = await axios.get('http://localhost:5000/new_analytics/token_stats', {
           params: { duration }
         });
         setData(response.data);

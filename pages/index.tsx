@@ -202,7 +202,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.246:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
         setVideo(data.data.video)
@@ -225,7 +225,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.246:5000/adverts/get_all_adverts")
+      .get("http://localhost:5000/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -239,7 +239,7 @@ export default function Home() {
   const getTickets = () => {
     setLoading(true);
     axios
-      .get("http://192.168.30.246:5000/tickets/get_display_tokens", {
+      .get("http://localhost:5000/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "" },
       })
       .then((data) => {

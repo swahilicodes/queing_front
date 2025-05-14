@@ -64,6 +64,13 @@
             align-items: center;
             justify-content: center;
             animation: move .5s ease-in-out;
+            .title{
+                margin: 15px;
+                h1{
+                    font-size: 20px;
+                    color: $mainColor;
+                }
+            }
             .add_items{
                 width: 100%;
                 display: flex;

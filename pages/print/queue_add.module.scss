@@ -174,10 +174,11 @@
             }
         }
         .item{
+            width: 20%;
             background: $mainColor;
             cursor: pointer;
             color: $mainBold;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 8px 15px rgba(0, 0, 0, 0.2), 0 12px 25px rgba(0, 0, 0, 0.3);
             //width: 30%;
             font-size: 25px;
             margin: 20px 0;

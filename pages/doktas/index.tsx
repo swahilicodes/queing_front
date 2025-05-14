@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styles from './services.module.scss'
 import axios from 'axios'
-import { MdDelete, MdOutlineClear } from 'react-icons/md'
+import { MdDelete, MdEdit, MdOutlineClear } from 'react-icons/md'
 import { useRouter } from 'next/router'
 import cx from 'classnames'
 import { FiEdit2 } from 'react-icons/fi'
@@ -12,7 +12,7 @@ import messageState from '@/store/atoms/message'
 export default function Attendants() {
 const [isAdd, setAdd] = useState(false)
 const [isDelete, setDelete] = useState(false)
-const [, setEdit] = useState(false)
+const [isEdit, setEdit] = useState(false)
 const [services, setServices] = useState([])
 const [fetchLoading, setFetchLoading] = useState(false)
 const router = useRouter()
@@ -20,7 +20,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data:clinics,loading:srsLoading, error: srsError} = useFetchData("http://192.168.30.246:5000/clinic/get_clinics")
+const {data:clinics,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5000/clinic/get_clinics")
 const [rooms, setRooms] = useState([])
 const setMessage = useSetRecoilState(messageState)
 const [fields, setFields] = useState({
@@ -29,7 +29,8 @@ const [fields, setFields] = useState({
     clinic: "",
     clinic_code: "",
     phone: "",
-    room: ""
+    room: "",
+    ispass: "false"
 })
 
 useEffect(()=> {
@@ -39,7 +40,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.246:5000/doktas/create_dokta",{name:fields.name,phone:fields.phone,room:fields.room,clinic: fields.clinic,clinic_code: fields.clinic_code}).then(()=> {
+    axios.post("http://localhost:5000/doktas/create_dokta",{name:fields.name,phone:fields.phone,room:fields.room,clinic: fields.clinic,clinic_code: fields.clinic_code}).then(()=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
@@ -63,7 +64,7 @@ useEffect(()=> {
     setFields({...fields,clinic:coder.cliniciname,clinic_code: code,room: ""})
  }
  const deleteService  = (id:string) => {
-    axios.put(`http://192.168.30.246:5000/doktas/delete_dokta/${id}`).then(()=> {
+    axios.put(`http://localhost:5000/doktas/delete_dokta/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -82,7 +83,7 @@ useEffect(()=> {
     })
  }
  const getRooms  = () => {
-    axios.get(`http://192.168.30.246:5000/rooms/get_rooms`,{params: {clinic_code: fields.clinic_code}}).then((data)=> {
+    axios.get(`http://localhost:5000/rooms/get_rooms`,{params: {clinic_code: fields.clinic_code}}).then((data)=> {
         setRooms(data.data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -100,27 +101,21 @@ useEffect(()=> {
         }
     })
  }
-//  const editService  = (e:React.FormEvent) => {
-//     e.preventDefault()
-//     axios.put(`http://192.168.30.246:5000/doctors/edit_doctor/${id}`,{fields}).then(()=> {
-//         setEdit(false)
-//         router.reload()
-//     }).catch((error:any)=> {
-//         if (error.response && error.response.status === 400) {
-//             console.log(`there is an error ${error.message}`)
-//             setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            // setTimeout(()=> {
-            //     setMessage({...onmessage,title:"",category: ""})  
-            // },5000)
-//         } else {
-//             console.log(`there is an error message ${error.message}`)
-//             setMessage({...onmessage,title:error.message,category: "error"})
-//             setTimeout(()=> {
-//                 setMessage({...onmessage,title:"",category: ""})  
-//             },5000)
-// //         }
-//     })
-//  }
+
+ const editService  = (e:React.FormEvent) => {
+    e.preventDefault()
+    axios.put(`http://localhost:5000/doktas/edit_dokta/${id}`,{fields}).then((data:any)=> {
+        setEdit(false)
+        router.reload()
+    }).catch((error)=> {
+        if (error.response && error.response.status === 400) {
+            setMessage({...onmessage,title:error.response.data.error,category: "error"})
+        } else {
+            setMessage({...onmessage,title:error.message,category: "error"})
+        }
+    })
+ }
+
  const handlePageChange = (namba:number) => {
     setPage(namba);
   };
@@ -128,7 +123,8 @@ useEffect(()=> {
     setId(namba);
     setDelete(true)
   };
- const handleEdit = (namba:string,doctor:Doctor) => {
+ const handleEdit = (namba:string,doctor:any) => {
+    console.log(doctor.room)
     setId(namba);
     setEdit(true)
     setFields({
@@ -136,12 +132,26 @@ useEffect(()=> {
         name: doctor.name,
         phone: doctor.phone,
         service: doctor.service,
-        room: doctor.room
+        room: doctor.room,
+        clinic: doctor.clinic,
+        clinic_code: doctor.clinic_code
+    })
+  };
+ const handleAdd = () => {
+    setAdd(true)
+    setFields({
+        ...fields,
+        name: "",
+        phone: "",
+        service: "",
+        room: "",
+        clinic: "",
+        clinic_code: ""
     })
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://192.168.30.246:5000/doktas/get_doktas",{params: {page,pagesize,clinic_code: fields.clinic_code}}).then((data)=> {
+    axios.get("http://localhost:5000/doktas/get_doktas",{params: {page,pagesize,clinic_code: fields.clinic_code}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)
@@ -185,14 +195,17 @@ useEffect(()=> {
                         }
                     </select>
                 </div>
-                <div className={styles.add_new} onClick={()=> setAdd(!isAdd)}>
+                <div className={styles.add_new} onClick={()=> handleAdd()}>
                  <p>Add new</p>
                 </div>
             </div>
         </div>
         {
-            isAdd && ( <div className={styles.add_service}>
-                <form onSubmit={submit}>
+            (isAdd || isEdit) && ( <div className={styles.add_service}>
+                <form onSubmit={isAdd?submit:editService}>
+                    <div className={styles.title}>
+                        <h1>{isEdit?`Edit ${fields.name}`:"Add New Doctor"}</h1>
+                    </div>
                     <div className={styles.add_items}>
                     <div className={styles.add_item}>
                     <label htmlFor="name">Enter name:</label>
@@ -219,6 +232,7 @@ useEffect(()=> {
                     <div className={styles.add_item}>
                     <label htmlFor="clinic">Select Clinic:</label>
                     <select
+                    value={fields.clinic}
                     onChange={e => handleClinic(e.target.value)}
                     >
                         <option value="" selected disabled>Select Clinic</option>
@@ -230,14 +244,28 @@ useEffect(()=> {
                     </select>
                     </div>
                     <div className={styles.add_item}>
-                    <label htmlFor="phone">Select Room:</label>
+                    <label>Select Room:</label>
                         <input 
                         type="text" 
+                        value={fields.room}
                         onChange={e => setFields({...fields,room: e.target.value})}
                         placeholder='Room'
                         required
                         />
                     </div>
+                    {
+                        isEdit && (<div className={styles.add_item}>
+                        <label htmlFor="counter">Reset Password?</label> 
+                        <select
+                        value={fields.ispass}
+                        onChange={e => setFields({...fields,ispass:e.target.value})}
+                        >
+                            <option value="" selected disabled>--select--</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>)
+                    }
                     {/* {
                         rooms.length>0 && (
                             <div className={styles.add_item}>
@@ -257,7 +285,7 @@ useEffect(()=> {
                     } */}
                     <div className={styles.action}>
                     <button type='submit'>submit</button>
-                    <div className={styles.clear} onClick={()=> setAdd(false)}><MdOutlineClear className={styles.icon}/></div>
+                    <div className={styles.clear} onClick={()=> isAdd?setAdd(false): setEdit(false)}><MdOutlineClear className={styles.icon}/></div>
                     </div>
                     </div>
                 </form>
@@ -306,6 +334,7 @@ useEffect(()=> {
                                     <td>{item.role}</td>
                                     <td>
                                         <div className={styles.delete} onClick={()=> handleDelete(item.id)}><MdDelete className={styles.icon}/></div> 
+                                        <div className={styles.delete} onClick={()=> handleEdit(item.id,item)}><MdEdit className={styles.icon}/></div> 
                                         {/* <div className={styles.edit} onClick={()=> handleEdit(item.id,item)}><FiEdit2 className={styles.icon}/></div>  */}
                                     </td>
                                 </tr>

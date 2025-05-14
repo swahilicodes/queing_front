@@ -30,7 +30,7 @@ function StageGraph() {
   },[fields.stage,fields.time, fields.clinic])
 
   const getTicks = () => {
-    axios.get("http://192.168.30.246:5000/analytics/token_analytics")
+    axios.get("http://localhost:5000/analytics/token_analytics")
       .then((data: any) => {
         setToken(data.data)
         //console.log(data)
@@ -52,7 +52,7 @@ function StageGraph() {
       });
   };
   const getClinics = () => {
-    axios.get("http://192.168.30.246:5000/clinic/get_clinics")
+    axios.get("http://localhost:5000/clinic/get_clinics")
       .then((data: any) => {
         setClinics(data.data)
         console.log('clinics are ',data.data)
@@ -73,7 +73,7 @@ function StageGraph() {
   };
 
   const getPeaks = () => {
-    axios.get("http://192.168.30.246:5000/analytics/peak_times",{params: {time: fields.time}})
+    axios.get("http://localhost:5000/analytics/peak_times",{params: {time: fields.time}})
       .then((data: any) => {
         setStagers(data.data)
         setPeaks(data.data)
@@ -94,7 +94,7 @@ function StageGraph() {
       });
   };
   const getStagers = () => {
-    axios.get("http://192.168.30.246:5000/analytics/stage_analytics",{params: {stage: fields.stage,time_factor:fields.time, clinic: fields.clinic}})
+    axios.get("http://localhost:5000/analytics/stage_analytics",{params: {stage: fields.stage,time_factor:fields.time, clinic: fields.clinic}})
       .then((data: any) => {
         setStagers(data.data)
         setTokens(data.data)

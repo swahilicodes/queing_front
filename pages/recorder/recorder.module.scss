@@ -3,6 +3,31 @@
     width: 100vw;
     height: calc(100vh - 70px);
     position: relative;
+    .insurance{
+        position: fixed;
+        bottom: 80px;
+        right: 40px;
+        background: $mainBold;
+        border-radius: 50%;
+        padding: 15px;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        color: white;
+        box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 10px 15px rgba(0, 0, 0, 0.1),
+        0 20px 25px rgba(0, 0, 0, 0.1),
+        0 40px 60px rgba(0, 0, 0, 0.05);
+        p{
+            font-size: 18px;
+            font-weight: 600;
+        }
+    }
     .overlay01{
         width: 100%;
         height: 100%;
@@ -12,6 +37,63 @@
         align-items: center;
         justify-content: center;
         z-index: 5;
+        .insurance_content{
+            background: white;
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            .close{
+                position: absolute;
+                top: -20px;
+                right: -20px;
+                background: red;
+                border-radius: 50%;
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 15px;
+            }
+            .title{
+                font-size: 20px;
+                color: $mainColor;
+                margin: 10px;
+            }
+            form{
+                width: 95%;
+                select{
+                    border: 2px solid $divColor;
+                    padding: 15px;
+                    outline: none;
+                    width: 100%;
+                    margin: 10px 0;
+                    color: $mainColor;
+                    font-size: 18px;
+                    font-weight: 600;
+                    option{
+                        color: black;
+                        font-size: 18px;
+                        font-weight: 500;
+                    }
+                }
+                button{
+                    padding: 15px;
+                    outline: none;
+                    width: 100%;
+                    margin: 10px 0;
+                    color: white;
+                    font-size: 18px;
+                    font-weight: 600;
+                    background: $mainColor;
+                    cursor: pointer;
+                    border: none;
+                }
+            }
+        }
         .contents{
             background: white;
             position: absolute;
