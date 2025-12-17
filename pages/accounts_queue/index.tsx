@@ -23,6 +23,7 @@ import LazyVideo from "@/components/lazyVideo/lazy_video";
 import DisplayCounter from "@/components/display_counter/display_counter";
 import CurrentServing from "@/components/current_serving/current_serving";
 import CurrentTime from "@/components/current_time/current_time";
+import UpNext from "@/components/upnext/current_serving";
 
 export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -74,7 +75,7 @@ export default function Home() {
   const [currentText, setCurrentText] = useState(0)
 
   useEffect(() => {
-    getTickets();
+    //getTickets();
     getAdverts();
     getActive();
     getServing()
@@ -134,7 +135,7 @@ export default function Home() {
         clearInterval(restId);
       },10000)
     };
-  }, [condition, blink,token, serveId,isRest, language]);
+  }, [condition,token, serveId,isRest, language]);
 
   useEffect(()=> {
     const langId = setInterval(() => {
@@ -148,6 +149,40 @@ export default function Home() {
       clearInterval(langId);
     };
   },[language])
+
+   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const interval = setInterval(() => {
+        const deviceId = localStorage.getItem("device_id_new");
+        if (!deviceId) return;
+  
+        axios
+          .get("http://localhost:5000/network/get_device", {
+            params: {
+              id: deviceId,
+            },
+          })
+          .then((dita) => {
+            getTickets(dita.data.floor, dita.data.isDiabetic);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }, 5000); // runs every 5 seconds
+  
+      // cleanup when component unmounts
+      return () => clearInterval(interval);
+    }
+  }, []);
+  // useEffect(()=> {
+  //     getTickets()
+  //     const interval = setInterval(()=> {
+  //       getTickets()
+  //     },2000)
+  //     return () => {
+  //     clearInterval(interval);
+  //   };
+  //   },[])
 
   const getServing = () => {
     if(tickets.length > 0){
@@ -225,14 +260,16 @@ export default function Home() {
         setMessage({...onmessage,title:error.message,category: "error"})
       });
   };
-  const getTickets = () => {
+  const getTickets = (floor:string,isDiabetic:boolean) => {
     setLoading(true);
     axios
       .get("http://localhost:5000/tickets/get_display_tokens", {
-        params: { stage: "accounts", clinic_code: "" },
+        params: { stage: "accounts", clinic_code: "", floor: floor, isDiabetic: isDiabetic },
       })
       .then((data) => {
-        setTickets(data.data);
+        console.log('accounts tickets are ',data.data)
+        setTickets([...data.data]);
+        //setTickets(data.data);
         setLoading(false);
       })
       .catch((error) => {
@@ -314,23 +351,21 @@ export default function Home() {
               }
               <div className={styles.nexting}>
                 <div className={cx(styles.nextang,isRest && styles.rest)}>
-                  {
-                    !isRest
-                    ? <div className={styles.video}>
-                      <video src="/videos/stomach.mp4" autoPlay muted loop/>
-                    </div>
-                    : <div className={styles.tiketi}>
-                      <p>{formatNumber(nextServe.id.toString())}</p>
-                      <TbHeartHandshake className={styles.icon} size={50}/>
-                      <p>{nextServe.window}</p>
-                    </div>
-                  }
+                  <div className={styles.tiketi}>
+                        <p>
+                          {
+                            tickets.filter((item:any)=> item.ticket.serving).length>0
+                            ? <UpNext savs={tickets.filter((item: any) => item.ticket.serving === true)}/>
+                            : "000"
+                          }
+                        </p>
+                      </div>
                 </div>
                 <div className={cx(styles.signage,isRest && styles.rest)}>
                   <div className={cx(styles.wrapper_sig,isRest && styles.rest)}>
                     {
                       isRest
-                      ? <p>{language==="English"?"NEXT":"ANAYE FUATA"}</p>
+                      ? <p>{language==="English"?"NEXT":"ANAYEFUATA"}</p>
                       : <div className={styles.indicators}>
                         <div className={`${styles.divAnimation} ${styles.divDelay1}`}></div>
                         <div className={`${styles.divAnimation} ${styles.divDelay2}`}></div>
@@ -507,12 +542,6 @@ export default function Home() {
                           className={cx(styles.cona, blink && styles.blink)}
                           size={40}
                           />
-                          // <div className={styles.indicator}>
-                          //   <BiCurrentLocation
-                          //     className={cx(styles.con, blink && styles.blink)}
-                          //     size={40}
-                          //   />
-                          // </div>
                         ) : (
                           <FaArrowTrendUp className={styles.con} size={40} />
                         )}

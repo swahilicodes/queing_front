@@ -1254,7 +1254,7 @@
                             }
                             p{
                                 color: $mainColor;
-                                font-size: 40px;
+                                font-size: 60px;
                                 font-weight: 600;
                             }
                         }
@@ -1282,14 +1282,14 @@
                     .signage{
                         position: absolute;
                         right: 0;
-                        width: 20%;
+                        width: 40%;
                         height: 100%;
                         background: $mainBold;
                         //background: linear-gradient(to left, $secondColor,$mainColor);
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        font-size: 30px;
+                        font-size: 60px;
                         font-weight: 600;
                         transition: all .5s ease-in-out;
                         &.rest{
@@ -1312,7 +1312,7 @@
                             p{
                                 animation: flyIn 1s both;
                                 font-weight: 500;
-                                font-size: 15px;
+                                font-size: 22px;
                             }
                             .indicators{
                                 display: flex;

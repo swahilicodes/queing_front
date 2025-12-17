@@ -21,7 +21,8 @@ interface Token{
         updatedAt: Date,
         serving: boolean,
         serving_id: string,
-        doctor_id: string
+        doctor_id: string,
+        calls: number
     },
     counter: {
         id: number,

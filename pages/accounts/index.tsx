@@ -19,10 +19,14 @@ import useCreateItem from "@/custom_hooks/useCreateItem";
 import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 import messageState from "@/store/atoms/message";
 import isUserState from "@/store/atoms/isUser";
+import AllTickets from "@/components/all_tickets/all_tickets";
+import SearchableSelect from "@/components/searchable_clinics";
 
 function Recorder() {
   const currentUser = useRecoilValue(currentUserState);
   const [status, setStatus] = useState("waiting");
+  const [floor, setFloor] = useState("first");
+  const [diabetic, setDiabetic] = useState("false");
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [page, setPage] = useState(1);
@@ -44,10 +48,28 @@ function Recorder() {
   const [isVideo, setVideo] = useState(false)
   const [videos, setVideos] = useState([])
   const [isUser, setUser] = useRecoilState(isUserState)
+  const [isPrior, setPrior] = useState(false)
+  const reasons = ["Staff","Wheel Chair","Pediatric","Old","Premature","Fast Track", "Pregnancy"]
+  const [reason, setReason] = useState("")
+  const items = ["Apple", "Banana", "Orange", "Mango", "Pineapple"];
+  const [selected, setSelected] = useState("");
+  const [isClinic, setIsClinic] = useState(false)
   const [fields, setFields] = useState({
-    mr_no: "",
-    status: ""
+    mrNumber: "",
+    status: "",
+    isNew: false,
+    isOld: false,
+    finish_id: "",
+    patName: "",
+    sex: "",
+    category: "",
+    age: "",
+    calling_token: ""
   })
+  const [priorFields, setPriorFields] = useState({
+      ticket_no: '',
+      stage: ''
+    })
   
 
   useEffect(() => {
@@ -57,13 +79,101 @@ function Recorder() {
     setInterval(()=> {
       setTokens((item)=> item.map((itema)=> itema))
     },1000)
-  }, [status, disable, ticket,active]);
+  }, [status,disable, ticket,active,floor,diabetic]);
+
+  useEffect(()=> {
+      if(typeof window !== undefined){
+        setStatus(localStorage.getItem("status")!)
+        setFloor(localStorage.getItem("floor")!)
+        setDiabetic(localStorage.getItem("diabetic")!)
+        console.log(localStorage.getItem("status"))
+      }
+    },[status])
 
   const handleNext = (token: any) => {
     setNext(true)
-    setFields({...fields,mr_no: token.mr_no})
+    setFields({...fields,mrNumber: token.mr_no})
   }
 
+  const priorReady = (ticket_no:string, stage: string) => {
+    setPrior(true)
+    setPriorFields({...priorFields,ticket_no: ticket_no, stage: stage})
+  }
+
+  const toMeds = (id:number) => {
+    axios.post("http://localhost:5000/ticketa/to_meds",{id}).then((data)=> {
+      location.reload()
+    }).catch((error)=> {
+      setMessage({...onmessage,title:"There is an error",category:"error"})
+      setTimeout(()=> {
+        setMessage({...onmessage,title:"",category:""})
+      },3000)
+    })
+  }
+
+  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {  
+    if(found){
+        setFinLoading(true)
+      axios.put(`http://localhost:5000/tickets/finish_account_token/${id}`,{stage:"nurse_station",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then((data)=> {
+        clinicGo(data.data.mr_no)
+        setInterval(()=> {
+          setFinLoading(false)
+          router.reload()
+        },3000)
+      }).catch((error)=> {
+        setFinLoading(false)
+        console.log('accounts error ',error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`)
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+              setTimeout(()=> {
+                  setMessage({...onmessage,title:"",category: ""})  
+              },5000)
+      } else {
+          //console.log(`there is an error message ${error.message}`)
+          setMessage({...onmessage,title:error.message,category: "error"})
+              setTimeout(()=> {
+                  setMessage({...onmessage,title:"",category: ""})  
+              },5000)
+      }
+      })
+      }else{
+        setMessage({...onmessage,title:'Patient not found',category: "error"})
+              setTimeout(()=> {
+                  setMessage({...onmessage,title:"",category: ""})  
+              },5000)
+      }
+    }
+
+     const nextToken = (e: React.FormEvent) => {
+        e.preventDefault()
+        setFinLoading(true);
+        axios.get("http://localhost:5000/tickets/next_stage", {
+            params: { mr_number: fields.mrNumber },
+          })
+          .then((data) => {
+            setFound(true)
+            setFields({...fields,patName:data.data.fullName.toUpperCase(),sex: data.data.gender, age: data.data.age,category: data.data.patgName})
+            setFinLoading(false);
+            console.log(fields)
+          })
+          .catch((error) => {
+            setFinLoading(false);
+            if (error.response && error.response.status === 400) {
+              console.log(`there is an error ${error.message}`);
+              setMessage({...onmessage,title:error.response.data.error,category: "error"})
+                setTimeout(()=> {
+                    setMessage({...onmessage,title:"",category: ""})  
+                },5000)
+            } else {
+              console.log(`there is an error message ${error.message}`);
+              setMessage({...onmessage,title:error.message,category: "error"})
+                setTimeout(()=> {
+                    setMessage({...onmessage,title:"",category: ""})  
+                },5000)
+            }
+          });
+      };
   const getVideos = () => {
     axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
     setVideos(data.data)
@@ -111,6 +221,43 @@ function Recorder() {
       });
   };
 
+  const handleStatus = (stata:string) => {
+    const status = localStorage.getItem("status")
+    if(status){
+      localStorage.removeItem("status")
+      localStorage.setItem("status",stata)
+      location.reload()
+    }else{
+      localStorage.setItem("status",stata)
+      location.reload()
+    }
+  }
+
+  const handleFloor = (stata:string) => {
+    const floor = localStorage.getItem("floor")
+    if(floor){
+      localStorage.removeItem("floor")
+      localStorage.setItem("floor",stata)
+      location.reload()
+    }else{
+      localStorage.setItem("floor",stata)
+      location.reload()
+    }
+  }
+  const handleDiabetic = (stata:string) => {
+    const diabetic = localStorage.getItem("floor")
+    if(diabetic){
+      localStorage.removeItem("diabetic")
+      localStorage.setItem("diabetic",stata)
+      setDiabetic(stata)
+      location.reload()
+    }else{
+      localStorage.setItem("diabetic",stata)
+      setDiabetic(stata)
+      location.reload()
+    }
+  }
+
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
     axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
@@ -138,7 +285,7 @@ function Recorder() {
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getMedsTickets", {
-        params: { page, pagesize, status, disable, phone: ticket, stage: "accounts" },
+        params: { page, pagesize, status: status, disable, phone: ticket, stage: "accounts",floor: floor,isDiabetic: diabetic},
       })
       .then((data: any) => {
         setTokens(data.data.data);
@@ -221,7 +368,34 @@ function Recorder() {
     localStorage.removeItem('token')
     router.reload()
   }
-  const priotize = (ticket_no:string, data:string,counter: number) => {
+
+  const priotize = (ticket_no:string, data:string, stage: string, reason:string,counter:number) => {
+    setFetchLoading(true);
+    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
+      .then(() => {
+        setInterval(() => {
+          setFetchLoading(false);
+          router.reload()
+        }, 2000);
+      })
+      .catch((error) => {
+        setFetchLoading(false);
+        if (error.response && error.response.status === 400) {
+          console.log(`there is an error ${error.message}`);
+          setMessage({...onmessage,title:error.response.data.error,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        } else {
+          console.log(`there is an error message ${error.message}`);
+          setMessage({...onmessage,title:error.message,category: "error"})
+            setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
+        }
+      });
+  };
+  const serveTicket = (ticket_no:string, data:string,counter: number) => {
     setFetchLoading(true);
     axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts",counter:counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
@@ -245,6 +419,19 @@ function Recorder() {
         }
       });
   };
+
+  const PrepareNexta = (item:any) => {
+    if(item.mr_no == null){
+      setFields({...fields,isNew: true,isOld: false,finish_id: item.id})
+    }else{
+      setFields({...fields,isOld: true,isNew: false,finish_id: item.id,mrNumber: item.mr_no})
+    }
+  }
+
+  const prepareCall = (token:string,stage:string,station:string,url:string,counter:string,phone:string) => {
+    setFields({...fields,calling_token: token})
+    createItem(token,stage,station,url,counter,phone)
+  }
   return (
     <div className={styles.recorder}>
       {
@@ -276,6 +463,37 @@ function Recorder() {
           </div>
         )
       }
+      {
+        isClinic && (
+          <div className={styles.overlay01}>
+            <div className={styles.contents}>
+              <div className={styles.close} onClick={()=> setIsClinic(false)}>close</div>
+              <div className={styles.search_list}>
+              <h1>Change Clinic</h1>
+              <SearchableSelect options={items} onSelect={setSelected} />
+            </div>
+            </div>
+          </div>
+        )
+      }
+      {
+      isPrior && (
+        <div className={styles.priority}>
+          <div className={styles.prior_data}>
+            <div className={styles.title}>Select Reason</div>
+            <select onChange={e => setReason(e.target.value)}>
+              <option value="" selected disabled>--select--</option>
+              {
+                reasons.map((item,index)=> (
+                  <option value={item} key={index}>{item}</option>
+                ))
+              }
+            </select>
+            <button onClick={()=> priotize(`${priorFields.ticket_no}`,"priority",priorFields.stage, reason,Number(currentUser.counter))}>Prioritize</button>
+          </div>
+        </div>
+      )
+    }
       <div className={cx(styles.overlaya,next && styles.active)}>
         <div className={styles.data}></div>
       </div>
@@ -317,13 +535,34 @@ function Recorder() {
                   :<IoSearch className={styles.icon__}onClick={() => setSearch(!search)} size={40}/>
                 }
           </div>
+          {
+            floor==="ground" && (<div className={styles.side}>
+            <label>isDiabetic:</label>
+            <select onChange={(e) => handleDiabetic(e.target.value)} 
+            value={diabetic}
+            >
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>)
+          }
+          <div className={styles.side}>
+            <label>Floor:</label>
+            <select onChange={(e) => handleFloor(e.target.value)} 
+            value={floor}
+            >
+              <option value="first">First</option>
+              <option value="ground">Ground</option>
+            </select>
+          </div>
           <div className={styles.side}>
             <label>Status:</label>
-            <select onChange={(e) => setStatus(e.target.value)} value={status}>
+            <select onChange={(e) => handleStatus(e.target.value)} 
+            value={status}
+            >
               <option value="waiting">waiting</option>
-              <option value="done">done</option>
-              <option value="cancelled">cancelled</option>
               <option value="pending">pending</option>
+              <option value="all">All</option>
             </select>
           </div>
           <div className={styles.side}>
@@ -333,15 +572,41 @@ function Recorder() {
           </div>
         </div>
       </div>
-      <div className={cx(styles.overlay, next && styles.active)}>
+      <div className={cx(styles.overlay, fields.isOld && styles.active)}>
         <div className={styles.next_stage}>
-            <div className={styles.close} onClick={()=> setNext(false)}>close</div>
+            {/* <div className={styles.close} onClick={()=> setNext(false)}>close</div> */}
+            <div className={styles.close} onClick={()=> setFields({...fields,isOld: false})}>close</div>
             <form>
                 <div className={styles.status}>Status: <span className={cx(fields.status==="Not Paid"?styles.red:styles.green)}>{fields.status ===""?"N/A": fields.status}</span></div>
                 <div className={styles.buttons}>
-                <div className={styles.button} onClick={()=> clinicGo(fields.mr_no)}>Check Status</div>
+                <div className={styles.button} onClick={()=> clinicGo(fields.mrNumber)}>Check Status</div>
                 {/* <div onClick={()=> submit(tokens[0].token.id,bill)} className={styles.button}>Check Status</div> */}
                 {/* <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div> */}
+                </div>
+            </form>
+            <div className={cx(styles.fin_loader,finLoading && styles.active)}>
+                <div className={styles.progress}></div>
+            </div>
+        </div>
+      </div>
+      <div className={cx(styles.overlay, fields.isNew && styles.active)}>
+        <div className={styles.next_stage}>
+            <div className={styles.close} onClick={()=> setFields({...fields,isNew: false})}>close</div>
+            <form>
+                <input 
+                type="text"
+                placeholder="Mr Number" 
+                value={fields.mrNumber}
+                onChange={e => setFields({...fields,mrNumber:e.target.value.toUpperCase()})}
+                />
+                {
+                    !fields.patName
+                    ? <p>Patient: -----</p>
+                    : <p>Patient: <span>{fields.patName}</span></p>
+                }
+                <div className={styles.buttons}>
+                <div onClick={nextToken} className={styles.button}>Search</div>
+                <div onClick={()=> found && finishToken(Number(fields.finish_id),"nurse_station",fields.mrNumber,fields.sex, currentUser.phone,fields.patName,fields.age, fields.category)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
                 </div>
             </form>
             <div className={cx(styles.fin_loader,finLoading && styles.active)}>
@@ -367,6 +632,11 @@ function Recorder() {
                       <th>Mr-Number</th>
                       <th>Gender</th>
                       <th>Status</th>
+                      {
+                        status ==="all" && (
+                          <th>Stage</th>
+                        )
+                        }
                       <th>Medical Time</th>
                       <th>Category</th>
                       <th>Action</th>
@@ -381,16 +651,40 @@ function Recorder() {
                         <td>{item.token.mr_no}</td>
                         <td>{item.token.gender}</td>
                         <td>{item.token.status}</td>
+                        {
+                        status ==="all" && (
+                          <td>{item.token.stage}</td>
+                        )
+                        }
                         <td><TimeAgo isoDate={new Date(item.token.med_time).toISOString()} /></td>
                         <td>{item.token.category===null?"N/A":item.token.category}</td>
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
+                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
                             </div>
-                            {/* <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.disabled && styles.priority)}>{item.token.disabled?"prioritized":"prioritize"}</div>
-                            </div> */}
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> serveTicket(`${item.token.ticket_no}`,"serve",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
+                            </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve)} onClick={()=> editTicket(item.token.id,status==="waiting"?"pending":"waiting")}>{status==="waiting"?"pend":"unpend"}</div>
+                            </div>
+                            <div className={styles.action}>
+                                <div className={cx(styles.serve,item.token.disabled && styles.prioritya)} onClick={()=> priorReady(`${item.token.ticket_no}`,item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div>
+                              </div>
+                            <div className={styles.action}>
+                                <div className={cx(styles.serve)} onClick={()=> toMeds(item.token.id)}>Meds</div>
+                              </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve)} onClick={()=> PrepareNexta(item.token)}>Finish</div>
+                            </div>
+                            {
+                              status == "all" && (
+                                <div className={styles.action}>
+                              <div className={cx(styles.serve)} onClick={()=> setIsClinic(true)}>Clinic</div>
+                            </div>
+                              )
+                            }
                           </div>
                         </td>
                       </tr>
@@ -407,7 +701,7 @@ function Recorder() {
         )}
       </div>
       {
-        tokens.filter((item)=> item.token.serving===true).map((item:Token,index:number)=> (
+        tokens.filter((item)=> item.token.serving===true && item.token.serving_id=== currentUser.phone).slice(0,1).map((item:Token,index:number)=> (
           <div
         className={cx(
           styles.serving,
@@ -418,7 +712,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts","m02","http://localhost:5000/speaker/create_speaker",currentUser.counter)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
@@ -430,22 +724,15 @@ function Recorder() {
         }
         </div>
         <div className={styles.row}>
-          <div className={styles.row_item} onClick={()=> editTicket(item.token.id,"pending")}>
-            <div className={styles.button}>Pend</div>
+          <div className={styles.row_item} onClick={()=> editTicket(item.token.id,status==="waiting"?"pending":"waiting")}>
+            <div className={styles.button}>{status==="waiting"?"pend":"unpend"}</div>
           </div>
-          {/* <div className={styles.row_item} onClick={nextToken}> */}
           <div className={styles.row_item}>
             <div className={styles.token}>{tokens.length> 0 && item.token.ticket_no}</div>
           </div>
-          <div className={styles.row_item} onClick={()=> handleNext(item.token)}>
+          <div className={styles.row_item} onClick={()=> PrepareNexta(item.token)}>
             <div className={styles.button}>Finish</div>
           </div>
-          {/* <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
-            <div className={styles.button}>Penalize</div>
-          </div>
-          <div className={styles.row_item} onClick={()=> preparePnF()}>
-            <div className={styles.button}>Finish & Penalize</div>
-          </div> */}
         </div>
       </div>
         ))
@@ -453,14 +740,14 @@ function Recorder() {
       {tokens.length > 0 && (
         <div className={styles.chini}>
           <div className={styles.top}>
-            <div className={styles.item}>
+            <div className={cx(styles.item,status==="waiting" && styles.active)} onClick={()=> handleStatus("waiting")}>
               <p>On Queue: <span> <Ticket_Category_Length category="accounts" status='waiting'/> </span> </p>
             </div>
-            <div className={styles.item}>
+            <div className={cx(styles.item,status==="pending" && styles.active)} onClick={()=> handleStatus("pending")}>
               <p>Pending: <span><Ticket_Category_Length category="accounts" status='pending'/></span> </p>
             </div>
-            <div className={styles.item}>
-              <p>Cancelled: <span><Ticket_Category_Length category="accounts" status='cancelled'/></span> </p>
+            <div className={cx(styles.item,status==="all" && styles.active)} onClick={()=> handleStatus("all")}>
+              <p>All: <span><AllTickets/></span></p>
             </div>
             <div className={styles.item_out}>
               <IoArrowRedoOutline className={styles.icon} />

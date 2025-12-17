@@ -20,15 +20,17 @@ import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 import useCreateItem from "@/custom_hooks/useCreateItem";
 import messageState from "@/store/atoms/message";
 import isUserState from "@/store/atoms/isUser";
+import AllTickets from "@/components/all_tickets/all_tickets";
 
 function Recorder() {
   const currentUser: User = useRecoilValue(currentUserState);
   const [status, setStatus] = useState("waiting");
+  const [floor, setFloor] = useState("first");
+  const [diabetic, setDiabetic] = useState("false");
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
-  const [page,] = useState(1);
+  const [page,setPage] = useState(1);
   const [pagesize, setPageSize] = useState(10);
-  const [, setTotalItems] = useState(0);
   const [disable,] = useRecoilState(currentConditionState);
   const [ticket, setTicket] = useState("");
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -50,12 +52,14 @@ function Recorder() {
   const setUser = useSetRecoilState(isUserState)
   const [insurance, setInsurance] = useState(5)
   const [isInsurance,setIsinsurance] = useState(false)
+  const [totalItems, setTotalItems] = useState(0)
   const [fields, setFields] = useState({
     finish_id: "",
     patName: "",
     sex: "",
     category: "",
-    age: ""
+    age: "",
+    calling_token: ""
   })
   const reasons = ["Staff","Wheel Chair","Pediatric","Old","Premature","Fast Track", "Pregnancy"]
   const [reason, setReason] = useState("")
@@ -70,7 +74,56 @@ function Recorder() {
     getActive()
     getRest()
     getVideos()
-  }, [status, disable, ticket, active]);
+  }, [disable, ticket, active,totalItems,page,pagesize,floor,diabetic]);
+
+  useEffect(()=> {
+    if(typeof window !== undefined){
+      setStatus(localStorage.getItem("status")!)
+      setFloor(localStorage.getItem("floor")!)
+      setDiabetic(localStorage.getItem("diabetic")!)
+      setPage(Number(localStorage.getItem("page"))!)
+    }
+  },[status])
+
+
+  const handleStatus = (stata:string) => {
+    const status = localStorage.getItem("status")
+    if(status){
+      localStorage.removeItem("status")
+      localStorage.setItem("status",stata)
+      location.reload()
+    }else{
+      localStorage.setItem("status",stata)
+      location.reload()
+    }
+  }
+
+  const handleDiabetic = (stata:string) => {
+    const diabetic = localStorage.getItem("diabetic")
+    if(diabetic){
+      localStorage.removeItem("diabetic")
+      localStorage.setItem("diabetic",stata)
+      location.reload()
+    }else{
+      localStorage.setItem("diabetic",stata)
+      location.reload()
+    }
+  }
+  const handleFloor = (stata:string) => {
+    const floor = localStorage.getItem("floor")
+    if(floor){
+      localStorage.removeItem("floor")
+      localStorage.setItem("floor",stata)
+      setDiabetic('false')
+      localStorage.removeItem("diabetic")
+      location.reload()
+    }else{
+      localStorage.setItem("floor",stata)
+      setDiabetic('false')
+      localStorage.removeItem("diabetic")
+      location.reload()
+    }
+  }
 
   const createRest = (e:React.FormEvent) => {
     e.preventDefault()
@@ -152,9 +205,10 @@ function Recorder() {
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getMedsTickets", {
-        params: { page, pagesize, status, disable, phone: ticket, stage: "meds" },
+        params: { page:1, pagesize:pagesize, status: status, disable, phone: ticket, stage: "meds",floor:floor, isDiabetic: diabetic},
       })
       .then((data) => {
+        console.log(data.data)
         setTokens(data.data.data);
         setTotalItems(data.data.totalItems);
         setExpired(data.data.data)
@@ -351,6 +405,21 @@ function Recorder() {
     setPrior(true)
     setPriorFields({...priorFields,ticket_no: ticket_no, stage: stage})
   }
+
+  const handlePageChange = (namba:number) => {
+    const page = localStorage.getItem("page")
+    if(page){
+      localStorage.removeItem('page')
+      localStorage.setItem("page",namba.toString())
+    }else{
+      localStorage.setItem("page",namba.toString())
+    }
+  };
+
+  const prepareCall = (token:string,stage:string,station:string,url:string,counter:string,phone:string) => {
+    setFields({...fields,calling_token: token})
+    createItem(token,stage,station,url,counter,phone)
+  }
   return (
     <div className={styles.recorder}>
      <div className={styles.insurance} onClick={()=> setIsinsurance(true)}>
@@ -466,13 +535,30 @@ function Recorder() {
                   :<IoSearch className={styles.icon__}onClick={() => setSearch(!search)} size={40}/>
                 }
           </div>
+          { 
+            floor==="ground" && (<div className={styles.side}>
+            <label>IsDiabetic:</label>
+            <select onChange={(e) => handleDiabetic(e.target.value)} value={diabetic}>
+              <option value="" disabled>--isDiabetic--</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>)
+          }
+          <div className={styles.side}>
+            <label>Floor:</label>
+            <select onChange={(e) => handleFloor(e.target.value)} value={floor}>
+              <option value="" disabled>--select floor--</option>
+              <option value="first">First</option>
+              <option value="ground">Ground</option>
+            </select>
+          </div>
           <div className={styles.side}>
             <label>Status:</label>
-            <select onChange={(e) => setStatus(e.target.value)} value={status}>
+            <select onChange={(e) => handleStatus(e.target.value)} value={status}>
               <option value="waiting">waiting</option>
-              <option value="done">done</option>
-              <option value="cancelled">cancelled</option>
               <option value="pending">pending</option>
+              <option value="all">All</option>
             </select>
           </div>
           <div className={styles.side}>
@@ -525,6 +611,11 @@ function Recorder() {
                       <th>Status</th>
                       <th>CreatedAt</th>
                       <th>Challenge</th>
+                      {
+                        status ==="all" && (
+                          <th>Stage</th>
+                        )
+                      }
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -537,8 +628,16 @@ function Recorder() {
                         <td>{item.token.status}</td>
                         <td><TimeAgo isoDate={new Date(item.token.createdAt).toISOString()} /></td>
                         <td>{item.token.disability===""?"N/A":item.token.disability}</td>
+                        {
+                        status ==="all" && (
+                          <td>{item.token.stage}</td>
+                        )
+                        }
                         <td>
                           <div className={styles.actions}>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
+                            </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve,item.token.serving && styles.active, (item.token.serving && item.token.serving_id === currentUser.phone) && styles.owner)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage, "sasas",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
                             </div>
@@ -546,11 +645,24 @@ function Recorder() {
                               <div className={cx(styles.serve,item.token.disabled && styles.prioritya)} onClick={()=> priorReady(`${item.token.ticket_no}`,item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div>
                               {/* <div className={cx(styles.serve,item.token.disabled && styles.priority)} onClick={()=> priotize(`${item.token.ticket_no}`,"priority",item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div> */}
                             </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve)} onClick={()=> editTicket(item.token.id, status==="pending"?"waiting":"pending")}>{item.token.status==="waiting"?"pend":"unpend"}</div>
+                            </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve)} onClick={()=> prepareFinish(item.token.id)}>Finish</div>
+                            </div>
                           </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
+                  <div className={styles.pagination}>
+                  {Array.from({ length: Math.ceil(totalItems / pagesize) }).map((_, index) => (
+                  <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={cx(index+1===page && styles.active)}>
+                      {index + 1}
+                  </button>
+                  ))}
+                  </div>
                 </table>
               </div>
             ) : (
@@ -562,7 +674,7 @@ function Recorder() {
         )}
       </div>
       {
-        tokens.filter((item)=> item.token.serving===true && item.token.serving_id=== currentUser.phone && item.token.status===status).map((item:Token,index:number)=> (
+        tokens.filter((item)=> item.token.serving===true && item.token.serving_id=== currentUser.phone).slice(0,1).map((item:Token,index:number)=> (
           <div
         className={cx(
           styles.serving,
@@ -573,7 +685,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds","m02","http://localhost:5000/speaker/create_speaker",currentUser.counter)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
@@ -611,14 +723,14 @@ function Recorder() {
       {tokens.length > 0 && (
         <div className={styles.chini}>
           <div className={styles.top}>
-            <div className={styles.item}>
+            <div className={cx(styles.item,status==="waiting" && styles.active)} onClick={()=> handleStatus("waiting")}>
               <p>On Queue: <span> <Ticket_Category_Length category="meds" status='waiting'/> </span> </p>
             </div>
-            <div className={styles.item}>
+            <div className={cx(styles.item,status==="pending" && styles.active)} onClick={()=> handleStatus("pending")}>
               <p>Pending: <span><Ticket_Category_Length category="meds" status='pending'/></span> </p>
             </div>
-            <div className={styles.item}>
-              <p>Cancelled: <span><Ticket_Category_Length category="meds" status='cancelled'/></span> </p>
+            <div className={cx(styles.item,status==="all" && styles.active)} onClick={()=> handleStatus("all")}>
+              <p>All: <span><AllTickets/></span></p>
             </div>
             <div className={styles.item_out}>
               <IoArrowRedoOutline className={styles.icon} />

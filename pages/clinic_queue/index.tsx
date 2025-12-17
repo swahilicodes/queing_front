@@ -18,6 +18,7 @@ import CurrentTime from "@/components/current_time/current_time";
 import { SlDirection } from "react-icons/sl";
 import { RiDirectionLine } from "react-icons/ri";
 import ClinicCounter from "@/components/display_clinic_counter/clinic_counter";
+import UpNext from "@/components/upnext/current_serving";
 
 export default function Home() {
   const [tickets, setTickets] = useState<any>([]);
@@ -375,14 +376,6 @@ export default function Home() {
                 </div>
                 <div className={styles.counter}>
                 <CurrentTime savs={tickets.filter((item: any) => item.ticket.serving === true)}/>
-                  {/* <div className={styles.stop}>
-                    <div className={styles.stopa_wrap}>
-                    <BsStopwatch size={45} className={styles.stop_watch}/>
-                    </div>
-                  </div>
-                  <div className={styles.stopa_time}>
-                  {`${formatTime(hours.toString())}:${formatTime(minutes.toString())}:${formatTime(seconds.toString())}`}
-                  </div> */}
                 </div>
               </div>
                 : <div className={styles.servicer}>
@@ -397,24 +390,21 @@ export default function Home() {
               }
               <div className={styles.nexting}>
                 <div className={cx(styles.nextang,isRest && styles.rest)}>
-                  {
-                    !isRest
-                    ? <div className={styles.video}>
-                      <video src="/videos/stomach.mp4" autoPlay muted loop/>
-                    </div>
-                    : <div className={styles.tiketi}>
-                      {/* <p>{formatNumber(nextServe.id.toString())}</p> */}
-                      <p>{getNextTicket(savs,tickets)}</p>
-                      <TbHeartHandshake className={styles.icon} size={50}/>
-                      <p>{nextServe.window}</p>
-                    </div>
-                  }
+                  <div className={styles.tiketi}>
+                        <p>
+                          {
+                            tickets.filter((item:any)=> item.ticket.serving).length>0
+                            ? <UpNext savs={tickets.filter((item: any) => item.ticket.serving === true)}/>
+                            : "000"
+                          }
+                        </p>
+                      </div>
                 </div>
                 <div className={cx(styles.signage,isRest && styles.rest)}>
                   <div className={cx(styles.wrapper_sig,isRest && styles.rest)}>
                     {
                       isRest
-                      ? <p>{language==="English"?"NEXT":"ANAYE FUATA"}</p>
+                      ? <p>{language==="English"?"NEXT":"ANAYEFUATA"}</p>
                       : <div className={styles.indicators}>
                         <div className={`${styles.divAnimation} ${styles.divDelay1}`}></div>
                         <div className={`${styles.divAnimation} ${styles.divDelay2}`}></div>

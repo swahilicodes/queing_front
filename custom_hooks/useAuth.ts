@@ -12,8 +12,6 @@ const useAuth = () => {
   const router = useRouter();
   const setCurrentUser = useSetRecoilState(currentUserState)
   const setDeviceState =  useSetRecoilState(deviceState)
-  const path = router.pathname
-  const [ipAddress, setIpAddress] = useState(null);
   const setMessage = useSetRecoilState(messageState)
   const id = getLocalDeviceIP()
 
@@ -143,6 +141,8 @@ const getMac = async () => {
       await axios.post("http://localhost:5000/network/create_update",{macAddress: `${localStorage.getItem('unique_id')}`,deviceName:"Null",deviceModel:id.type,manufacturer: "Null"}).then((dita)=> {
         setDeviceState(dita.data)
         validRoutes(dita.data.default_page)
+        console.log(dita.data.macAddress)
+        localStorage.setItem('device_id_new',dita.data.macAddress)
       }).catch((error)=> {
         console.log(error)
       })

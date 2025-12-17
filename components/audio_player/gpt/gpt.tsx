@@ -20,9 +20,14 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     token: 0,
     id: 0
   })
+  const [countering, setCountering] = useState({
+    namba: 0,
+    token: 0,
+  })
 
   useEffect(() => {
   if (isPlaying) {
+    setCountering({namba: counting.namba+1,token})
     if (counting.namba === 0 || counting.id !== id) {
       // Play audio if it's the first play (namba === 0) or if id is different
       PlayThem();
@@ -35,80 +40,138 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     }
   }
 }, [isPlaying, token, id, counting.namba, counting.id, counting.token, serving]);
-  // useEffect(() => {
-  //   console.log(counting.id,id,token,counting.token)
-  //   if (isPlaying) {
-  //     // if (counting.namba <= 1) {
-  //     if (counting.namba <= 1 ) {
-  //       PlayThem()
-  //       setCounting({ ...counting, namba: counting.namba + 1, token: token,id: id })
-  //     }else if(counting.namba > 1 && counting.id != id){
-  //       PlayThem()
-  //       setCounting({ ...counting, namba: counting.namba + 1, token: token,id: id })
-  //     } else {
-  //       console.log(`token ${token}, serving ${serving}`)
-  //       if (token !== serving) {
-  //         setCounting({ ...counting, namba: 0, token: token })
+
+
+  // const getAudioSequence = (number: number): string[] => {
+  //   setTalking(true)
+  //   const numString = number.toString();
+  //   const length = numString.length;
+  //   const audioSequence: string[] = [];
+  //   if (length === 4) {
+  //     audioSequence.push('/Glad/beep.mp3')
+  //     audioSequence.push('/Glad/tiketi.mp3')
+  //     audioSequence.push(`/Glad/${numString[0]}000.mp3`);
+  //     if (numString[1] !== "0") {
+  //       audioSequence.push(`/Glad/${numString[1]}00.mp3`);
+  //     }
+  //     if (numString[2] !== "0" || numString[3] !== "0") {
+  //       audioSequence.push(`/Glad/na.mp3`);
+  //       if (numString[2] !== "0") {
+  //         audioSequence.push(`/Glad/${numString[2]}0.mp3`);
+  //       }
+  //       if (numString[3] !== "0") {
+  //         audioSequence.push(`/Glad/${numString[3]}.mp3`);
   //       }
   //     }
+  //     audioSequence.push(stage === "clinic" ? `/Glad/chumba.mp3` : `/Glad/dirisha.mp3`);
+  //   } else if (length === 3) {
+  //     audioSequence.push('/Glad/beep.mp3')
+  //     audioSequence.push('/Glad/tiketi.mp3')
+  //     audioSequence.push(`/Glad/${numString[0]}00.mp3`);
+  //     if (numString[1] !== "0" || numString[2] !== "0") {
+  //       audioSequence.push(`/Glad/na.mp3`);
+  //       if (numString[1] !== "0") {
+  //         audioSequence.push(`/Glad/${numString[1]}0.mp3`);
+  //       }
+  //       if (numString[2] !== "0") {
+  //         audioSequence.push(`/Glad/${numString[2]}.mp3`);
+  //       }
+  //     }
+  //     audioSequence.push(stage === "clinic" ? `/Glad/chumba.mp3` : `/Glad/dirisha.mp3`);
+  //   } else if (length === 2) {
+  //     audioSequence.push('/Glad/beep.mp3')
+  //     audioSequence.push('/Glad/tiketi.mp3')
+  //     audioSequence.push(`/Glad/${numString[0]}0.mp3`);
+  //     if (numString[1] !== "0") {
+  //       audioSequence.push(`/Glad/na.mp3`);
+  //       audioSequence.push(`/Glad/${numString[1]}.mp3`);
+  //     }
+  //     audioSequence.push(stage === "clinic" ? `/Glad/chumba.mp3` : `/Glad/dirisha.mp3`);
+  //   } else if (length === 1) {
+  //     audioSequence.push('/Glad/beep.mp3')
+  //     audioSequence.push('/Glad/tiketi.mp3')
+  //     audioSequence.push(`/Glad/${numString}.mp3`);
+  //     audioSequence.push(stage === "clinic" ? `/Glad/chumba.mp3` : `/Glad/dirisha.mp3`);
   //   }
-  // }, [isPlaying, talking, token, counting.namba])
 
+  //   return audioSequence;
+  // };
 
-  const getAudioSequence = (number: number): string[] => {
-    setTalking(true)
-    const numString = number.toString();
-    const length = numString.length;
-    const audioSequence: string[] = [];
-    if (length === 4) {
-      audioSequence.push('/Edited/beep.mp3')
-      audioSequence.push('/Edited/tiketi.mp3')
-      audioSequence.push(`/Edited/${numString[0]}000.mp3`);
-      if (numString[1] !== "0") {
-        audioSequence.push(`/Edited/${numString[1]}00.mp3`);
-      }
-      if (numString[2] !== "0" || numString[3] !== "0") {
-        audioSequence.push(`/Edited/na.mp3`);
-        if (numString[2] !== "0") {
-          audioSequence.push(`/Edited/${numString[2]}0.mp3`);
-        }
-        if (numString[3] !== "0") {
-          audioSequence.push(`/Edited/${numString[3]}.mp3`);
-        }
-      }
-      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
-    } else if (length === 3) {
-      audioSequence.push('/Edited/beep.mp3')
-      audioSequence.push('/Edited/tiketi.mp3')
-      audioSequence.push(`/Edited/${numString[0]}00.mp3`);
-      if (numString[1] !== "0" || numString[2] !== "0") {
-        audioSequence.push(`/Edited/na.mp3`);
-        if (numString[1] !== "0") {
-          audioSequence.push(`/Edited/${numString[1]}0.mp3`);
-        }
-        if (numString[2] !== "0") {
-          audioSequence.push(`/Edited/${numString[2]}.mp3`);
-        }
-      }
-      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
-    } else if (length === 2) {
-      audioSequence.push('/Edited/beep.mp3')
-      audioSequence.push('/Edited/tiketi.mp3')
-      audioSequence.push(`/Edited/${numString[0]}0.mp3`);
-      if (numString[1] !== "0") {
-        audioSequence.push(`/Edited/na.mp3`);
-        audioSequence.push(`/Edited/${numString[1]}.mp3`);
-      }
-      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
-    } else if (length === 1) {
-      audioSequence.push('/Edited/beep.mp3')
-      audioSequence.push('/Edited/tiketi.mp3')
-      audioSequence.push(`/Edited/${numString}.mp3`);
-      audioSequence.push(stage === "clinic" ? `/Edited/chumba.mp3` : `/Edited/dirisha.mp3`);
-    }
+const getAudioSequence = (number: number): string[] => {
+  setTalking(true);
+  const numString = number.toString().padStart(4, '0'); // Pad to 4 digits
+  const audioSequence: string[] = [];
+  audioSequence.push('/Glad/tiketi.mp3');
+  const thousands = parseInt(numString[0]);
+  if (thousands > 0) {
+    audioSequence.push(`/Glad/${thousands}000.mp3`); // e.g., 1000.mp3 for "elfu moja"
+  }
 
-    return audioSequence;
-  };
+  // Hundreds
+  const hundreds = parseInt(numString[1]);
+  if (hundreds > 0) {
+    audioSequence.push(`/Glad/${hundreds}00.mp3`); // e.g., 100.mp3 for "mia moja"
+  }
+
+  // Tens and units
+  const tens = parseInt(numString[2]);
+  const units = parseInt(numString[3]);
+
+  // Handle tens and units
+  if (thousands > 0 || hundreds > 0 || tens > 0) {
+    if (tens === 1) {
+  if (units === 0) {
+    audioSequence.push('/Glad/10.mp3'); // Play "kumi" for 10
+  } else {
+    audioSequence.push('/Glad/10.mp3'); // e.g., 10.mp3 for "kumi"
+    audioSequence.push('/Glad/na.mp3'); // "and"
+    audioSequence.push(`/Glad/${units}.mp3`); // e.g., 2.mp3 for "mbili"
+  }
+} else {
+  // Tens
+  if (tens > 1) {
+    audioSequence.push(`/Glad/${tens}0.mp3`); // e.g., 50.mp3 for "hamsini"
+  }
+  // Add "na" if there are units and either thousands, hundreds, or tens are non-zero
+  if (units > 0 && (thousands > 0 || hundreds > 0 || tens > 0)) {
+    audioSequence.push('/Glad/na.mp3'); // "and"
+  }
+  // Units
+  if (units > 0) {
+    audioSequence.push(`/Glad/${units}.mp3`); // e.g., 3.mp3 for "tatu"
+  }
+}
+    // if (tens === 1 && units > 0) {
+    //   audioSequence.push(`/Glad/10.mp3`); // e.g., 10.mp3 for "kumi"
+    //   if (units > 0) {
+    //     audioSequence.push('/Glad/na.mp3'); // "and"
+    //     audioSequence.push(`/Glad/${units}.mp3`); // e.g., 2.mp3 for "mbili"
+    //   }
+    // } else {
+    //   // Tens
+    //   if (tens > 1) {
+    //     audioSequence.push(`/Glad/${tens}0.mp3`); // e.g., 50.mp3 for "hamsini"
+    //   }
+    //   // Add "na" if there are units and either thousands, hundreds, or tens are non-zero
+    //   if (units > 0 && (thousands > 0 || hundreds > 0 || tens > 0)) {
+    //     audioSequence.push('/Glad/na.mp3'); // "and"
+    //   }
+    //   // Units
+    //   if (units > 0) {
+    //     audioSequence.push(`/Glad/${units}.mp3`); // e.g., 3.mp3 for "tatu"
+    //   }
+    // }
+  } else if (units > 0) {
+    // Only units non-zero (e.g., 0004): just add the unit
+    audioSequence.push(`/Glad/${units}.mp3`); // e.g., 4.mp3 for "nne"
+  }
+
+  // Ending based on stage
+  audioSequence.push(stage === 'clinic' ? '/Glad/chumba.mp3' : '/Glad/dirisha.mp3');
+
+  return audioSequence;
+};
+ 
 
   const getAudioSequenceEnglish = (number: number): string[] => {
     const numString = number.toString();
@@ -165,38 +228,38 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
     const length = numString.length;
     const audioSequence: string[] = [];
     if (length === 4) {
-      audioSequence.push(`/Edited/1000.mp3`);
+      audioSequence.push(`/Glad/1000.mp3`);
       if (numString[1] !== "0") {
-        audioSequence.push(`/Edited/${numString[1]}00.mp3`);
+        audioSequence.push(`/Glad/${numString[1]}00.mp3`);
       }
       if (numString[2] !== "0" || numString[3] !== "0") {
-        audioSequence.push(`/Edited/na.mp3`);
+        audioSequence.push(`/Glad/na.mp3`);
         if (numString[2] !== "0") {
-          audioSequence.push(`/Edited/${numString[2]}0.mp3`);
+          audioSequence.push(`/Glad/${numString[2]}0.mp3`);
         }
         if (numString[3] !== "0") {
-          audioSequence.push(`/Edited/${numString[3]}.mp3`);
+          audioSequence.push(`/Glad/${numString[3]}.mp3`);
         }
       }
     } else if (length === 3) {
-      audioSequence.push(`/Edited/${numString[0]}00.mp3`);
+      audioSequence.push(`/Glad/${numString[0]}00.mp3`);
       if (numString[1] !== "0" && numString[2] !== "0") {
-        audioSequence.push(`/Edited/na.mp3`);
+        audioSequence.push(`/Glad/na.mp3`);
         if (numString[1] !== "0") {
-          audioSequence.push(`/Edited/${numString[1]}0.mp3`);
+          audioSequence.push(`/Glad/${numString[1]}0.mp3`);
         }
         if (numString[2] !== "0") {
-          audioSequence.push(`/Edited/${numString[2]}.mp3`);
+          audioSequence.push(`/Glad/${numString[2]}.mp3`);
         }
       }
     } else if (length === 2) {
-      audioSequence.push(`/Edited/${numString[0]}0.mp3`);
+      audioSequence.push(`/Glad/${numString[0]}0.mp3`);
       if (numString[1] !== "0") {
-        audioSequence.push(`/Edited/na.mp3`);
-        audioSequence.push(`/Edited/${numString[1]}.mp3`);
+        audioSequence.push(`/Glad/na.mp3`);
+        audioSequence.push(`/Glad/${numString[1]}.mp3`);
       }
     } else if (length === 1) {
-      audioSequence.push(`/Edited/${numString}.mp3`);
+      audioSequence.push(`/Glad/${numString}.mp3`);
     }
 
     return audioSequence;
@@ -255,10 +318,17 @@ const GptPlayer: React.FC<NumberAudioPlayerProps> = ({ token, counter, isPlaying
 
   const PlayThem = async () => {
     setServing(token)
+    const audio = new Audio("/Glad/beep.mp3");
+      await audio.play();
+      await new Promise((resolve) => {
+        audio.onended = resolve;
+      });
+    // await playAudioSequence(getAudioSequenceEnglish(token))
+    // await playAudioSequence(getCounterEnglish(counter))
     await playAudioSequence(getAudioSequence(token))
     await playAudioSequence(getCounterSwahili(counter))
-    await playAudioSequence(getAudioSequenceEnglish(token))
-    await playAudioSequence(getCounterEnglish(counter))
+    // await playAudioSequence(getAudioSequence(token))
+    // await playAudioSequence(getCounterSwahili(counter))
     setTalking(false)
     axios.post("http://localhost:5000/speaker/delete_play", { id: id }).then((data: any) => {
       console.log(`audio with id ${data.id} deleted successfully`)

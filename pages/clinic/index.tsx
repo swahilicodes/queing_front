@@ -5,13 +5,11 @@ import currentUserState from "@/store/atoms/currentUser";
 import cx from "classnames";
 import { MdClear, MdDeleteOutline } from "react-icons/md";
 import { IoArrowRedoOutline, IoSearch } from "react-icons/io5";
-import Ticket_Category_Length from "@/components/ticket_category_length/ticket_category_length";
 import currentConditionState from "@/store/atoms/current";
 import axios from "axios";
 import Cubes from "@/components/loaders/cubes/cubes";
 import { useRouter } from "next/router";
 import TimeAgo from "@/components/time";
-import AudioTest from "@/components/audio_player/audio_test/audio";
 import { GrPowerShutdown } from "react-icons/gr";
 import useFetchData from "@/custom_hooks/fetch";
 import { IoIosAdd, IoMdAdd } from "react-icons/io";
@@ -33,7 +31,10 @@ function Recorder() {
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [page, setPage] = useState(1);
+  const [docPage, setDocPage] = useState(1);
   const [pagesize, setPageSize] = useState(10);
+  const [docpagesize, setdocPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
   const [disable, setDisable] = useRecoilState(currentConditionState);
   const [ticket, setTicket] = useState("");
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -74,12 +75,14 @@ function Recorder() {
     doctor_id: "",
     loading: false
   })
+  const [serveDoc, setServeDoc] = useState("")
   const [fields, setFields] = useState({
     doctor_id: '',
     patient_id: '',
     room: '',
     clinic: "",
     clinic_code: "",
+    calling_token: ""
   })
 
 
@@ -94,13 +97,13 @@ function Recorder() {
       getActive()
       getClinicDevices()
     }
-  }, [status, disable, ticket, currentUser, active, fields.clinic_code, currentToken, attendantClinics.length]);
+  }, [status, disable, ticket, currentUser, active, fields.clinic_code, currentToken, attendantClinics.length, page, pagesize]);
 
   useEffect(() => {
     if (currentUser.clinics !== undefined && currentUser.clinics.length > 0) {
       getDoktas()
     }
-  }, [currentUser,page,pagesize])
+  }, [currentUser, page, pagesize, totalItems, totalPages])
   const PrepareDisplay = (index: number) => {
     setVid({ ...vid, index: index, clicked: true })
   }
@@ -180,8 +183,11 @@ function Recorder() {
     setCurrentToken({ ...currentToken, ticket_no: item.token.ticket_no, stage: item.token.stage, counter: item.counter.namba })
   }
 
-  const handlePageChange = (namba:number) => {
+  const handlePageChange = (namba: number) => {
     setPage(namba);
+  };
+  const handleDocPageChange = (namba: number) => {
+    setDocPage(namba);
   };
 
   const createClinic = () => {
@@ -255,10 +261,12 @@ function Recorder() {
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://localhost:5000/tickets/getClinicTickets", {
-      params: { page, pagesize, status, disable, phone: ticket, stage: "nurse_station", clinic_code: attendantClinics.map((item: any) => item.clinic_code), mr_no: ticket, current_clinic: fields.clinic_code },
+      params: { page: page, pagesize: pagesize, status, disable, phone: ticket, stage: "nurse_station", clinic_code: attendantClinics.map((item: any) => item.clinic_code), mr_no: ticket, current_clinic: fields.clinic_code },
     })
       .then((data) => {
+        console.log('clinic tickets are ', data.data)
         setTokens(data.data.data);
+        setTotalPages(data.data.totalPages)
         setTotalItems(data.data.totalItems);
         setInterval(() => {
           setFetchLoading(false);
@@ -280,14 +288,14 @@ function Recorder() {
     setDocLoading(true);
     axios.get("http://localhost:5000/doktas/get_clinic_doktas", {
       params: {
-        page:page,
-        pagesize:pagesize,
+        page: docPage,
+        pagesize: 5,
         clinics: currentUser.clinics.map((item: any) => item.clinic_code)
       }
     })
       .then((data) => {
         setDoktas(data.data.data);
-        setTotalItems(data.data.totalItems);
+        setTotalItems(data.data.totalPages);
         setInterval(() => {
           setDocLoading(false);
         }, 2000);
@@ -444,33 +452,39 @@ function Recorder() {
     return name.cliniciname
   }
   const displayDoctor = (id: number) => {
-    const doctor:any = doktas.find((item: any) => item.id === id)
-    if(doctor){
+    const doctor: any = doktas.find((item: any) => item.id === id)
+    if (doctor) {
       return doctor.name
-    }else{
+    } else {
       return "N/A"
     }
   }
   const showLoad = (id: string) => {
-    if(servePatient.loading){
-      return "Loading.."
-    }else{
+    console.log('serving id ', id, serveDoc)
+    if (servePatient.loading) {
+      if (id == serveDoc) {
+        return "Loading.."
+      } else {
+        return "Assign"
+      }
+    } else {
       return "Assign"
     }
   }
 
-  const assignDoctor = (patient_id:number,doctor_id:number) => {
-    setServePatient({...servePatient,loading:true})
-    axios.post("http://localhost:5000/doktas/assign_doctor",{patient_id:patient_id,doctor_id:doctor_id}).then((data)=> {
-      setTimeout(()=> {
-        setServePatient({...servePatient,loading:false,id:"",name:''})
+  const assignDoctor = (patient_id: number, doctor_id: number) => {
+    setServePatient({ ...servePatient, loading: true })
+    setServeDoc(doctor_id.toString())
+    axios.post("http://localhost:5000/doktas/assign_doctor", { patient_id: patient_id, doctor_id: doctor_id }).then((data) => {
+      setTimeout(() => {
+        setServePatient({ ...servePatient, loading: false, id: "", name: '' })
         setIsDoctors(false)
         location.reload()
-      },3000)
-    }).catch((error)=> {
-      setTimeout(()=> {
-        setServePatient({...servePatient,loading:false})
-      },3000)
+      }, 3000)
+    }).catch((error) => {
+      setTimeout(() => {
+        setServePatient({ ...servePatient, loading: false })
+      }, 3000)
       if (error.response && error.response.status === 400) {
         console.log(`there is an error ${error.message}`);
         setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
@@ -481,11 +495,23 @@ function Recorder() {
     })
   }
 
-  const prepareAssign = (name:string,id:string) => {
-    console.log(name,id)
+  const prepareAssign = (name: string, id: string) => {
+    console.log(name, id)
     setIsDoctors(true)
-    setServePatient({...servePatient,isServePatient:true,name:name,id:id})
+    setServePatient({ ...servePatient, isServePatient: true, name: name, id: id })
   }
+
+  const onPageChange = (page: number) => {
+    setPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    getTicks()
+  };
+
+  const prepareCall = (token: string, stage: string, station: string, url: string, counter: string, phone: string) => {
+    setFields({ ...fields, calling_token: token })
+    createItem(token, stage, station, url, counter, phone)
+  }
+
   return (
     <div className={styles.recorder}>
       {
@@ -609,18 +635,18 @@ function Recorder() {
       </div>
       {
         isDoctors && (
-        <div className={styles.doctors_overlay}>
-          <div className={styles.content}>
-          <div className={styles.close} onClick={()=> setIsDoctors(false)}>close</div>
-            {
-              doktas.length>0 
-              ? <div className={styles.doctor_list}>
-                <div className={styles.title}>
-                  <h3>{servePatient.isServePatient
-                  ? `${servePatient.name}`
-                  :"Clinic Doctors"}</h3>
-                </div>
-                <div className={styles.head_item}>
+          <div className={styles.doctors_overlay}>
+            <div className={styles.content}>
+              <div className={styles.close} onClick={() => setIsDoctors(false)}>close</div>
+              {
+                doktas.length > 0
+                  ? <div className={styles.doctor_list}>
+                    <div className={styles.title}>
+                      <h3>{servePatient.isServePatient
+                        ? `${servePatient.name}`
+                        : "Clinic Doctors"}</h3>
+                    </div>
+                    <div className={styles.head_item}>
                       <div className={styles.item}>
                         <p>#</p>
                       </div>
@@ -647,52 +673,66 @@ function Recorder() {
                         )
                       }
                     </div>
-                {
-                  doktas.map((item:any,index:number)=> (
-                    <div className={styles.list_item} key={index} onLoad={()=> setServePatient({...servePatient,doctor_id: item.id})}>
-                      <div className={styles.item}>
-                        <p>{item.id}</p>
-                      </div>
-                      <div className={styles.item}>
-                        <p>{item.name}</p>
-                      </div>
-                      <div className={styles.item}>
-                        <p>{item.room}</p>
-                      </div>
-                      <div className={styles.item}>
-                        <p>{getClicName(item.clinic_code)}</p>
-                      </div>
-                      <div className={styles.item}>
-                        <p>{item.status===undefined?"N/A":item.status}</p>
-                      </div>
-                      <div className={styles.item}>
-                        <DoctorPatients itema={item.id}/>
-                      </div>
-                      {
-                        servePatient.isServePatient && (
+                    {
+                      doktas.map((item: any, index: number) => (
+                        <div className={styles.list_item} key={item.id} onLoad={() => setServePatient({ ...servePatient, doctor_id: item.id })}>
                           <div className={styles.item}>
-                            <div className={styles.action} onClick={()=> assignDoctor(Number(servePatient.id),item.id)}>
-                              <p>{showLoad(item.id)}</p>
-                            </div>
+                            <p>{index + 1}</p>
                           </div>
-                        )
-                      }
+                          <div className={styles.item}>
+                            <p>{item.name}</p>
+                          </div>
+                          <div className={styles.item}>
+                            <p>{item.room}</p>
+                          </div>
+                          <div className={styles.item}>
+                            <p>{getClicName(item.clinic_code)}</p>
+                          </div>
+                          <div className={styles.item}>
+                            <p>{item.status === undefined ? "N/A" : item.status}</p>
+                          </div>
+                          <div className={styles.item}>
+                            <DoctorPatients itema={item.id} />
+                          </div>
+                          {
+                            servePatient.isServePatient && (
+                              <div className={styles.item}>
+                                <div className={styles.action} onClick={() => assignDoctor(Number(servePatient.id), item.id)}>
+                                  <p>{showLoad(item.id)}</p>
+                                </div>
+                              </div>
+                            )
+                          }
+                        </div>
+                      ))
+                    }
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
+                      {Array.from({ length: totalItems }).map((_, index) => (
+                        <button
+                          key={index + 1}
+                          onClick={() => handleDocPageChange(index + 1)}
+                          style={{
+                            padding: '8px 12px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            backgroundColor: index + 1 === docPage ? '#007bff' : '#fff',
+                            color: index + 1 === docPage ? '#fff' : '#000',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.3s',
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = index + 1 === docPage ? '#0056b3' : '#f0f0f0'}
+                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = index + 1 === docPage ? '#007bff' : '#fff'}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
                     </div>
-                  ))
-                }
-                <div className={styles.pagination}>
-                  {Array.from({ length: Math.ceil(totalItems /10) }).map((_, index) => (
-                  <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={cx(index+1===page && styles.active)}>
-                      {index + 1}
-                  </button>
-                  ))}
+                  </div>
+                  : <div className={styles.message}>no doctors</div>
+              }
             </div>
-              </div>
-              : <div className={styles.message}>no doctors</div>
-            }
           </div>
-        </div>
-       )
+        )
       }
       <div className={cx(styles.overlay01, isAdd && styles.active)}>
         <div className={styles.contents}>
@@ -781,7 +821,7 @@ function Recorder() {
               {
                 (fields.room !== '' && tokens.length > 0) && (
                   <div className={cx(styles.spika, loading && styles.active)} onClick={() => setSpeaker(!isSpeaker)}>
-                    <div className={styles.rounder} onClick={() => createItem(currentToken.ticket_no.toString(), "nurse_station", "m02", "http://localhost:5000/speaker/create_speaker", fields.room)}>
+                    <div className={styles.rounder} onClick={() => createItem(currentToken.ticket_no.toString(), "nurse_station", "m02", "http://localhost:5000/speaker/create_speaker", fields.room, currentUser.phone)}>
                       {
                         !loading
                           ? <HiOutlineSpeakerWave className={styles.icon} size={30} />
@@ -789,16 +829,8 @@ function Recorder() {
                       }
                     </div>
                   </div>
-                  //   <div className={styles.spika} onClick={()=> setSpeaker(!isSpeaker)}>
-                  //   <SequentialAudio token={`${currentToken.ticket_no}`} counter={`${fields.room}`} stage={currentToken.stage} isButton={true} talking={isSpeaker}/>
-                  // </div>
-                  // <div className={styles.button}>
-                  //   <AudioTest token={`${tokens[0].token.ticket_no}`} counter={`${tokens[0].counter===undefined?"1":tokens[0].counter.namba}`} stage={tokens[0].token.stage} isButton={true}/>
-                  //   {/* <SequentialAudioPlayerFinish  token={`${tokens[0].token.ticket_no}`} counter={fields.room}/> */}
-                  // </div>
                 )
               }
-              {/* <div onClick={()=> found && finishToken(tokens[0].token.id,"accounts",mr_number)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div> */}
             </div>
           </form>
           <div className={cx(styles.fin_loader, finLoading && styles.active)}>
@@ -848,16 +880,64 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
+                              <div className={cx(styles.serve, (loading && fields.calling_token === item.token.ticket_no.toString()) && styles.calling)} onClick={() => prepareCall(item.token.ticket_no.toString(), "meds", "m02", "http://localhost:5000/speaker/create_speaker", currentUser.counter, currentUser.phone)}>{loading && fields.calling_token === item.token.ticket_no.toString() ? "calling.." : "call"}/{item.token.calls === null ? 0 : item.token.calls}</div>
+                            </div>
+                            <div className={styles.action}>
                               <div className={cx(styles.serve, item.token.serving && styles.active)} onClick={() => priotize(`${item.token.ticket_no}`, "serve", Number(currentUser.counter))}>{item.token.serving === true ? "serving" : "Serve"}</div>
                             </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve, item.token.disabled && styles.priority)} onClick={() => priotize(`${item.token.ticket_no}`, "priority", Number(currentUser.counter))}>{item.token.disabled ? "prioritized" : "prioritize"}</div>
+                            </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve, item.token.disabled && styles.priority)} onClick={() => editTicket(item.token.id, status === "pending" ? "waiting" : "pending")}>{item.token.status === "waiting" ? "pend" : "unpend"}</div>
+                            </div>
+                            <div className={styles.action}>
+                              <div className={cx(styles.serve, item.token.disabled && styles.priority)} onClick={() => prepareAssign(item.token.name, `${item.token.id}`)}>Finish</div>
                             </div>
                           </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '12px',
+                    margin: '24px 0',
+                    padding: '10px 0'
+                  }}>
+                    {Array.from({ length: totalPages }).map((_, index) => (
+                      <button
+                        key={index + 1}
+                        onClick={() => handlePageChange(index + 1)}
+                        style={{
+                          padding: '10px 16px',
+                          border: '1px solid #dfe6e9',
+                          borderRadius: '8px',
+                          backgroundColor: page === index + 1 ? '#2c5282' : '#ffffff',
+                          color: page === index + 1 ? '#ffffff' : '#2c3e50',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          fontFamily: "'Inter', sans-serif",
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease-in-out',
+                          boxShadow: page === index + 1 ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none',
+                          outline: 'none',
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = page === index + 1 ? '#2b6cb0' : '#edf2f7';
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = page === index + 1 ? '#2c5282' : '#ffffff';
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                  </div>
                 </table>
               </div>
             ) : (
@@ -869,7 +949,7 @@ function Recorder() {
         )}
       </div>
       {
-        tokens.filter((item) => item.token.serving === true && item.token.serving_id === currentUser.phone && item.token.status === status).map((item: Token, index: number) => (
+        tokens.filter((item) => item.token.serving === true && item.token.serving_id === currentUser.phone && item.token.status === status).slice(0, 1).map((item: Token, index: number) => (
           <div
             className={cx(
               styles.serving,
@@ -877,7 +957,7 @@ function Recorder() {
             )}
           >
             <div className={cx(styles.spika, loading && styles.active)} onClick={() => setSpeaker(!isSpeaker)}>
-              <div className={styles.rounder} onClick={() => createItem(item.token.ticket_no.toString(), "nurse_station", "m02", "http://localhost:5000/speaker/create_speaker", currentUser.counter)}>
+              <div className={styles.rounder} onClick={() => createItem(item.token.ticket_no.toString(), "nurse_station", "m02", "http://localhost:5000/speaker/create_speaker", currentUser.counter, currentUser.phone)}>
                 {
                   !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30} />
@@ -893,7 +973,7 @@ function Recorder() {
                 <div className={styles.token}>{tokens.length > 0 && item.token.ticket_no}</div>
               </div>
               {/* <div className={styles.row_item} onClick={() => handleNext(item)}> */}
-              <div className={styles.row_item} onClick={() => prepareAssign(item.token.name,`${item.token.id}`)}>
+              <div className={styles.row_item} onClick={() => prepareAssign(item.token.name, `${item.token.id}`)}>
                 <div className={styles.button}>Finish</div>
               </div>
             </div>

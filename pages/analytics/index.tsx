@@ -8,13 +8,18 @@ const AnalyticsDashboard = () => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fields, setFields] = useState({
+    start_date: "",
+    end_date: "",
+    status: "all"
+  })
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await axios.get('http://localhost:5000/new_analytics/token_stats', {
-          params: { duration }
+          params: { duration,start_date: fields.start_date,end_date: fields.end_date,status:fields.status }
         });
         setData(response.data);
         setError(null);
@@ -26,7 +31,7 @@ const AnalyticsDashboard = () => {
     };
 
     fetchData();
-  }, [duration]);
+  }, [duration,fields.start_date,fields.end_date,fields.status]);
 
   return (
     <div className={styles.dashboardContainer}>
@@ -42,7 +47,7 @@ const AnalyticsDashboard = () => {
         {/* Duration Selector */}
         <div className={styles.durationSelectorContainer}>
           <div className={styles.durationSelector}>
-            {['day', 'week', 'month', 'year', 'all'].map((option) => (
+            {['day', 'week', 'month', 'year', 'all','custom'].map((option) => (
               <button
                 key={option}
                 onClick={() => setDuration(option)}
@@ -53,6 +58,48 @@ const AnalyticsDashboard = () => {
                 {option.charAt(0).toUpperCase() + option.slice(1)}
               </button>
             ))}
+            {
+              duration==="custom" && (
+                <div className={styles.customs}>
+                  <div className={styles.custom}>
+                  <label htmlFor="date" className="block font-medium mb-1">
+                    Start Date:
+                  </label>
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value={fields.start_date}
+                    onChange={(e) => setFields({...fields,start_date:e.target.value})}
+                    className="border rounded px-3 py-2"
+                  />
+                </div>
+                  <div className={styles.custom}>
+                  <label htmlFor="date" className="block font-medium mb-1">
+                    End Date:
+                  </label>
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value={fields.end_date}
+                    onChange={(e) => setFields({...fields,end_date:e.target.value})}
+                    className="border rounded px-3 py-2"
+                  />
+                </div>
+                </div>
+              )
+            }
+            <div className={styles.status} style={{display:"none"}}>
+              <select
+              value={fields.status}
+              onChange={e => setFields({...fields,status: e.target.value})}
+              >
+                <option value="all">All</option>
+                <option value="waiting">On Queue</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
           </div>
         </div>
 

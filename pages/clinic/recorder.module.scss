@@ -818,6 +818,25 @@
                             }
                         }
                     }
+                    .pagination{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 10px;
+                        button{
+                            padding: 10px;
+                            border: none;
+                            outline: none;
+                            cursor: pointer;
+                            border-radius: 4px;
+                            margin: 5px;
+                            transition: all .5s ease-in-out;
+                            &.active{
+                                background: $mainColor;
+                                color: white;
+                            }
+                        }
+                    }
                 }
                 .no_data{
                     width: 100%;

@@ -48,7 +48,7 @@ export default function Layout({children}: any) {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       console.log(event.key)
-      if (event.key === 'p') {
+      if (event.key === ']') {
         setUser(prev => !prev);
       } else if (event.key === "<") {
         setMenu(true);
