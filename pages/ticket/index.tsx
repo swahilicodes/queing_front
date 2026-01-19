@@ -42,7 +42,9 @@ const [fields, setFields] = useState({
     isPriorCode: false,
     priorToken: "",
     priorCode: "",
-    priorLoading: false
+    priorLoading: false,
+    isChild: false,
+    isNotChild: false
 })
 const numbers = [1,2,3,4,5,6,7,8,9,11,0,12]
 const [subLoading, setSubLoading] = useState(false)
@@ -61,7 +63,7 @@ const [error, setError] = useRecoilState(errorState)
       if (seleccted.index > 0 && seleccted.type !== "") {
         setTimeout(()=> {
             setSubLoading(true)
-        axios.post("http://localhost:5000/suggestion/create_suggestion", {
+        axios.post("http://localhost:5005/suggestion/create_suggestion", {
           type: seleccted.type,
           reason: seleccted.reason
         }).then(() => {
@@ -157,7 +159,7 @@ const handleClose = () => {
   const handlePriotize = (priorToken:string,priorCode:string) => {
     //setFields({...fields,priorLoading: true})
     setFields({...fields,isPriorCode: true,priorToken: priorToken,priorCode: priorCode,priorLoading: true})
-    axios.post("http://localhost:5000/ticketa/priotize",{ticket_no:priorToken,code:priorCode}).then((data)=> {
+    axios.post("http://localhost:5005/ticketa/priotize",{ticket_no:priorToken,code:priorCode}).then((data)=> {
         setTimeout(()=> {
             setFields({...fields,priorLoading: false,isPriority:false,isPriorCode:false})
             location.reload()
@@ -239,13 +241,14 @@ const submit = (e:React.FormEvent) => {
           setFields({...fields,isLoading:false})  
         },3000)
     }else{
-        axios.post("http://localhost:5000/ticketa/create_ticket",{
+        axios.post("http://localhost:5005/ticketa/create_ticket",{
         //phone: fields.hasMedical?formatCode(fields.isA,fields.isM,fields.numberString):fields.numberString,
         phone: fields.numberString,
         category: fields.isBima===true?"insurance":"cash",
         hasMedical: fields.hasMedical,
         isNHIF: fields.isNHIF,
-        floor: 'first'
+        floor: 'first',
+        isChild: fields.isChild
     }).then((data)=> {
         setQrState(data.data)
         //setClicked(false)
@@ -398,33 +401,61 @@ const changeLanguage = () => {
             </form>
         </div>
         {
-            (fields.isBima===true && fields.isMrTime===false) && (
+             (fields.isBima===true && fields.isMrTime===false) && (
                 <div className={styles.isBima}>
                     <div className={styles.general_decision}>
                         <div className={styles.close} onClick={()=> handleClose()}>close</div>
                         <div className={styles.bima_choices}>
-                        <div className={cx(styles.choice,fields.isNHIF===true && styles.active)} onClick={()=> setFields({...fields,isNHIF: true,isOther: false})}>NHIF</div>
-                        <div className={cx(styles.choice,fields.isOther===true && styles.active)} onClick={()=> setFields({...fields,isOther: true,isNHIF: false})}>{language==="Swahili"?"Zingine":"Other"}</div>
-                    </div>
-                    {
+                          <div className={cx(styles.choice,fields.isNHIF===true && styles.active)} onClick={()=> setFields({...fields,isNHIF: true,isOther: false})}>NHIF</div>
+                          <div className={cx(styles.choice,fields.isOther===true && styles.active)} onClick={()=> setFields({...fields,isOther: true,isNHIF: false})}>{language==="Swahili"?"Zingine":"Other"}</div>
+                        </div>
+
+                      {
                         (fields.isNHIF || fields.isOther) && (
-                            <div className={styles.decision}>
-                                <div className={styles.title}>
-                                    <p>{language==="Swahili"?"Una Namba Ya Matibabu?":"Have Medical Records Number!"}</p>
-                                </div>
-                                <div className={styles.bima_choices}>
-                                <div className={cx(styles.choice,fields.hasMedical===true && styles.active)} onClick={()=> handleMrTime(true)}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
-                                <div className={cx(styles.choice,fields.dontHaveMedical===true && styles.active)} onClick={()=> handleMrTime(false)}>{language==="Swahili"?"Hapana":"No"}</div>
-                            </div>
-                            </div>
+                          <div className={styles.decision}>
+                              <div className={styles.title}>
+                                  <p>{language==="Swahili"?"Una Namba Ya Matibabu?":"Have Medical Records Number!"}</p>
+                              </div>
+                              <div className={styles.bima_choices}>
+                                <div className={cx(styles.choice,fields.hasMedical===true && styles.active)} onClick={()=> setFields({...fields,hasMedical:true,dontHaveMedical:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
+                                <div className={cx(styles.choice,fields.dontHaveMedical===true && styles.active)} onClick={()=> setFields({...fields,hasMedical:false,dontHaveMedical:true})}>{language==="Swahili"?"Hapana":"No"}</div>
+                              </div>
+
+                              {/* Diabetic question (shows after MR choice) */}
+                              {
+                                (fields.hasMedical || fields.dontHaveMedical) && (
+                                  <div className={styles.decision}>
+                                    <div className={styles.title}>
+                                      <p>{language==="Swahili"?"Je, umemleta mtoto?":"Did you bring a child?"}</p>
+                                    </div>
+                                    <div className={styles.bima_choices}>
+                                      <div className={cx(styles.choice,fields.isChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:true,isNotChild:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
+                                      <div className={cx(styles.choice,fields.isNotChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:false,isNotChild:true})}>{language==="Swahili"?"Hapana":"No"}</div>
+                                    </div>
+                                  </div>
+                                )
+                              }
+                              {/* Continue button to go to number input */}
+                              {
+                                (fields.isChild || fields.isNotChild) && (
+                                  <div style={{marginTop: 12}}>
+                                    <button className={styles.submit_btn} onClick={()=> setFields({...fields,isMrTime:true})}>
+                                      {language==="Swahili"?"Endelea":"Continue"}
+                                    </button>
+                                  </div>
+                                )
+                              }
+
+                          </div>
                         )
-                    }
-                    {/* <button onClick={handleMrTime}>{language==="Swahili"?"Wasilisha":"Submit"}</button> */}
+                      }
+
                     </div>
                 </div>
             )
         }
         {
+            /* ---------- Cash Flow (shows similar MR + diabetic question) ---------- */
             (fields.isCash===true && fields.isMrTime===false) && (
                 <div className={styles.isBima}>
                     <div className={styles.general_decision}>
@@ -434,9 +465,35 @@ const changeLanguage = () => {
                                 <p>{language==="Swahili"?"Una Namba Ya Matibabu?":"Have Medical Records Number!"}</p>
                             </div>
                             <div className={styles.bima_choices}>
-                            <div className={cx(styles.choice,fields.hasMedical===true && styles.active)} onClick={()=> handleMrTime(true)}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
-                            <div className={cx(styles.choice,fields.dontHaveMedical===true && styles.active)} onClick={()=> handleMrTime(false)}>{language==="Swahili"?"Hapana":"No"}</div>
+                            <div className={cx(styles.choice,fields.hasMedical===true && styles.active)} onClick={()=> setFields({...fields,hasMedical:true,dontHaveMedical:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
+                            <div className={cx(styles.choice,fields.dontHaveMedical===true && styles.active)} onClick={()=> setFields({...fields,hasMedical:false,dontHaveMedical:true})}>{language==="Swahili"?"Hapana":"No"}</div>
                         </div>
+
+                        {/* Diabetic question (for cash flow) */}
+                        {
+                          (fields.hasMedical || fields.dontHaveMedical) && (
+                            <div className={styles.decision}>
+                              <div className={styles.title}>
+                                <p>{language==="Swahili"?"Umemleta Mtoto?":"Did you bring a child?"}</p>
+                              </div>
+                              <div className={styles.bima_choices}>
+                                <div className={cx(styles.choice,fields.isChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:true,isNotChild:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
+                                <div className={cx(styles.choice,fields.isNotChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:false,isNotChild:true})}>{language==="Swahili"?"Hapana":"No"}</div>
+                              </div>
+                            </div>
+                          )
+                        }
+                        {/* Continue button */}
+                        {
+                          (fields.isChild || fields.isNotChild) && (
+                            <div style={{marginTop: 12}}>
+                              <button className={styles.submit_btn} onClick={()=> setFields({...fields,isMrTime:true})}>
+                                {language==="Swahili"?"Endelea":"Continue"}
+                              </button>
+                            </div>
+                          )
+                        }
+
                         </div>
                     {/* <button onClick={handleMrTime}>{language==="Swahili"?"Wasilisha":"Submit"}</button> */}
                     </div>

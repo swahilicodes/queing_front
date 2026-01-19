@@ -27,6 +27,8 @@ function Recorder() {
   const [status, setStatus] = useState("waiting");
   const [floor, setFloor] = useState("first");
   const [diabetic, setDiabetic] = useState("false");
+  const [isChild, setChild] = useState("false");
+  const [window, setWindow] = useState("1");
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [page, setPage] = useState(1);
@@ -86,6 +88,8 @@ function Recorder() {
         setStatus(localStorage.getItem("status")!)
         setFloor(localStorage.getItem("floor")!)
         setDiabetic(localStorage.getItem("diabetic")!)
+        setChild(localStorage.getItem("isChild")!)
+        setWindow(localStorage.getItem("window")!)
         console.log(localStorage.getItem("status"))
       }
     },[status])
@@ -101,7 +105,7 @@ function Recorder() {
   }
 
   const toMeds = (id:number) => {
-    axios.post("http://localhost:5000/ticketa/to_meds",{id}).then((data)=> {
+    axios.post("http://localhost:5005/ticketa/to_meds",{id}).then((data)=> {
       location.reload()
     }).catch((error)=> {
       setMessage({...onmessage,title:"There is an error",category:"error"})
@@ -114,7 +118,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {  
     if(found){
         setFinLoading(true)
-      axios.put(`http://localhost:5000/tickets/finish_account_token/${id}`,{stage:"nurse_station",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then((data)=> {
+      axios.put(`http://localhost:5005/tickets/finish_account_token/${id}`,{stage:"nurse_station",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then((data)=> {
         clinicGo(data.data.mr_no)
         setInterval(()=> {
           setFinLoading(false)
@@ -148,7 +152,7 @@ function Recorder() {
      const nextToken = (e: React.FormEvent) => {
         e.preventDefault()
         setFinLoading(true);
-        axios.get("http://localhost:5000/tickets/next_stage", {
+        axios.get("http://localhost:5005/tickets/next_stage", {
             params: { mr_number: fields.mrNumber },
           })
           .then((data) => {
@@ -175,7 +179,7 @@ function Recorder() {
           });
       };
   const getVideos = () => {
-    axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
+    axios.get("http://localhost:5005/uploads/get_videos").then((data)=> {
     setVideos(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -195,7 +199,7 @@ function Recorder() {
 
   const activate = (page:string,video:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page,video:video})
+    axios.post(`http://localhost:5005/active/activate`,{page: page,video:video})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -244,6 +248,17 @@ function Recorder() {
       location.reload()
     }
   }
+  const handleChild = (stata:string) => {
+    const floor = localStorage.getItem("isChild")
+    if(floor){
+      localStorage.removeItem("isChild")
+      localStorage.setItem("isChild",stata)
+      location.reload()
+    }else{
+      localStorage.setItem("isChild",stata)
+      location.reload()
+    }
+  }
   const handleDiabetic = (stata:string) => {
     const diabetic = localStorage.getItem("floor")
     if(diabetic){
@@ -257,10 +272,23 @@ function Recorder() {
       location.reload()
     }
   }
+  const handleWindow = (stata:string) => {
+    const diabetic = localStorage.getItem("window")
+    if(diabetic){
+      localStorage.removeItem("window")
+      localStorage.setItem("window",stata)
+      setWindow(stata)
+      location.reload()
+    }else{
+      localStorage.setItem("window",stata)
+      setWindow(stata)
+      location.reload()
+    }
+  }
 
   const clinicGo = (mr_no:string) => {
     setFinLoading(true)
-    axios.post(`http://localhost:5000/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
+    axios.post(`http://localhost:5005/tickets/clinic_go`,{stage:"nurse_station",mr_number: mr_no,cashier_id: currentUser.phone}).then((data)=> {
       setFields({...fields,status:data.data})
       setTokens((tokens)=> tokens.map((item)=> item))
       setFinLoading(false)
@@ -284,8 +312,8 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
-        params: { page, pagesize, status: status, disable, phone: ticket, stage: "accounts",floor: floor,isDiabetic: diabetic},
+    axios.get("http://localhost:5005/tickets/getMedsTickets", {
+        params: { page, pagesize, status: status, disable, phone: ticket, stage: "accounts",floor: floor,isDiabetic: diabetic,isChild: isChild},
       })
       .then((data: any) => {
         setTokens(data.data.data);
@@ -298,8 +326,14 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           setMessage({...onmessage,title:error.response.data.error,category: "error"})
+          setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         } else {
           setMessage({...onmessage,title:error.message,category: "error"})
+          setTimeout(()=> {
+                setMessage({...onmessage,title:"",category: ""})  
+            },5000)
         }
       });
   };
@@ -311,7 +345,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5005/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -329,7 +363,7 @@ function Recorder() {
   };
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5005/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -348,7 +382,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/accounts_queue"}})
+    axios.get(`http://localhost:5005/active/get_active`,{params: {page: "/accounts_queue"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -371,7 +405,7 @@ function Recorder() {
 
   const priotize = (ticket_no:string, data:string, stage: string, reason:string,counter:number) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
+    axios.get(`http://localhost:5005/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -397,7 +431,7 @@ function Recorder() {
   };
   const serveTicket = (ticket_no:string, data:string,counter: number) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data, stage: "accounts",counter:counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
+    axios.get(`http://localhost:5005/tickets/priority`,{params: {ticket_no,data, stage: "accounts",counter:counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -536,6 +570,26 @@ function Recorder() {
                 }
           </div>
           {
+            <div className={styles.side}>
+            <label>Select Window:</label>
+            <select onChange={(e) => handleWindow(e.target.value)} 
+            value={window}
+            >
+              <option value="" selected disabled>--select window--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+          }
+          {
             floor==="ground" && (<div className={styles.side}>
             <label>isDiabetic:</label>
             <select onChange={(e) => handleDiabetic(e.target.value)} 
@@ -545,6 +599,17 @@ function Recorder() {
               <option value="false">No</option>
             </select>
           </div>)
+          }
+          {
+            <div className={styles.side}>
+            <label>isChild:</label>
+            <select onChange={(e) => handleChild(e.target.value)} 
+            value={isChild}
+            >
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
           }
           <div className={styles.side}>
             <label>Floor:</label>
@@ -661,7 +726,7 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
+                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5005/speaker/create_speaker",window,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
                             </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve,item.token.serving && styles.active)} onClick={()=> serveTicket(`${item.token.ticket_no}`,"serve",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
@@ -712,7 +777,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"accounts",floor,"http://localhost:5005/speaker/create_speaker",window,currentUser.phone)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>

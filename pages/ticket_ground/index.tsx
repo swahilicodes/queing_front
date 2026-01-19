@@ -46,6 +46,8 @@ function TicketGround() {
       // NEW diabetic flags
       isDiabetic: false,
       isNotDiabetic: false,
+      isChild: false,
+      isNotChild: false
   })
   const numbers = [1,2,3,4,5,6,7,8,9,11,0,12]
   const [subLoading, setSubLoading] = useState(false)
@@ -64,7 +66,7 @@ function TicketGround() {
         if (seleccted.index > 0 && seleccted.type !== "") {
           setTimeout(()=> {
               setSubLoading(true)
-          axios.post("http://localhost:5000/suggestion/create_suggestion", {
+          axios.post("http://localhost:5005/suggestion/create_suggestion", {
             type: seleccted.type,
             reason: seleccted.reason
           }).then(() => {
@@ -161,7 +163,7 @@ function TicketGround() {
     const handlePriotize = (priorToken:string,priorCode:string) => {
       //setFields({...fields,priorLoading: true})
       setFields({...fields,isPriorCode: true,priorToken: priorToken,priorCode: priorCode,priorLoading: true})
-      axios.post("http://localhost:5000/ticketa/priotize",{ticket_no:priorToken,code:priorCode}).then((data)=> {
+      axios.post("http://localhost:5005/ticketa/priotize",{ticket_no:priorToken,code:priorCode}).then((data)=> {
           setTimeout(()=> {
               setFields({...fields,priorLoading: false,isPriority:false,isPriorCode:false})
               location.reload()
@@ -244,14 +246,15 @@ function TicketGround() {
             setFields({...fields,isLoading:false})  
           },3000)
       }else{
-          axios.post("http://localhost:5000/ticketa/create_ticket",{
+          axios.post("http://localhost:5005/ticketa/create_ticket",{
           //phone: fields.hasMedical?formatCode(fields.isA,fields.isM,fields.numberString):fields.numberString,
           phone: fields.numberString,
           category: fields.isBima===true?"insurance":"cash",
           hasMedical: fields.hasMedical,
           isNHIF: fields.isNHIF,
           floor: "ground",
-          isDiabetic: fields.isDiabetic // <-- send diabetic flag
+          isDiabetic: fields.isDiabetic, // <-- send diabetic flag
+          isChild: fields.isChild // <-- send diabetic flag
       }).then((data)=> {
           setQrState(data.data)
           //setClicked(false)
@@ -430,7 +433,7 @@ function TicketGround() {
                                 (fields.hasMedical || fields.dontHaveMedical) && (
                                   <div className={styles.decision}>
                                     <div className={styles.title}>
-                                      <p>{language==="Swahili"?"Je, una ugonjwa wa kisukari?":"Are you diabetic?"}</p>
+                                      <p>{language==="Swahili"?"Je, unaenda kliniki ya kisukari?":"Heading to Diabetic Clinic?"}</p>
                                     </div>
                                     <div className={styles.bima_choices}>
                                       <div className={cx(styles.choice,fields.isDiabetic===true && styles.active)} onClick={()=> setFields({...fields,isDiabetic:true,isNotDiabetic:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
@@ -439,10 +442,23 @@ function TicketGround() {
                                   </div>
                                 )
                               }
+                              {
+                                (fields.isDiabetic || fields.isNotDiabetic) && (
+                                  <div className={styles.decision}>
+                                    <div className={styles.title}>
+                                      <p>{language==="Swahili"?"Je, umemleta Mtoto?":"Did you bring a child?"}</p>
+                                    </div>
+                                    <div className={styles.bima_choices}>
+                                      <div className={cx(styles.choice,fields.isChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:true,isNotChild:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
+                                      <div className={cx(styles.choice,fields.isNotChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:false,isNotChild:true})}>{language==="Swahili"?"Hapana":"No"}</div>
+                                    </div>
+                                  </div>
+                                )
+                              }
 
                               {/* Continue button to go to number input */}
                               {
-                                (fields.isDiabetic || fields.isNotDiabetic) && (
+                                (fields.isChild || fields.isNotChild) && (
                                   <div style={{marginTop: 12}}>
                                     <button className={styles.submit_btn} onClick={()=> setFields({...fields,isMrTime:true})}>
                                       {language==="Swahili"?"Endelea":"Continue"}
@@ -480,7 +496,7 @@ function TicketGround() {
                           (fields.hasMedical || fields.dontHaveMedical) && (
                             <div className={styles.decision}>
                               <div className={styles.title}>
-                                <p>{language==="Swahili"?"Je, una ugonjwa wa kisukari?":"Are you diabetic?"}</p>
+                                <p>{language==="Swahili"?"Unaenda Kliniki ya kisukari?":"Heading to diabetic clinic?"}</p>
                               </div>
                               <div className={styles.bima_choices}>
                                 <div className={cx(styles.choice,fields.isDiabetic===true && styles.active)} onClick={()=> setFields({...fields,isDiabetic:true,isNotDiabetic:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
@@ -489,10 +505,22 @@ function TicketGround() {
                             </div>
                           )
                         }
-
+                        {
+                                (fields.isDiabetic || fields.isNotDiabetic) && (
+                                  <div className={styles.decision}>
+                                    <div className={styles.title}>
+                                      <p>{language==="Swahili"?"Je, umemleta Mtoto?":"Did you bring a child?"}</p>
+                                    </div>
+                                    <div className={styles.bima_choices}>
+                                      <div className={cx(styles.choice,fields.isChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:true,isNotChild:false})}>{language==="Swahili"?"Ndiyo":"Yes"}</div>
+                                      <div className={cx(styles.choice,fields.isNotChild===true && styles.active)} onClick={()=> setFields({...fields,isChild:false,isNotChild:true})}>{language==="Swahili"?"Hapana":"No"}</div>
+                                    </div>
+                                  </div>
+                                )
+                              }
                         {/* Continue button */}
                         {
-                          (fields.isDiabetic || fields.isNotDiabetic) && (
+                          (fields.isChild || fields.isNotChild) && (
                             <div style={{marginTop: 12}}>
                               <button className={styles.submit_btn} onClick={()=> setFields({...fields,isMrTime:true})}>
                                 {language==="Swahili"?"Endelea":"Continue"}

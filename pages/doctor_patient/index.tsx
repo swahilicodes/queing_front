@@ -38,7 +38,7 @@ export default function DoctorPatient() {
     const [isAdd, setAdd] = useState(false)
     const [jeevaClinics, setJeevaClinics] = useState([])
     const [attendantClinics, setAttendantClinics] = useState([])
-    const { data } = useFetchData("http://localhost:5000/clinic/get_clinics")
+    const { data } = useFetchData("http://localhost:5005/clinic/get_clinics")
     const { createItem, loading } = useCreateItem()
     const [fetchLoading, setFetchLoading] = useState(false)
     const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
@@ -74,7 +74,7 @@ export default function DoctorPatient() {
     }
 
     const getDoktas = () => {
-        axios.get("http://localhost:5000/doktas/get_all_doktas")
+        axios.get("http://localhost:5005/doktas/get_all_doktas")
             .then((data) => {
                 setDoktas(data.data)
             })
@@ -96,7 +96,7 @@ export default function DoctorPatient() {
     const editDoctor = (e: React.FormEvent) => {
         e.preventDefault()
         console.log("clinic code is",cliniccode(fields.clinic))
-        axios.post("http://localhost:5000/doktas/edit_doctor_one", {
+        axios.post("http://localhost:5005/doktas/edit_doctor_one", {
             name: fields.name, 
             clinic: fields.clinic,
             clinic_code: cliniccode(fields.clinic), 
@@ -121,7 +121,7 @@ export default function DoctorPatient() {
 
     const editTicket = (id: number, status: string) => {
         setFetchLoading(true)
-        axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, { status })
+        axios.put(`http://localhost:5005/tickets/edit_ticket/${id}`, { status })
             .then(() => {
                 setTimeout(() => {
                     setFetchLoading(false)
@@ -145,7 +145,7 @@ export default function DoctorPatient() {
 
     const priotize = (ticket_no: string, data: string, counter: number) => {
         setFetchLoading(true)
-        axios.get(`http://localhost:5000/tickets/priority`, {
+        axios.get(`http://localhost:5005/tickets/priority`, {
             params: { ticket_no, data, stage: "nurse_station", counter },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -169,7 +169,7 @@ export default function DoctorPatient() {
 
     const getDocPat = () => {
         setFetchLoading(true)
-        axios.get(`http://localhost:5000/doktas/get_doc_patients`, {
+        axios.get(`http://localhost:5005/doktas/get_doc_patients`, {
             params: { status,page },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -192,7 +192,7 @@ export default function DoctorPatient() {
     }
 
     const createClinic = () => {
-        axios.post(`http://localhost:5000/attendant_clinics/create_attendant_clinic`, { 
+        axios.post(`http://localhost:5005/attendant_clinics/create_attendant_clinic`, { 
             clinic_code: fields.clinic_code, 
             clinic: fields.clinic, 
             attendant_id: currentUser.phone 
@@ -211,7 +211,7 @@ export default function DoctorPatient() {
     }
 
     const deleteClinic = (clinic_code: string) => {
-        axios.get(`http://localhost:5000/attendant_clinics/delete_clinic`, { 
+        axios.get(`http://localhost:5005/attendant_clinics/delete_clinic`, { 
             params: { clinic_code, attendant_id: currentUser.phone }
         }).then(() => {
             const updatedItems = attendantClinics.filter((item: any) => item.clinic_code !== clinic_code)
@@ -228,7 +228,7 @@ export default function DoctorPatient() {
     }
 
     const getDocClinics = () => {
-        axios.get(`http://localhost:5000/attendant_clinics/get_clinics`, { 
+        axios.get(`http://localhost:5005/attendant_clinics/get_clinics`, { 
             params: { attendant_id: currentUser.phone }
         }).then((data) => {
             setAttendantClinics(data.data)
@@ -251,7 +251,7 @@ export default function DoctorPatient() {
 
     const finishToken = (patient_id: string) => {
         setFinLoading(true)
-        axios.post("http://localhost:5000/doktas/finish_patient", { 
+        axios.post("http://localhost:5005/doktas/finish_patient", { 
             doctor_id: currentUser.id, 
             patient_id 
         }).then(() => {
@@ -532,7 +532,7 @@ export default function DoctorPatient() {
                                         item.ticket_no.toString(), 
                                         "clinic", 
                                         "m02", 
-                                        "http://localhost:5000/speaker/create_speaker", 
+                                        "http://localhost:5005/speaker/create_speaker", 
                                         getRoom(currentUser.id),
                                         currentUser.phone
                                     )}

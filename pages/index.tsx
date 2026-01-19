@@ -71,13 +71,13 @@ export default function Home() {
       if (!deviceId) return;
 
       axios
-        .get("http://localhost:5000/network/get_device", {
+        .get("http://localhost:5005/network/get_device", {
           params: {
             id: deviceId,
           },
         })
         .then((dita) => {
-          getTickets(dita.data.floor, dita.data.isDiabetic);
+          getTickets(dita.data.floor, dita.data.isDiabetic, dita.data.isChild);
         })
         .catch((error) => {
           console.log(error);
@@ -215,7 +215,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5000/active/get_active`, { params: { page: "/" } })
+      .get(`http://localhost:5005/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
         setVideo(data.data.video)
@@ -238,7 +238,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5000/adverts/get_all_adverts")
+      .get("http://localhost:5005/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -249,11 +249,11 @@ export default function Home() {
         }, 3000)
       });
   };
-  const getTickets = (floor:string,isDiabetic:boolean) => {
+  const getTickets = (floor:string,isDiabetic:boolean, isChild: boolean) => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/tickets/get_display_tokens", {
-        params: { stage: "meds", clinic_code: "",floor:floor, isDiabetic: isDiabetic },
+      .get("http://localhost:5005/tickets/get_display_tokens", {
+        params: { stage: "meds", clinic_code: "",floor:floor, isDiabetic: isDiabetic, isChild: true },
       })
       .then((data) => {
         setTickets(data.data);

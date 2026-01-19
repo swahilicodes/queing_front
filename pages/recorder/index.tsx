@@ -27,6 +27,8 @@ function Recorder() {
   const [status, setStatus] = useState("waiting");
   const [floor, setFloor] = useState("first");
   const [diabetic, setDiabetic] = useState("false");
+  const [isChild, setChild] = useState("false");
+  const [window, setWindow] = useState("1");
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [page,setPage] = useState(1);
@@ -81,6 +83,8 @@ function Recorder() {
       setStatus(localStorage.getItem("status")!)
       setFloor(localStorage.getItem("floor")!)
       setDiabetic(localStorage.getItem("diabetic")!)
+      setChild(localStorage.getItem("isChild")!)
+      setWindow(localStorage.getItem("window")!)
       setPage(Number(localStorage.getItem("page"))!)
     }
   },[status])
@@ -97,6 +101,17 @@ function Recorder() {
       location.reload()
     }
   }
+  const handleWindow = (stata:string) => {
+    const status = localStorage.getItem("window")
+    if(status){
+      localStorage.removeItem("window")
+      localStorage.setItem("window",stata)
+      location.reload()
+    }else{
+      localStorage.setItem("window",stata)
+      location.reload()
+    }
+  }
 
   const handleDiabetic = (stata:string) => {
     const diabetic = localStorage.getItem("diabetic")
@@ -106,6 +121,17 @@ function Recorder() {
       location.reload()
     }else{
       localStorage.setItem("diabetic",stata)
+      location.reload()
+    }
+  }
+  const handleChild = (stata:string) => {
+    const diabetic = localStorage.getItem("isChild")
+    if(diabetic){
+      localStorage.removeItem("isChild")
+      localStorage.setItem("isChild",stata)
+      location.reload()
+    }else{
+      localStorage.setItem("isChild",stata)
       location.reload()
     }
   }
@@ -127,7 +153,7 @@ function Recorder() {
 
   const createRest = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5000/rest/create_rest",{time:insurance}).then((data)=> {
+    axios.post("http://localhost:5005/rest/create_rest",{time:insurance}).then((data)=> {
       location.reload()
     }).catch((error)=> {
       console.log("rest error ",error)
@@ -135,7 +161,7 @@ function Recorder() {
   }
   const getRest = () => {
     console.log('getting rest')
-    axios.get("http://localhost:5000/rest/get_rest").then((data)=> {
+    axios.get("http://localhost:5005/rest/get_rest").then((data)=> {
       setInsurance(data.data.time)
       console.log('rest data is ',data.data.time)
     }).catch((error)=> {
@@ -144,7 +170,7 @@ function Recorder() {
   }
 
   const getVideos = () => {
-    axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
+    axios.get("http://localhost:5005/uploads/get_videos").then((data)=> {
     setVideos(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -171,7 +197,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5000/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
+    axios.put(`http://localhost:5005/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -204,8 +230,8 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5000/tickets/getMedsTickets", {
-        params: { page:1, pagesize:pagesize, status: status, disable, phone: ticket, stage: "meds",floor:floor, isDiabetic: diabetic},
+    axios.get("http://localhost:5005/tickets/getMedsTickets", {
+        params: { page:1, pagesize:pagesize, status: status, disable, phone: ticket, stage: "meds",floor:floor, isDiabetic: diabetic, isChild: isChild},
       })
       .then((data) => {
         console.log(data.data)
@@ -240,7 +266,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://localhost:5005/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -267,7 +293,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5000/tickets/penalt/${id}`)
+    axios.put(`http://localhost:5005/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -293,7 +319,7 @@ function Recorder() {
   };
   const priotize = (ticket_no:string, data:string, stage: string, reason:string,counter:number) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5000/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
+    axios.get(`http://localhost:5005/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -319,7 +345,7 @@ function Recorder() {
   };
   const activate = (page:string,video:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5000/active/activate`,{page: page,video:video})
+    axios.post(`http://localhost:5005/active/activate`,{page: page,video:video})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -345,7 +371,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5000/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://localhost:5005/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -370,7 +396,7 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://localhost:5000/tickets/next_stage", {
+    axios.get("http://localhost:5005/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -536,6 +562,24 @@ function Recorder() {
                 }
           </div>
           { 
+            <div className={styles.side}>
+            <label>Select Window:</label>
+            <select onChange={(e) => handleWindow(e.target.value)} value={window}>
+              <option value="" disabled>--select window--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+          }
+          { 
             floor==="ground" && (<div className={styles.side}>
             <label>IsDiabetic:</label>
             <select onChange={(e) => handleDiabetic(e.target.value)} value={diabetic}>
@@ -544,6 +588,16 @@ function Recorder() {
               <option value="false">No</option>
             </select>
           </div>)
+          }
+          { 
+            <div className={styles.side}>
+            <label>IsChild:</label>
+            <select onChange={(e) => handleChild(e.target.value)} value={isChild}>
+              <option value="" disabled>--isChild--</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
           }
           <div className={styles.side}>
             <label>Floor:</label>
@@ -636,7 +690,7 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
+                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5005/speaker/create_speaker",window,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
                             </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve,item.token.serving && styles.active, (item.token.serving && item.token.serving_id === currentUser.phone) && styles.owner)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage, "sasas",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
@@ -685,7 +739,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5000/speaker/create_speaker",currentUser.counter,currentUser.phone)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5005/speaker/create_speaker",window,currentUser.phone)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>

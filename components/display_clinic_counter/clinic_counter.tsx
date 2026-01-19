@@ -14,7 +14,7 @@
 
 // const getAttendants = () => {
 //     axios
-//       .get("http://localhost:5000/network/get_all_devices")
+//       .get("http://localhost:5005/network/get_all_devices")
 //       .then((data) => {
 //         setServices(data.data);
 //         console.log(data.data)
@@ -75,7 +75,7 @@ function ClinicCounter() {
 
   const getAttendants = () => {
     axios
-      .get("http://localhost:5000/network/get_all_devices")
+      .get("http://localhost:5005/network/get_all_devices")
       .then((data) => {
         setServices(data.data);
         console.log(data.data);

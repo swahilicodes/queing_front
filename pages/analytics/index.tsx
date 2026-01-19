@@ -18,7 +18,7 @@ const AnalyticsDashboard = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/new_analytics/token_stats', {
+        const response = await axios.get('http://localhost:5005/new_analytics/token_stats', {
           params: { duration,start_date: fields.start_date,end_date: fields.end_date,status:fields.status }
         });
         setData(response.data);

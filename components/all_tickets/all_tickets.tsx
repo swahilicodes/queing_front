@@ -11,7 +11,7 @@ function AllTickets() {
 
   const getTickets = () => {
     setLoading(true)
-    axios.get("http://localhost:5000/tickets/get_all_the_tickets").then((data)=> {
+    axios.get("http://localhost:5005/tickets/get_all_the_tickets").then((data)=> {
         setTickets(data.data)
         setLoading(false)
     }).catch((error)=> {

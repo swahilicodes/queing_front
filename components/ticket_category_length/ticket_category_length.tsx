@@ -17,7 +17,7 @@ interface MyComponentProps {
       }, [category,status]);
     
       const getTickets = () => {
-        axios.get("http://localhost:5000/tickets/getTicketTotal",{params: {status,stage:category}}).then((data)=> {
+        axios.get("http://localhost:5005/tickets/getTicketTotal",{params: {status,stage:category}}).then((data)=> {
           setTickets(data.data)
         }).catch((error)=> {
           if (error.response && error.response.status === 400) {

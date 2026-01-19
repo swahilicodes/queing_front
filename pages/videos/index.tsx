@@ -32,7 +32,7 @@ function Videos() {
     },[uploadProgress])
 
     const uploadFinal = (url:string) => {
-        axios.post("http://localhost:5000/uploads/upload-video",{name: fields.name,description: fields.description,url: url}).then((data)=> {
+        axios.post("http://localhost:5005/uploads/upload-video",{name: fields.name,description: fields.description,url: url}).then((data)=> {
                 setFields({...fields, url: ""});
                 setUploadProgress(0);
                 setAdd(false);
@@ -56,7 +56,7 @@ function Videos() {
 
     const getVideos = () => {
         setLoading(true)
-        axios.get("http://localhost:5000/uploads/get_videos").then((data)=> {
+        axios.get("http://localhost:5005/uploads/get_videos").then((data)=> {
         setVideos(data.data)
         setLoading(false)
         }).catch((error)=> {
@@ -82,7 +82,7 @@ function Videos() {
     }
     const deleteVideo = (id:number,url:string) => {
         console.log('video url is ',url)
-        axios.post("http://localhost:5000/uploads/delete_video",{id:id, url: url}).then((data)=> {
+        axios.post("http://localhost:5005/uploads/delete_video",{id:id, url: url}).then((data)=> {
         location.reload()
         }).catch((error)=> {
             if (error.response && error.response.status === 400) {
@@ -132,7 +132,7 @@ function Videos() {
         formData.append('file', file);
         
         try {
-            axios.post("http://localhost:5000/uploads/upload", formData, {
+            axios.post("http://localhost:5005/uploads/upload", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
