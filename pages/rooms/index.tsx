@@ -20,7 +20,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data,loading,error} = useFetchData("http://localhost:5005/clinic/get_clinics")
+const {data,loading,error} = useFetchData("http://192.168.30.246:5005/clinic/get_clinics")
 const setMessage = useSetRecoilState(messageState)
 const [fields, setFields] = useState({
     service: "",
@@ -40,7 +40,7 @@ const clinicSeta = (code:string) => {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5005/rooms/create_room",{namba: fields.namba, clinic: fields.clinic,clinic_code: fields.code}).then((data:any)=> {
+    axios.post("http://192.168.30.246:5005/rooms/create_room",{namba: fields.namba, clinic: fields.clinic,clinic_code: fields.code}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -58,7 +58,7 @@ const clinicSeta = (code:string) => {
     })
  }
  const deleteService  = (id:any) => {
-    axios.put(`http://localhost:5005/counters/delete_counter/${id}`).then((data:any)=> {
+    axios.put(`http://192.168.30.246:5005/counters/delete_counter/${id}`).then((data:any)=> {
         router.reload()
     }).catch((error:any)=> {
         if (error.response && error.response.status === 400) {
@@ -76,7 +76,7 @@ const clinicSeta = (code:string) => {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5005/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
+    axios.put(`http://192.168.30.246:5005/counters/edit_counter/${id}`,{service:fields.service,namba: fields.namba, sub_service: fields.clinic}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error:any)=> {
@@ -107,7 +107,7 @@ const clinicSeta = (code:string) => {
   };
  const getServices  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5005/rooms/get_rooms",{params: {page,pagesize, clinic_code: fields.code}}).then((data:any)=> {
+    axios.get("http://192.168.30.246:5005/rooms/get_rooms",{params: {page,pagesize, clinic_code: fields.code}}).then((data:any)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)

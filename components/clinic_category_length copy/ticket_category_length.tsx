@@ -19,7 +19,7 @@ interface MyComponentProps {
       }, [category,status,clinics,current_clinic]);
     
       const getTickets = () => {
-        axios.get("http://localhost:5005/tickets/get_clinic_length",{params: {status, stage: "nurse_station",clinic_code: clinics,current_clinic:current_clinic}}).then((data)=> {
+        axios.get("http://192.168.30.246:5005/tickets/get_clinic_length",{params: {status, stage: "nurse_station",clinic_code: clinics,current_clinic:current_clinic}}).then((data)=> {
           setTickets(data.data)
         }).catch((error)=> {
           if (error.response && error.response.status === 400) {

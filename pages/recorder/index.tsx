@@ -153,7 +153,7 @@ function Recorder() {
 
   const createRest = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5005/rest/create_rest",{time:insurance}).then((data)=> {
+    axios.post("http://192.168.30.246:5005/rest/create_rest",{time:insurance}).then((data)=> {
       location.reload()
     }).catch((error)=> {
       console.log("rest error ",error)
@@ -161,7 +161,7 @@ function Recorder() {
   }
   const getRest = () => {
     console.log('getting rest')
-    axios.get("http://localhost:5005/rest/get_rest").then((data)=> {
+    axios.get("http://192.168.30.246:5005/rest/get_rest").then((data)=> {
       setInsurance(data.data.time)
       console.log('rest data is ',data.data.time)
     }).catch((error)=> {
@@ -170,7 +170,7 @@ function Recorder() {
   }
 
   const getVideos = () => {
-    axios.get("http://localhost:5005/uploads/get_videos").then((data)=> {
+    axios.get("http://192.168.30.246:5005/uploads/get_videos").then((data)=> {
     setVideos(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -197,7 +197,7 @@ function Recorder() {
   const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
     if(found){
       setFinLoading(true)
-    axios.put(`http://localhost:5005/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
+    axios.put(`http://192.168.30.246:5005/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
       setInterval(()=> {
         setFinLoading(false)
         router.reload()
@@ -230,7 +230,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5005/tickets/getMedsTickets", {
+    axios.get("http://192.168.30.246:5005/tickets/getMedsTickets", {
         params: { page:1, pagesize:pagesize, status: status, disable, phone: ticket, stage: "meds",floor:floor, isDiabetic: diabetic, isChild: isChild},
       })
       .then((data) => {
@@ -266,7 +266,7 @@ function Recorder() {
   }
   const editTicket = (id:number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5005/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`http://192.168.30.246:5005/tickets/edit_ticket/${id}`, {status: status})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -293,7 +293,7 @@ function Recorder() {
 
   const penalize = (id:number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5005/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.246:5005/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -319,7 +319,7 @@ function Recorder() {
   };
   const priotize = (ticket_no:string, data:string, stage: string, reason:string,counter:number) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5005/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
+    axios.get(`http://192.168.30.246:5005/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -345,7 +345,7 @@ function Recorder() {
   };
   const activate = (page:string,video:string) => {
     setFetchLoading(true);
-    axios.post(`http://localhost:5005/active/activate`,{page: page,video:video})
+    axios.post(`http://192.168.30.246:5005/active/activate`,{page: page,video:video})
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -371,7 +371,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://localhost:5005/active/get_active`,{params: {page: "/"}})
+    axios.get(`http://192.168.30.246:5005/active/get_active`,{params: {page: "/"}})
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -396,7 +396,7 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://localhost:5005/tickets/next_stage", {
+    axios.get("http://192.168.30.246:5005/tickets/next_stage", {
         params: { mr_number: mr_number },
       })
       .then((data) => {
@@ -690,7 +690,7 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5005/speaker/create_speaker",window,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
+                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://192.168.30.246:5005/speaker/create_speaker",window,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
                             </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve,item.token.serving && styles.active, (item.token.serving && item.token.serving_id === currentUser.phone) && styles.owner)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage, "sasas",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
@@ -739,7 +739,7 @@ function Recorder() {
         {
             tokens.length > 0 && (
               <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds",floor,"http://localhost:5005/speaker/create_speaker",window,currentUser.phone)}>
+                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds",floor,"http://192.168.30.246:5005/speaker/create_speaker",window,currentUser.phone)}>
                   {
                     !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>

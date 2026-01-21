@@ -21,7 +21,7 @@ useEffect(()=> {
     getCounter()
 },[category])
  const getTickets = () => {
-    axios.get('http://localhost:5005/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
+    axios.get('http://192.168.30.246:5005/tickets/getWaitingTickets',{params: {page,pagesize,category}}).then((data:any)=> {
         setData(data.data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -32,7 +32,7 @@ useEffect(()=> {
     })
  }
  const getCounter = () => {
-    axios.get('http://localhost:5005/tickets/getTicketCounter',{params: {category:category}}).then((data:any)=> {
+    axios.get('http://192.168.30.246:5005/tickets/getTicketCounter',{params: {category:category}}).then((data:any)=> {
         setService(data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {

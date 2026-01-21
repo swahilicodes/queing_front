@@ -23,7 +23,7 @@ export default function Admins() {
   const [id, setId] = useState("");
   const setMessage = useSetRecoilState(messageState)
   const { data } = useFetchData(
-    "http://localhost:5005/services/get_all_services"
+    "http://192.168.30.246:5005/services/get_all_services"
   );
   useAuth();
 
@@ -39,7 +39,7 @@ export default function Admins() {
   const getAttendants = () => {
     setFetchLoading(true);
     axios
-      .get("http://localhost:5005/clinic/get_display_clinics", {
+      .get("http://192.168.30.246:5005/clinic/get_display_clinics", {
         params: { page, pagesize },
       })
       .then((data) => {

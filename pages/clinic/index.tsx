@@ -44,7 +44,7 @@ function Recorder() {
   const router = useRouter()
   const [penalized, setPenalized] = useState(false)
   const [doktas, setDoktas] = useState([])
-  const { data } = useFetchData("http://localhost:5005/clinic/get_clinics")
+  const { data } = useFetchData("http://192.168.30.246:5005/clinic/get_clinics")
   const [isAddittion, setAddittion] = useState(false)
   const [isAdd, setAdd] = useState(false)
   const [attendantClinics, setAttendantClinics] = useState([])
@@ -108,7 +108,7 @@ function Recorder() {
     setVid({ ...vid, index: index, clicked: true })
   }
   const getVideos = () => {
-    axios.get("http://localhost:5005/uploads/get_videos").then((data) => {
+    axios.get("http://192.168.30.246:5005/uploads/get_videos").then((data) => {
       setVideos(data.data)
     }).catch((error) => {
       if (error.response && error.response.status === 400) {
@@ -127,7 +127,7 @@ function Recorder() {
 
   const handleCurrentClinic = (code: string) => {
     if (code === "all") {
-      axios.post('http://localhost:5005/current_clinic/create_current', { clinic_code: "", clinic_name: "" }).then((data) => {
+      axios.post('http://192.168.30.246:5005/current_clinic/create_current', { clinic_code: "", clinic_name: "" }).then((data) => {
         setFields({ ...fields, clinic_code: "", clinic: "" })
       })
         .catch((error) => {
@@ -144,7 +144,7 @@ function Recorder() {
     } else {
       const clinic = data.find((item: any) => item.clinicicode === code)
       setFields({ ...fields, clinic: clinic.cliniciname, clinic_code: clinic.clinicicode })
-      axios.post('http://localhost:5005/current_clinic/create_current', { clinic_code: clinic.clinicicode, clinic_name: clinic.cliniciname }).then((data) => {
+      axios.post('http://192.168.30.246:5005/current_clinic/create_current', { clinic_code: clinic.clinicicode, clinic_name: clinic.cliniciname }).then((data) => {
         setFields({ ...fields, clinic: data.data.clinic_name, clinic_code: data.data.clinic_code })
       })
         .catch((error) => {
@@ -161,7 +161,7 @@ function Recorder() {
     }
   }
   const getActive = () => {
-    axios.get(`http://localhost:5005/active/get_active`, { params: { page: "/clinic_queue" } })
+    axios.get(`http://192.168.30.246:5005/active/get_active`, { params: { page: "/clinic_queue" } })
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -191,7 +191,7 @@ function Recorder() {
   };
 
   const createClinic = () => {
-    axios.post(`http://localhost:5005/attendant_clinics/create_attendant_clinic`, { clinic_code: fields.clinic_code, clinic: fields.clinic, attendant_id: currentUser.phone }).then((data) => {
+    axios.post(`http://192.168.30.246:5005/attendant_clinics/create_attendant_clinic`, { clinic_code: fields.clinic_code, clinic: fields.clinic, attendant_id: currentUser.phone }).then((data) => {
       //setPat(data.data)
       setAddittion(!isAddittion)
       getDocClinics()
@@ -209,7 +209,7 @@ function Recorder() {
     })
   }
   const deleteClinic = (clinic_code: string) => {
-    axios.get(`http://localhost:5005/attendant_clinics/delete_clinic`, { params: { clinic_code: clinic_code, attendant_id: currentUser.phone } }).then((data) => {
+    axios.get(`http://192.168.30.246:5005/attendant_clinics/delete_clinic`, { params: { clinic_code: clinic_code, attendant_id: currentUser.phone } }).then((data) => {
       const updatedItems = attendantClinics.filter((item: any) => item.clinic_code !== clinic_code);
       setAttendantClinics(updatedItems.map((item) => item));
     }).catch((error) => {
@@ -223,7 +223,7 @@ function Recorder() {
     })
   }
   const getDocClinics = () => {
-    axios.get(`http://localhost:5005/attendant_clinics/get_clinics`, { params: { attendant_id: currentUser.phone } }).then((data) => {
+    axios.get(`http://192.168.30.246:5005/attendant_clinics/get_clinics`, { params: { attendant_id: currentUser.phone } }).then((data) => {
       setAttendantClinics(data.data)
     }).catch((error) => {
       if (error.response && error.response.status === 400) {
@@ -239,7 +239,7 @@ function Recorder() {
 
   const finishToken = () => {
     setFinLoading(true)
-    axios.post(`http://localhost:5005/tickets/send_to_clinic`, { patient_id: fields.patient_id, doctor_id: fields.doctor_id, nurse_id: currentUser.phone }).then((data) => {
+    axios.post(`http://192.168.30.246:5005/tickets/send_to_clinic`, { patient_id: fields.patient_id, doctor_id: fields.doctor_id, nurse_id: currentUser.phone }).then((data) => {
       console.log(data)
       setInterval(() => {
         setFinLoading(false)
@@ -260,7 +260,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://localhost:5005/tickets/getClinicTickets", {
+    axios.get("http://192.168.30.246:5005/tickets/getClinicTickets", {
       params: { page: page, pagesize: pagesize, status, disable, phone: ticket, stage: "nurse_station", clinic_code: attendantClinics.map((item: any) => item.clinic_code), mr_no: ticket, current_clinic: fields.clinic_code },
     })
       .then((data) => {
@@ -286,7 +286,7 @@ function Recorder() {
   };
   const getDoktas = () => {
     setDocLoading(true);
-    axios.get("http://localhost:5005/doktas/get_clinic_doktas", {
+    axios.get("http://192.168.30.246:5005/doktas/get_clinic_doktas", {
       params: {
         page: docPage,
         pagesize: 5,
@@ -327,7 +327,7 @@ function Recorder() {
   }
   const editTicket = (id: number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5005/tickets/edit_ticket/${id}`, { status: status })
+    axios.put(`http://192.168.30.246:5005/tickets/edit_ticket/${id}`, { status: status })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -357,7 +357,7 @@ function Recorder() {
   }
   const penalize = (id: number) => {
     setFetchLoading(true);
-    axios.put(`http://localhost:5005/tickets/penalt/${id}`)
+    axios.put(`http://192.168.30.246:5005/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -378,7 +378,7 @@ function Recorder() {
   const activate = (page: string, video: string, device: string) => {
     console.log(page, device, video)
     setFetchLoading(true);
-    axios.post(`http://localhost:5005/active/activate`, { page: page, video: video, device: device })
+    axios.post(`http://192.168.30.246:5005/active/activate`, { page: page, video: video, device: device })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -402,7 +402,7 @@ function Recorder() {
       });
   };
   const getClinicDevices = () => {
-    axios.get(`http://localhost:5005/active/get_clinic_devices`)
+    axios.get(`http://192.168.30.246:5005/active/get_clinic_devices`)
       .then((data: any) => {
         setDevices(data.data)
       })
@@ -424,7 +424,7 @@ function Recorder() {
   };
   const priotize = (ticket_no: string, data: string, counter: number) => {
     setFetchLoading(true);
-    axios.get(`http://localhost:5005/tickets/priority`, {
+    axios.get(`http://192.168.30.246:5005/tickets/priority`, {
       params: { ticket_no, data, stage: "nurse_station", counter: counter }, headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -475,7 +475,7 @@ function Recorder() {
   const assignDoctor = (patient_id: number, doctor_id: number) => {
     setServePatient({ ...servePatient, loading: true })
     setServeDoc(doctor_id.toString())
-    axios.post("http://localhost:5005/doktas/assign_doctor", { patient_id: patient_id, doctor_id: doctor_id }).then((data) => {
+    axios.post("http://192.168.30.246:5005/doktas/assign_doctor", { patient_id: patient_id, doctor_id: doctor_id }).then((data) => {
       setTimeout(() => {
         setServePatient({ ...servePatient, loading: false, id: "", name: '' })
         setIsDoctors(false)
@@ -821,7 +821,7 @@ function Recorder() {
               {
                 (fields.room !== '' && tokens.length > 0) && (
                   <div className={cx(styles.spika, loading && styles.active)} onClick={() => setSpeaker(!isSpeaker)}>
-                    <div className={styles.rounder} onClick={() => createItem(currentToken.ticket_no.toString(), "nurse_station", "m02", "http://localhost:5005/speaker/create_speaker", fields.room, currentUser.phone)}>
+                    <div className={styles.rounder} onClick={() => createItem(currentToken.ticket_no.toString(), "nurse_station", "m02", "http://192.168.30.246:5005/speaker/create_speaker", fields.room, currentUser.phone)}>
                       {
                         !loading
                           ? <HiOutlineSpeakerWave className={styles.icon} size={30} />
@@ -880,7 +880,7 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve, (loading && fields.calling_token === item.token.ticket_no.toString()) && styles.calling)} onClick={() => prepareCall(item.token.ticket_no.toString(), "meds", "m02", "http://localhost:5005/speaker/create_speaker", currentUser.counter, currentUser.phone)}>{loading && fields.calling_token === item.token.ticket_no.toString() ? "calling.." : "call"}/{item.token.calls === null ? 0 : item.token.calls}</div>
+                              <div className={cx(styles.serve, (loading && fields.calling_token === item.token.ticket_no.toString()) && styles.calling)} onClick={() => prepareCall(item.token.ticket_no.toString(), "meds", "m02", "http://192.168.30.246:5005/speaker/create_speaker", currentUser.counter, currentUser.phone)}>{loading && fields.calling_token === item.token.ticket_no.toString() ? "calling.." : "call"}/{item.token.calls === null ? 0 : item.token.calls}</div>
                             </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve, item.token.serving && styles.active)} onClick={() => priotize(`${item.token.ticket_no}`, "serve", Number(currentUser.counter))}>{item.token.serving === true ? "serving" : "Serve"}</div>
@@ -957,7 +957,7 @@ function Recorder() {
             )}
           >
             <div className={cx(styles.spika, loading && styles.active)} onClick={() => setSpeaker(!isSpeaker)}>
-              <div className={styles.rounder} onClick={() => createItem(item.token.ticket_no.toString(), "nurse_station", "m02", "http://localhost:5005/speaker/create_speaker", currentUser.counter, currentUser.phone)}>
+              <div className={styles.rounder} onClick={() => createItem(item.token.ticket_no.toString(), "nurse_station", "m02", "http://192.168.30.246:5005/speaker/create_speaker", currentUser.counter, currentUser.phone)}>
                 {
                   !loading
                     ? <HiOutlineSpeakerWave className={styles.icon} size={30} />

@@ -22,7 +22,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data} = useFetchData("http://localhost:5005/services/get_all_services")
+const {data} = useFetchData("http://192.168.30.246:5005/services/get_all_services")
 const setMessage = useSetRecoilState(messageState)
 
 useEffect(()=> {
@@ -31,7 +31,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5005/admins/create_admin",{name,phone,service:"administration",counter:"101",role:"admin"}).then((data:any)=> {
+    axios.post("http://192.168.30.246:5005/admins/create_admin",{name,phone,service:"administration",counter:"101",role:"admin"}).then((data:any)=> {
         setAdd(false)
         router.reload()
     }).catch((error:any)=> {
@@ -44,7 +44,7 @@ useEffect(()=> {
     })
  }
  const deleteService  = (id:string) => {
-    axios.put(`http://localhost:5005/admins/delete_admin/${id}`).then(()=> {
+    axios.put(`http://192.168.30.246:5005/admins/delete_admin/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -57,7 +57,7 @@ useEffect(()=> {
  }
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5005/services/edit_service/${id}`,{name}).then((data:any)=> {
+    axios.put(`http://192.168.30.246:5005/services/edit_service/${id}`,{name}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
@@ -83,7 +83,7 @@ useEffect(()=> {
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5005/admins/get_admins",{params: {page,pagesize}}).then((data)=> {
+    axios.get("http://192.168.30.246:5005/admins/get_admins",{params: {page,pagesize}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)

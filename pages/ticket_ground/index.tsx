@@ -66,7 +66,7 @@ function TicketGround() {
         if (seleccted.index > 0 && seleccted.type !== "") {
           setTimeout(()=> {
               setSubLoading(true)
-          axios.post("http://localhost:5005/suggestion/create_suggestion", {
+          axios.post("http://192.168.30.246:5005/suggestion/create_suggestion", {
             type: seleccted.type,
             reason: seleccted.reason
           }).then(() => {
@@ -163,7 +163,7 @@ function TicketGround() {
     const handlePriotize = (priorToken:string,priorCode:string) => {
       //setFields({...fields,priorLoading: true})
       setFields({...fields,isPriorCode: true,priorToken: priorToken,priorCode: priorCode,priorLoading: true})
-      axios.post("http://localhost:5005/ticketa/priotize",{ticket_no:priorToken,code:priorCode}).then((data)=> {
+      axios.post("http://192.168.30.246:5005/ticketa/priotize",{ticket_no:priorToken,code:priorCode}).then((data)=> {
           setTimeout(()=> {
               setFields({...fields,priorLoading: false,isPriority:false,isPriorCode:false})
               location.reload()
@@ -246,7 +246,7 @@ function TicketGround() {
             setFields({...fields,isLoading:false})  
           },3000)
       }else{
-          axios.post("http://localhost:5005/ticketa/create_ticket",{
+          axios.post("http://192.168.30.246:5005/ticketa/create_ticket",{
           //phone: fields.hasMedical?formatCode(fields.isA,fields.isM,fields.numberString):fields.numberString,
           phone: fields.numberString,
           category: fields.isBima===true?"insurance":"cash",

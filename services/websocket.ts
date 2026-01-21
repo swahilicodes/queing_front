@@ -2,7 +2,7 @@
 
 import WebSocket from 'websocket';
 
-const socketUrl = 'ws://localhost:500'; // Replace with your WebSocket server URL
+const socketUrl = 'ws://192.168.30.246:500'; // Replace with your WebSocket server URL
 
 //let client: WebSocket | null = null;
 let client:any

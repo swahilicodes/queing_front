@@ -136,7 +136,7 @@ export default function Home() {
   }
 
   const getDoktas = () => {
-    axios.get("http://localhost:5005/doktas/get_all_doktas").then((data)=> {
+    axios.get("http://192.168.30.246:5005/doktas/get_all_doktas").then((data)=> {
       setDoktas(data.data)
       console.log('doctors are ',data.data)
     }).catch((error)=> {
@@ -281,7 +281,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5005/active/get_active`, { params: { page: "/clinic_queue" } })
+      .get(`http://192.168.30.246:5005/active/get_active`, { params: { page: "/clinic_queue" } })
       .then((data) => {
         //setActive(data.data.isActive && localStorage.getItem('device_id')?true:false);
         setActive(data.data.isActive?true:false);
@@ -299,7 +299,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5005/adverts/get_all_adverts")
+      .get("http://192.168.30.246:5005/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -314,7 +314,7 @@ export default function Home() {
   const getTickets = async () => {
     setLoading(true);
     await axios
-      .get("http://localhost:5005/tickets/pata_clinic", {
+      .get("http://192.168.30.246:5005/tickets/pata_clinic", {
         headers: {
           'Cache-Control': 'no-cache',
         },

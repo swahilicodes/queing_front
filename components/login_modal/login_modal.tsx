@@ -24,7 +24,7 @@ function LoginModal() {
  const login = (e:React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    axios.post("http://localhost:5005/users/login",{phone: fields.phone,password:fields.password},{headers}).then((data)=> {
+    axios.post("http://192.168.30.246:5005/users/login",{phone: fields.phone,password:fields.password},{headers}).then((data)=> {
         localStorage.setItem("token",data.data)
         setTimeout(()=> {
             setLoading(false)

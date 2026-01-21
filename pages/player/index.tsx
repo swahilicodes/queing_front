@@ -34,7 +34,7 @@
 //    },[fields.floor])
 
 //  const getPlays = () => {
-//     axios.get("http://localhost:5005/speaker/get_speakers",{params: {floor: fields.floor}}).then((data)=> {
+//     axios.get("http://192.168.30.246:5005/speaker/get_speakers",{params: {floor: fields.floor}}).then((data)=> {
 //         const sortedTickets = data.data.sort((a:any, b:any) => a.id - b.id);
 //         setPlays(sortedTickets)
 //         if(data.data.length>0){
@@ -206,7 +206,7 @@ function Player() {
     setLoading(true)
 
     axios
-      .get('http://localhost:5005/speaker/get_speakers', {
+      .get('http://192.168.30.246:5005/speaker/get_speakers', {
         params: { floor: fields.floor }
       })
       .then(res => {

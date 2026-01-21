@@ -20,7 +20,7 @@ const [page,setPage] = useState(1)
 const [pagesize,setPageSize] = useState(10)
 const [totalItems, setTotalItems] = useState(0);
 const [id,setId] = useState("")
-const {data:clinics,loading:srsLoading, error: srsError} = useFetchData("http://localhost:5005/clinic/get_clinics")
+const {data:clinics,loading:srsLoading, error: srsError} = useFetchData("http://192.168.30.246:5005/clinic/get_clinics")
 const [rooms, setRooms] = useState([])
 const setMessage = useSetRecoilState(messageState)
 const [fields, setFields] = useState({
@@ -40,7 +40,7 @@ useEffect(()=> {
  
  const submit  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://localhost:5005/doktas/create_dokta",{name:fields.name,phone:fields.phone,room:fields.room,clinic: fields.clinic,clinic_code: fields.clinic_code}).then(()=> {
+    axios.post("http://192.168.30.246:5005/doktas/create_dokta",{name:fields.name,phone:fields.phone,room:fields.room,clinic: fields.clinic,clinic_code: fields.clinic_code}).then(()=> {
         setAdd(false)
         router.reload()
     }).catch((error)=> {
@@ -64,7 +64,7 @@ useEffect(()=> {
     setFields({...fields,clinic:coder.cliniciname,clinic_code: code,room: ""})
  }
  const deleteService  = (id:string) => {
-    axios.put(`http://localhost:5005/doktas/delete_dokta/${id}`).then(()=> {
+    axios.put(`http://192.168.30.246:5005/doktas/delete_dokta/${id}`).then(()=> {
         router.reload()
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -83,7 +83,7 @@ useEffect(()=> {
     })
  }
  const getRooms  = () => {
-    axios.get(`http://localhost:5005/rooms/get_rooms`,{params: {clinic_code: fields.clinic_code}}).then((data)=> {
+    axios.get(`http://192.168.30.246:5005/rooms/get_rooms`,{params: {clinic_code: fields.clinic_code}}).then((data)=> {
         setRooms(data.data.data)
     }).catch((error)=> {
         if (error.response && error.response.status === 400) {
@@ -104,7 +104,7 @@ useEffect(()=> {
 
  const editService  = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.put(`http://localhost:5005/doktas/edit_dokta/${id}`,{fields}).then((data:any)=> {
+    axios.put(`http://192.168.30.246:5005/doktas/edit_dokta/${id}`,{fields}).then((data:any)=> {
         setEdit(false)
         router.reload()
     }).catch((error)=> {
@@ -151,7 +151,7 @@ useEffect(()=> {
   };
  const getAttendants  = () => {
     setFetchLoading(true)
-    axios.get("http://localhost:5005/doktas/get_doktas",{params: {page,pagesize,clinic_code: fields.clinic_code}}).then((data)=> {
+    axios.get("http://192.168.30.246:5005/doktas/get_doktas",{params: {page,pagesize,clinic_code: fields.clinic_code}}).then((data)=> {
         setServices(data.data.data)
         setFetchLoading(false)
         setTotalItems(data.data.totalItems)

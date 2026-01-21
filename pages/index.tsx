@@ -71,7 +71,7 @@ export default function Home() {
       if (!deviceId) return;
 
       axios
-        .get("http://localhost:5005/network/get_device", {
+        .get("http://192.168.30.246:5005/network/get_device", {
           params: {
             id: deviceId,
           },
@@ -215,7 +215,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://localhost:5005/active/get_active`, { params: { page: "/" } })
+      .get(`http://192.168.30.246:5005/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
         setVideo(data.data.video)
@@ -238,7 +238,7 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://localhost:5005/adverts/get_all_adverts")
+      .get("http://192.168.30.246:5005/adverts/get_all_adverts")
       .then((data) => {
         setAdverts(data.data);
       })
@@ -252,7 +252,7 @@ export default function Home() {
   const getTickets = (floor:string,isDiabetic:boolean, isChild: boolean) => {
     setLoading(true);
     axios
-      .get("http://localhost:5005/tickets/get_display_tokens", {
+      .get("http://192.168.30.246:5005/tickets/get_display_tokens", {
         params: { stage: "meds", clinic_code: "",floor:floor, isDiabetic: isDiabetic, isChild: true },
       })
       .then((data) => {
