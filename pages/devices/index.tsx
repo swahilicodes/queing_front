@@ -1160,6 +1160,7 @@ export default function Admins() {
                           <option value="/doctor_patient">Doctor Patient</option>
                           <option value="/nurse_station">Nurse Station</option>
                           <option value="/accounts">Accounts</option>
+                          <option value="/accounts_queue">Accounts Queue</option>
                           <option value="/clinic_queue">Clinic Queue</option>
                           <option value="/analytics">Analytics</option>
                           <option value="/settings">Settings</option>
