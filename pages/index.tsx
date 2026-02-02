@@ -77,10 +77,10 @@ export default function Home() {
           },
         })
         .then((dita) => {
+          console.log(dita)
           getTickets(dita.data.floor, dita.data.isDiabetic, dita.data.isChild);
         })
         .catch((error) => {
-          console.log(error);
         });
     }, 5000); // runs every 5 seconds
 
@@ -253,7 +253,7 @@ export default function Home() {
     setLoading(true);
     axios
       .get("http://192.168.30.246:5005/tickets/get_display_tokens", {
-        params: { stage: "meds", clinic_code: "",floor:floor, isDiabetic: isDiabetic, isChild: true },
+        params: { stage: "meds", clinic_code: "",floor:floor, isDiabetic: isDiabetic, isChild: isChild },
       })
       .then((data) => {
         setTickets(data.data);
