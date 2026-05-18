@@ -310,10 +310,38 @@ function Recorder() {
   }
 
 
+  // const getTicks = () => {
+  //   setFetchLoading(true);
+  //   axios.get("http://192.168.30.246:5005/tickets/getMedsTickets", {
+  //     params: { page, pagesize, status: status, disable, phone: ticket, stage: "accounts", floor: floor, isDiabetic: diabetic, isChild: isChild, ...(ticket && ticket.trim() !== "" ? { phone: ticket } : {}) },
+  //   })
+  //     .then((data: any) => {
+  //       setTokens(data.data.data);
+  //       setTotalItems(data.data.totalItems);
+  //       setInterval(() => {
+  //         setFetchLoading(false);
+  //       }, 2000);
+  //     })
+  //     .catch((error: any) => {
+  //       setFetchLoading(false);
+  //       if (error.response && error.response.status === 400) {
+  //         setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+  //         setTimeout(() => {
+  //           setMessage({ ...onmessage, title: "", category: "" })
+  //         }, 5000)
+  //       } else {
+  //         setMessage({ ...onmessage, title: error.message, category: "error" })
+  //         setTimeout(() => {
+  //           setMessage({ ...onmessage, title: "", category: "" })
+  //         }, 5000)
+  //       }
+  //     });
+  // };
+
   const getTicks = () => {
     setFetchLoading(true);
     axios.get("http://192.168.30.246:5005/tickets/getMedsTickets", {
-      params: { page, pagesize, status: status, disable, phone: ticket, stage: "accounts", floor: floor, isDiabetic: diabetic, isChild: isChild, ...(ticket && ticket.trim() !== "" ? { phone: ticket } : {}) },
+      params: { page, pagesize, status: status, disable, stage: "accounts", floor: floor, isDiabetic: diabetic, isChild: isChild, ...(ticket && ticket.trim() !== "" ? { phone: ticket } : {}) },
     })
       .then((data: any) => {
         setTokens(data.data.data);
