@@ -51,7 +51,7 @@ export default function QueueAdd() {
       if (seleccted.index > 0 && seleccted.type !== "") {
         setTimeout(()=> {
             setSubLoading(true)
-        axios.post("http://192.168.30.246:5005/suggestion/create_suggestion", {
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/suggestion/create_suggestion`, {
           type: seleccted.type,
           reason: seleccted.reason
         }).then(() => {
@@ -132,7 +132,7 @@ export default function QueueAdd() {
 
   const submit = (e:React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.246:5005/tickets/create_ticket",{phone:numberString,category: category})
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/tickets/create_ticket`,{phone:numberString,category: category})
     .then((data)=> {
         setQrState(data.data)
         setClicked(false)
@@ -174,6 +174,7 @@ export default function QueueAdd() {
 
 function printImage(src: string) {
     var win:any = window.open('about:blank', '_blank');
+    if (!win) return;
     win.document.open();
     win.document.write([
         '<html>',

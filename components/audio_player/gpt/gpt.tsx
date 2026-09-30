@@ -330,7 +330,7 @@ const getAudioSequence = (number: number): string[] => {
     // await playAudioSequence(getAudioSequence(token))
     // await playAudioSequence(getCounterSwahili(counter))
     setTalking(false)
-    axios.post("http://192.168.30.246:5005/speaker/delete_play", { id: id }).then((data: any) => {
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/speaker/delete_play`, { id: id }).then((data: any) => {
       console.log(`audio with id ${data.id} deleted successfully`)
     })
   }

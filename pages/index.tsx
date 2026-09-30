@@ -71,7 +71,7 @@ export default function Home() {
       if (!deviceId) return;
 
       axios
-        .get("http://192.168.30.246:5005/network/get_device", {
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/network/get_device`, {
           params: {
             id: deviceId,
           },
@@ -215,7 +215,7 @@ export default function Home() {
 
   const getActive = () => {
     axios
-      .get(`http://192.168.30.246:5005/active/get_active`, { params: { page: "/" } })
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive);
         setVideo(data.data.video)
@@ -238,12 +238,12 @@ export default function Home() {
 
   const getAdverts = () => {
     axios
-      .get("http://192.168.30.246:5005/adverts/get_all_adverts")
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/adverts/get_all_adverts`)
       .then((data) => {
         setAdverts(data.data);
       })
       .catch((error) => {
-        setMessage({ ...onmessage, title: error, category: "error" })
+        setMessage({ ...onmessage, title: error?.response?.data?.error || error?.message || 'Error', category: "error" })
         setTimeout(() => {
           setMessage({ ...onmessage, title: "", category: "" })
         }, 3000)
@@ -252,7 +252,7 @@ export default function Home() {
   const getTickets = (floor:string,isDiabetic:boolean, isChild: boolean) => {
     setLoading(true);
     axios
-      .get("http://192.168.30.246:5005/tickets/get_display_tokens", {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/get_display_tokens`, {
         params: { stage: "meds", clinic_code: "",floor:floor, isDiabetic: isDiabetic, isChild: isChild },
       })
       .then((data) => {

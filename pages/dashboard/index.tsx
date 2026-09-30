@@ -15,14 +15,14 @@ import { useSetRecoilState } from 'recoil'
 import messageState from '@/store/atoms/message'
 
 export default function Dashboard() {
- const {data} = useFetchData("http://192.168.30.246:5005/tickets/getTickets")
- const {data:week} = useFetchData("http://192.168.30.246:5005/tickets/getWeekTickets")
- const {data:month} = useFetchData("http://192.168.30.246:5005/tickets/getMonthTickets")
- const {data:services} = useFetchData("http://192.168.30.246:5005/services/get_all_services")
- const {data:admins} = useFetchData("http://192.168.30.246:5005/admins/get_all_admins")
- const {data:attends} = useFetchData("http://192.168.30.246:5005/attendants/get_all_attendants")
- const {data:counters} = useFetchData("http://192.168.30.246:5005/counters/get_all_counters")
- const {data:ads} = useFetchData("http://192.168.30.246:5005/adverts/get_all_adverts")
+ const {data} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/tickets/getTickets`)
+ const {data:week} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/tickets/getWeekTickets`)
+ const {data:month} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/tickets/getMonthTickets`)
+ const {data:services} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/services/get_all_services`)
+ const {data:admins} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/admins/get_all_admins`)
+ const {data:attends} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/attendants/get_all_attendants`)
+ const {data:counters} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/counters/get_all_counters`)
+ const {data:ads} = useFetchData(`${process.env.NEXT_PUBLIC_API_URL}/adverts/get_all_adverts`)
  
  const router = useRouter()
   return (

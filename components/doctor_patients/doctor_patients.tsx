@@ -12,7 +12,7 @@ useEffect(()=> {
     getpats()
 },[])
  const getpats = () => {
-    axios.get('http://192.168.30.246:5005/doktas/get_dokta_patients',{
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/doktas/get_dokta_patients`,{
         params: {id:itema}
     }).then((data)=> {
         setPatients(data.data)

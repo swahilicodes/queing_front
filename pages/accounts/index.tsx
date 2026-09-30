@@ -105,7 +105,7 @@ function Recorder() {
   }
 
   const toMeds = (id: number) => {
-    axios.post("http://192.168.30.246:5005/ticketa/to_meds", { id }).then((data) => {
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/ticketa/to_meds`, { id }).then((data) => {
       location.reload()
     }).catch((error) => {
       setMessage({ ...onmessage, title: "There is an error", category: "error" })
@@ -118,7 +118,7 @@ function Recorder() {
   const finishToken = (id: number, stage: string, mr_number: string, sex: string, recorder_id: string, name: string, age: string, category: string) => {
     if (found) {
       setFinLoading(true)
-      axios.put(`http://192.168.30.246:5005/tickets/finish_account_token/${id}`, { stage: "nurse_station", mr_number: mr_number, penalized: penalized, sex: sex, recorder_id: recorder_id, name: name, age: age, category: category }).then((data) => {
+      axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tickets/finish_account_token/${id}`, { stage: "nurse_station", mr_number: mr_number, penalized: penalized, sex: sex, recorder_id: recorder_id, name: name, age: age, category: category }).then((data) => {
         clinicGo(data.data.mr_no)
         setInterval(() => {
           setFinLoading(false)
@@ -152,7 +152,7 @@ function Recorder() {
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://192.168.30.246:5005/tickets/next_stage", {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/next_stage`, {
       params: { mr_number: fields.mrNumber },
     })
       .then((data) => {
@@ -179,7 +179,7 @@ function Recorder() {
       });
   };
   const getVideos = () => {
-    axios.get("http://192.168.30.246:5005/uploads/get_videos").then((data) => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/uploads/get_videos`).then((data) => {
       setVideos(data.data)
     }).catch((error) => {
       if (error.response && error.response.status === 400) {
@@ -199,7 +199,7 @@ function Recorder() {
 
   const activate = (page: string, video: string) => {
     setFetchLoading(true);
-    axios.post(`http://192.168.30.246:5005/active/activate`, { page: page, video: video })
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/active/activate`, { page: page, video: video })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -288,7 +288,7 @@ function Recorder() {
 
   const clinicGo = (mr_no: string) => {
     setFinLoading(true)
-    axios.post(`http://192.168.30.246:5005/tickets/clinic_go`, { stage: "nurse_station", mr_number: mr_no, cashier_id: currentUser.phone }).then((data) => {
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/tickets/clinic_go`, { stage: "nurse_station", mr_number: mr_no, cashier_id: currentUser.phone }).then((data) => {
       setFields({ ...fields, status: data.data })
       setTokens((tokens) => tokens.map((item) => item))
       setFinLoading(false)
@@ -312,7 +312,7 @@ function Recorder() {
 
   // const getTicks = () => {
   //   setFetchLoading(true);
-  //   axios.get("http://192.168.30.246:5005/tickets/getMedsTickets", {
+  //   axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/getMedsTickets`, {
   //     params: { page, pagesize, status: status, disable, phone: ticket, stage: "accounts", floor: floor, isDiabetic: diabetic, isChild: isChild, ...(ticket && ticket.trim() !== "" ? { phone: ticket } : {}) },
   //   })
   //     .then((data: any) => {
@@ -340,7 +340,7 @@ function Recorder() {
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://192.168.30.246:5005/tickets/getMedsTickets", {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/getMedsTickets`, {
       params: { page, pagesize, status: status, disable, stage: "accounts", floor: floor, isDiabetic: diabetic, isChild: isChild, ...(ticket && ticket.trim() !== "" ? { phone: ticket } : {}) },
     })
       .then((data: any) => {
@@ -374,7 +374,7 @@ function Recorder() {
   }
   const editTicket = (id: number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.246:5005/tickets/edit_ticket/${id}`, { status: status })
+    axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tickets/edit_ticket/${id}`, { status: status })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -392,7 +392,7 @@ function Recorder() {
   };
   const penalize = (id: number) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.246:5005/tickets/penalt/${id}`)
+    axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -411,7 +411,7 @@ function Recorder() {
       });
   };
   const getActive = () => {
-    axios.get(`http://192.168.30.246:5005/active/get_active`, { params: { page: "/accounts_queue" } })
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/active/get_active`, { params: { page: "/accounts_queue" } })
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -434,7 +434,7 @@ function Recorder() {
 
   const priotize = (ticket_no: string, data: string, stage: string, reason: string, counter: number) => {
     setFetchLoading(true);
-    axios.get(`http://192.168.30.246:5005/tickets/priority`, { params: { ticket_no, data, stage, reason, counter }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/priority`, { params: { ticket_no, data, stage, reason, counter }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -460,7 +460,7 @@ function Recorder() {
   };
   const serveTicket = (ticket_no: string, data: string, counter: number) => {
     setFetchLoading(true);
-    axios.get(`http://192.168.30.246:5005/tickets/priority`, { params: { ticket_no, data, stage: "accounts", counter: counter }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/priority`, { params: { ticket_no, data, stage: "accounts", counter: counter }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -755,7 +755,7 @@ function Recorder() {
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve, (loading && fields.calling_token === item.token.ticket_no.toString()) && styles.calling)} onClick={() => prepareCall(item.token.ticket_no.toString(), "meds", floor, "http://192.168.30.246:5005/speaker/create_speaker", window, currentUser.phone)}>{loading && fields.calling_token === item.token.ticket_no.toString() ? "calling.." : "call"}/{item.token.calls === null ? 0 : item.token.calls}</div>
+                              <div className={cx(styles.serve, (loading && fields.calling_token === item.token.ticket_no.toString()) && styles.calling)} onClick={() => prepareCall(item.token.ticket_no.toString(), "meds", floor, `${process.env.NEXT_PUBLIC_API_URL}/speaker/create_speaker`, window, currentUser.phone)}>{loading && fields.calling_token === item.token.ticket_no.toString() ? "calling.." : "call"}/{item.token.calls === null ? 0 : item.token.calls}</div>
                             </div>
                             <div className={styles.action}>
                               <div className={cx(styles.serve, item.token.serving && styles.active)} onClick={() => serveTicket(`${item.token.ticket_no}`, "serve", Number(currentUser.counter))}>{item.token.serving === true ? "serving" : "Serve"}</div>
@@ -806,7 +806,7 @@ function Recorder() {
               {
                 tokens.length > 0 && (
                   <div className={cx(styles.spika, loading && styles.active)} onClick={() => setSpeaker(!isSpeaker)}>
-                    <div className={styles.rounder} onClick={() => createItem(item.token.ticket_no.toString(), "accounts", floor, "http://192.168.30.246:5005/speaker/create_speaker", window, currentUser.phone)}>
+                    <div className={styles.rounder} onClick={() => createItem(item.token.ticket_no.toString(), "accounts", floor, `${process.env.NEXT_PUBLIC_API_URL}/speaker/create_speaker`, window, currentUser.phone)}>
                       {
                         !loading
                           ? <HiOutlineSpeakerWave className={styles.icon} size={30} />

@@ -62,7 +62,7 @@ function Speaker() {
  }
 
  const getPlays = () => {
-    axios.get("http://192.168.30.246:5005/speaker/get_speakers",{params: {station: fields.station}}).then((data)=> {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/speaker/get_speakers`,{params: {station: fields.station}}).then((data)=> {
         setPlays(data.data)
         setPlays((plays) => plays.map((item)=> item))
         const sortedTickets = data.data.sort((a:any, b:any) => a.id - b.id);
@@ -145,7 +145,7 @@ function Speaker() {
             </table>
             }
         </div>
-        {/* <button onClick={()=> createItem("1005","meds","m02","http://192.168.30.246:5005/speaker/create_speaker","1")}>{loading?"loading..":"Create Speaker"}</button> */}
+        {/* <button onClick={()=> createItem("1005","meds","m02",`${process.env.NEXT_PUBLIC_API_URL}/speaker/create_speaker`,"1")}>{loading?"loading..":"Create Speaker"}</button> */}
     </div>
   )
 }

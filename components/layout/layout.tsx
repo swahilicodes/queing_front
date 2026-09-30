@@ -93,8 +93,14 @@ export default function Layout({children}: any) {
 
   return (
     <div className={styles.layout}>
-      <div className={cx(styles.message, message.title !== "" && styles.active, message.category === "error" && styles.danger)}>
-        {message.title}
+      <div className={cx(styles.message, Boolean(message?.title) && styles.active, message?.category === "error" && styles.danger)}>
+        {(() => {
+          const title: any = message?.title;
+          if (typeof title === 'object' && title !== null) {
+            return title.message || JSON.stringify(title);
+          }
+          return String(title || '');
+        })()}
       </div>
 
       {(isUser && currentUser) && (

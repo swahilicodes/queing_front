@@ -31,7 +31,7 @@ function Recorder() {
   const [window, setWindow] = useState("1");
   const [search, setSearch] = useState(false);
   const [tokens, setTokens] = useState<Token[]>([]);
-  const [page,setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [pagesize, setPageSize] = useState(10);
   const [disable,] = useRecoilState(currentConditionState);
   const [ticket, setTicket] = useState("");
@@ -45,7 +45,7 @@ function Recorder() {
   const [, setExpired] = useState<Token[]>([]);
   const [active, setActive] = useState(false)
   const [isSpeaker, setSpeaker] = useRecoilState(isSpeakerState)
-  const {createItem,loading} = useCreateItem()
+  const { createItem, loading } = useCreateItem()
   const setMessage = useSetRecoilState(messageState)
   const [isPrior, setPrior] = useState(false)
   const [videos, setVideos] = useState([])
@@ -53,7 +53,7 @@ function Recorder() {
   const [isVideo, setVideo] = useState(false)
   const setUser = useSetRecoilState(isUserState)
   const [insurance, setInsurance] = useState(5)
-  const [isInsurance,setIsinsurance] = useState(false)
+  const [isInsurance, setIsinsurance] = useState(false)
   const [totalItems, setTotalItems] = useState(0)
   const [fields, setFields] = useState({
     finish_id: "",
@@ -63,23 +63,23 @@ function Recorder() {
     age: "",
     calling_token: ""
   })
-  const reasons = ["Staff","Wheel Chair","Pediatric","Old","Premature","Fast Track", "Pregnancy"]
+  const reasons = ["Staff", "Wheel Chair", "Pediatric", "Old", "Premature", "Fast Track", "Pregnancy"]
   const [reason, setReason] = useState("")
   const [priorFields, setPriorFields] = useState({
     ticket_no: '',
     stage: ''
   })
-  
+
 
   useEffect(() => {
     getTicks();
     getActive()
     getRest()
     getVideos()
-  }, [disable, ticket, active,totalItems,page,pagesize,floor,diabetic]);
+  }, [disable, ticket, active, totalItems, page, pagesize, floor, diabetic]);
 
-  useEffect(()=> {
-    if(typeof window !== undefined){
+  useEffect(() => {
+    if (typeof window !== undefined) {
       setStatus(localStorage.getItem("status")!)
       setFloor(localStorage.getItem("floor")!)
       setDiabetic(localStorage.getItem("diabetic")!)
@@ -87,152 +87,152 @@ function Recorder() {
       setWindow(localStorage.getItem("window")!)
       setPage(Number(localStorage.getItem("page"))!)
     }
-  },[status])
+  }, [status])
 
 
-  const handleStatus = (stata:string) => {
+  const handleStatus = (stata: string) => {
     const status = localStorage.getItem("status")
-    if(status){
+    if (status) {
       localStorage.removeItem("status")
-      localStorage.setItem("status",stata)
+      localStorage.setItem("status", stata)
       location.reload()
-    }else{
-      localStorage.setItem("status",stata)
+    } else {
+      localStorage.setItem("status", stata)
       location.reload()
     }
   }
-  const handleWindow = (stata:string) => {
+  const handleWindow = (stata: string) => {
     const status = localStorage.getItem("window")
-    if(status){
+    if (status) {
       localStorage.removeItem("window")
-      localStorage.setItem("window",stata)
+      localStorage.setItem("window", stata)
       location.reload()
-    }else{
-      localStorage.setItem("window",stata)
+    } else {
+      localStorage.setItem("window", stata)
       location.reload()
     }
   }
 
-  const handleDiabetic = (stata:string) => {
+  const handleDiabetic = (stata: string) => {
     const diabetic = localStorage.getItem("diabetic")
-    if(diabetic){
+    if (diabetic) {
       localStorage.removeItem("diabetic")
-      localStorage.setItem("diabetic",stata)
+      localStorage.setItem("diabetic", stata)
       location.reload()
-    }else{
-      localStorage.setItem("diabetic",stata)
+    } else {
+      localStorage.setItem("diabetic", stata)
       location.reload()
     }
   }
-  const handleChild = (stata:string) => {
+  const handleChild = (stata: string) => {
     const diabetic = localStorage.getItem("isChild")
-    if(diabetic){
+    if (diabetic) {
       localStorage.removeItem("isChild")
-      localStorage.setItem("isChild",stata)
+      localStorage.setItem("isChild", stata)
       location.reload()
-    }else{
-      localStorage.setItem("isChild",stata)
+    } else {
+      localStorage.setItem("isChild", stata)
       location.reload()
     }
   }
-  const handleFloor = (stata:string) => {
+  const handleFloor = (stata: string) => {
     const floor = localStorage.getItem("floor")
-    if(floor){
+    if (floor) {
       localStorage.removeItem("floor")
-      localStorage.setItem("floor",stata)
+      localStorage.setItem("floor", stata)
       setDiabetic('false')
       localStorage.removeItem("diabetic")
       location.reload()
-    }else{
-      localStorage.setItem("floor",stata)
+    } else {
+      localStorage.setItem("floor", stata)
       setDiabetic('false')
       localStorage.removeItem("diabetic")
       location.reload()
     }
   }
 
-  const createRest = (e:React.FormEvent) => {
+  const createRest = (e: React.FormEvent) => {
     e.preventDefault()
-    axios.post("http://192.168.30.246:5005/rest/create_rest",{time:insurance}).then((data)=> {
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/rest/create_rest`, { time: insurance }).then((data) => {
       location.reload()
-    }).catch((error)=> {
-      console.log("rest error ",error)
+    }).catch((error) => {
+      console.log("rest error ", error)
     })
   }
   const getRest = () => {
     console.log('getting rest')
-    axios.get("http://192.168.30.246:5005/rest/get_rest").then((data)=> {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/rest/get_rest`).then((data) => {
       setInsurance(data.data.time)
-      console.log('rest data is ',data.data.time)
-    }).catch((error)=> {
-      console.log("rest error ",error)
+      console.log('rest data is ', data.data.time)
+    }).catch((error) => {
+      console.log("rest error ", error)
     })
   }
 
   const getVideos = () => {
-    axios.get("http://192.168.30.246:5005/uploads/get_videos").then((data)=> {
-    setVideos(data.data)
-    }).catch((error)=> {
-        if (error.response && error.response.status === 400) {
-            console.log(`there is an error ${error.message}`)
-            setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})
-            },5000)
-        } else {
-            setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""}) 
-            },5000)
-        }
-    })
-}
-
-  const prepareFinish = (id:number) => {
-    setNext(true)
-    setFields({...fields,finish_id: id.toString()})
-  }
-  
-
-  const finishToken = (id:number,stage:string,mr_number:string,sex:string, recorder_id: string,name:string, age: string, category: string) => {
-    if(found){
-      setFinLoading(true)
-    axios.put(`http://192.168.30.246:5005/tickets/finish_token/${id}`,{stage:"accounts",mr_number: mr_number,penalized: penalized,sex:sex, recorder_id: recorder_id, name:name, age: age, category: category}).then(()=> {
-      setInterval(()=> {
-        setFinLoading(false)
-        router.reload()
-      },3000)
-    }).catch((error)=> {
-      setFinLoading(false)
-      console.log('accounts error ',error.response)
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/uploads/get_videos`).then((data) => {
+      setVideos(data.data)
+    }).catch((error) => {
       if (error.response && error.response.status === 400) {
-        //console.log(`there is an error ${error.message}`)
-        setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
-    } else {
-        //console.log(`there is an error message ${error.message}`)
-        setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
-    }
+        console.log(`there is an error ${error.message}`)
+        setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+        setTimeout(() => {
+          setMessage({ ...onmessage, title: "", category: "" })
+        }, 5000)
+      } else {
+        setMessage({ ...onmessage, title: error.message, category: "error" })
+        setTimeout(() => {
+          setMessage({ ...onmessage, title: "", category: "" })
+        }, 5000)
+      }
     })
-    }else{
-      setMessage({...onmessage,title:'Patient not found',category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+  }
+
+  const prepareFinish = (id: number) => {
+    setNext(true)
+    setFields({ ...fields, finish_id: id.toString() })
+  }
+
+
+  const finishToken = (id: number, stage: string, mr_number: string, sex: string, recorder_id: string, name: string, age: string, category: string) => {
+    if (found) {
+      setFinLoading(true)
+      axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tickets/finish_token/${id}`, { stage: "accounts", mr_number: mr_number, penalized: penalized, sex: sex, recorder_id: recorder_id, name: name, age: age, category: category }).then(() => {
+        setInterval(() => {
+          setFinLoading(false)
+          router.reload()
+        }, 3000)
+      }).catch((error) => {
+        setFinLoading(false)
+        console.log('accounts error ', error.response)
+        if (error.response && error.response.status === 400) {
+          //console.log(`there is an error ${error.message}`)
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
+        } else {
+          //console.log(`there is an error message ${error.message}`)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
+        }
+      })
+    } else {
+      setMessage({ ...onmessage, title: 'Patient not found', category: "error" })
+      setTimeout(() => {
+        setMessage({ ...onmessage, title: "", category: "" })
+      }, 5000)
     }
   }
 
 
   const getTicks = () => {
     setFetchLoading(true);
-    axios.get("http://192.168.30.246:5005/tickets/getMedsTickets", {
-        params: { page:1, pagesize:pagesize, status: status, disable, phone: ticket, stage: "meds",floor:floor, isDiabetic: diabetic, isChild: isChild},
-      })
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/getMedsTickets`, {
+      params: { page: 1, pagesize: pagesize, status: status, disable, phone: ticket, stage: "meds", floor: floor, isDiabetic: diabetic, isChild: isChild },
+    })
       .then((data) => {
         console.log(data.data)
         setTokens(data.data.data);
@@ -246,16 +246,16 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         }
       });
   };
@@ -264,9 +264,9 @@ function Recorder() {
     setPenalized(true)
     setNext(true)
   }
-  const editTicket = (id:number, status: string) => {
+  const editTicket = (id: number, status: string) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.246:5005/tickets/edit_ticket/${id}`, {status: status})
+    axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tickets/edit_ticket/${id}`, { status: status })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -277,23 +277,23 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         }
       });
   };
 
-  const penalize = (id:number) => {
+  const penalize = (id: number) => {
     setFetchLoading(true);
-    axios.put(`http://192.168.30.246:5005/tickets/penalt/${id}`)
+    axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tickets/penalt/${id}`)
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -304,22 +304,22 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         }
       });
   };
-  const priotize = (ticket_no:string, data:string, stage: string, reason:string,counter:number) => {
+  const priotize = (ticket_no: string, data: string, stage: string, reason: string, counter: number) => {
     setFetchLoading(true);
-    axios.get(`http://192.168.30.246:5005/tickets/priority`,{params: {ticket_no,data,stage, reason,counter},headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}})
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/priority`, { params: { ticket_no, data, stage, reason, counter }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -330,22 +330,22 @@ function Recorder() {
         setFetchLoading(false);
         if (error.response && error.response.status === 400) {
           console.log(`there is an error ${error.message}`);
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         }
       });
   };
-  const activate = (page:string,video:string) => {
+  const activate = (page: string, video: string) => {
     setFetchLoading(true);
-    axios.post(`http://192.168.30.246:5005/active/activate`,{page: page,video:video})
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/active/activate`, { page: page, video: video })
       .then(() => {
         setInterval(() => {
           setFetchLoading(false);
@@ -357,21 +357,21 @@ function Recorder() {
         console.log(error.response)
         if (error.response && error.response.status === 400) {
           //console.log(`there is an error ${error.message}`);
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         } else {
           //console.log(`there is an error message ${error.message}`);
-          setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         }
       });
   };
   const getActive = () => {
-    axios.get(`http://192.168.30.246:5005/active/get_active`,{params: {page: "/"}})
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/active/get_active`, { params: { page: "/" } })
       .then((data) => {
         setActive(data.data.isActive)
       })
@@ -380,45 +380,45 @@ function Recorder() {
         console.log(error.response)
         if (error.response && error.response.status === 400) {
           //console.log(`there is an error ${error.message}`);
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         } else {
           //console.log(`there is an error message ${error.message}`);
-          setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         }
       });
   };
   const nextToken = (e: React.FormEvent) => {
     e.preventDefault()
     setFinLoading(true);
-    axios.get("http://192.168.30.246:5005/tickets/next_stage", {
-        params: { mr_number: mr_number },
-      })
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tickets/next_stage`, {
+      params: { mr_number: mr_number },
+    })
       .then((data) => {
         setFound(true)
-        setFields({...fields,patName:data.data.fullName.toUpperCase(),sex: data.data.gender, age: data.data.age,category: data.data.patgName})
+        setFields({ ...fields, patName: data.data.fullName.toUpperCase(), sex: data.data.gender, age: data.data.age, category: data.data.patgName })
         setFinLoading(false);
         console.log(fields)
       })
       .catch((error) => {
         setFinLoading(false);
         if (error.response && error.response.status === 400) {
-          console.log(`there is an error ${error.message}`);
-          setMessage({...onmessage,title:error.response.data.error,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          console.error("next_stage rejected the MR number", error.response.data);
+          setMessage({ ...onmessage, title: error.response.data.error, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         } else {
           console.log(`there is an error message ${error.message}`);
-          setMessage({...onmessage,title:error.message,category: "error"})
-            setTimeout(()=> {
-                setMessage({...onmessage,title:"",category: ""})  
-            },5000)
+          setMessage({ ...onmessage, title: error.message, category: "error" })
+          setTimeout(() => {
+            setMessage({ ...onmessage, title: "", category: "" })
+          }, 5000)
         }
       });
   };
@@ -427,60 +427,60 @@ function Recorder() {
     router.reload()
   }
 
-  const priorReady = (ticket_no:string, stage: string) => {
+  const priorReady = (ticket_no: string, stage: string) => {
     setPrior(true)
-    setPriorFields({...priorFields,ticket_no: ticket_no, stage: stage})
+    setPriorFields({ ...priorFields, ticket_no: ticket_no, stage: stage })
   }
 
-  const handlePageChange = (namba:number) => {
+  const handlePageChange = (namba: number) => {
     const page = localStorage.getItem("page")
-    if(page){
+    if (page) {
       localStorage.removeItem('page')
-      localStorage.setItem("page",namba.toString())
-    }else{
-      localStorage.setItem("page",namba.toString())
+      localStorage.setItem("page", namba.toString())
+    } else {
+      localStorage.setItem("page", namba.toString())
     }
   };
 
-  const prepareCall = (token:string,stage:string,station:string,url:string,counter:string,phone:string) => {
-    setFields({...fields,calling_token: token})
-    createItem(token,stage,station,url,counter,phone)
+  const prepareCall = (token: string, stage: string, station: string, url: string, counter: string, phone: string) => {
+    setFields({ ...fields, calling_token: token })
+    createItem(token, stage, station, url, counter, phone)
   }
   return (
     <div className={styles.recorder}>
-     <div className={styles.insurance} onClick={()=> setIsinsurance(true)}>
-      <p>{insurance}</p>
-     </div>
-     {
-      isInsurance && (
-        <div className={styles.overlay01}>
-          <div className={styles.insurance_content}>
-            <div className={styles.close} onClick={()=> setIsinsurance(false)}>close</div>
-            <div className={styles.title}>Insurance Wait Time</div>
-            <form onSubmit={createRest}>
-              <select
-              value={insurance}
-              onChange={e => setInsurance(Number(e.target.value))}
-              >
-                <option value="" selected disabled>--select--</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="25">25</option>
-                <option value="30">30</option>
-              </select>
-              <button type="submit">Submit</button>
-            </form>
+      <div className={styles.insurance} onClick={() => setIsinsurance(true)}>
+        <p>{insurance}</p>
+      </div>
+      {
+        isInsurance && (
+          <div className={styles.overlay01}>
+            <div className={styles.insurance_content}>
+              <div className={styles.close} onClick={() => setIsinsurance(false)}>close</div>
+              <div className={styles.title}>Insurance Wait Time</div>
+              <form onSubmit={createRest}>
+                <select
+                  value={insurance}
+                  onChange={e => setInsurance(Number(e.target.value))}
+                >
+                  <option value="" selected disabled>--select--</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="25">25</option>
+                  <option value="30">30</option>
+                </select>
+                <button type="submit">Submit</button>
+              </form>
+            </div>
           </div>
-        </div>
-      )
-     }
+        )
+      }
       {
         isVideo && (
           <div className={styles.overlay01}>
             <div className={styles.contents}>
-              <div className={styles.close} onClick={()=> setVideo(false)}>close</div>
+              <div className={styles.close} onClick={() => setVideo(false)}>close</div>
               {
                 videos.length > 0 && (
                   <div className={styles.video_list}>
@@ -488,13 +488,13 @@ function Recorder() {
                       <h1>Display Videos</h1>
                     </div>
                     {
-                      videos.map((item:any,index:number)=> (
+                      videos.map((item: any, index: number) => (
                         <div className={styles.video_item} key={index}>
                           <p>{item.name}</p>
                           <div className={styles.video}>
-                            <video src={item.url}/>
+                            <video src={item.url} />
                           </div>
-                          <div className={styles.action} onClick={()=> activate("/",item.url)}>set</div>
+                          <div className={styles.action} onClick={() => activate("/", item.url)}>set</div>
                         </div>
                       ))
                     }
@@ -513,91 +513,91 @@ function Recorder() {
               <select onChange={e => setReason(e.target.value)}>
                 <option value="" selected disabled>--select--</option>
                 {
-                  reasons.map((item,index)=> (
+                  reasons.map((item, index) => (
                     <option value={item} key={index}>{item}</option>
                   ))
                 }
               </select>
-              <button onClick={()=> priotize(`${priorFields.ticket_no}`,"priority",priorFields.stage, reason,Number(currentUser.counter))}>Prioritize</button>
+              <button onClick={() => priotize(`${priorFields.ticket_no}`, "priority", priorFields.stage, reason, Number(currentUser.counter))}>Prioritize</button>
             </div>
           </div>
         )
       }
       <div className={styles.meds_top}>
         <div className={styles.left}>
-          {currentUser.name !== undefined && <h4>{currentUser.name}| <span>{currentUser.role} | {currentUser.counter}</span> </h4> }
+          {currentUser.name !== undefined && <h4>{currentUser.name}| <span>{currentUser.role} | {currentUser.counter}</span> </h4>}
           {
             currentUser.name !== undefined && (
               <div className={styles.out} onClick={signOut}>
-            <GrPowerShutdown/>
-          </div>
+                <GrPowerShutdown />
+              </div>
             )
           }
-           <div className={styles.rest} onClick={()=> setVideo(true)}>
-           {/* <div className={styles.rest} onClick={()=> activate("/")}> */}
-            {!active?"rest":"activate"}
+          <div className={styles.rest} onClick={() => setVideo(true)}>
+            {/* <div className={styles.rest} onClick={()=> activate("/")}> */}
+            {!active ? "rest" : "activate"}
           </div>
         </div>
         <div className={styles.right}>
           <div
             className={cx(styles.search, search && styles.active)}
-            // onClick={() => setSearch(!search)}
+          // onClick={() => setSearch(!search)}
           >
             {search ? (
               <div className={styles.search_bar}>
-                <input 
-                type="text" 
-                value={ticket}
-                onChange={e => setTicket(e.target.value)}
-                placeholder="Phone Number"
+                <input
+                  type="text"
+                  value={ticket}
+                  onChange={e => setTicket(e.target.value)}
+                  placeholder="Phone Number"
                 />
               </div>
             ) : (
               <div className={styles.icon}></div>
             )}
             {
-                  search
-                  ?<MdClear className={styles.icon__}onClick={() => setSearch(!search)} size={40}/>
-                  :<IoSearch className={styles.icon__}onClick={() => setSearch(!search)} size={40}/>
-                }
+              search
+                ? <MdClear className={styles.icon__} onClick={() => setSearch(!search)} size={40} />
+                : <IoSearch className={styles.icon__} onClick={() => setSearch(!search)} size={40} />
+            }
           </div>
-          { 
+          {
             <div className={styles.side}>
-            <label>Select Window:</label>
-            <select onChange={(e) => handleWindow(e.target.value)} value={window}>
-              <option value="" disabled>--select window--</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
-          </div>
+              <label>Select Window:</label>
+              <select onChange={(e) => handleWindow(e.target.value)} value={window}>
+                <option value="" disabled>--select window--</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
           }
-          { 
-            floor==="ground" && (<div className={styles.side}>
-            <label>IsDiabetic:</label>
-            <select onChange={(e) => handleDiabetic(e.target.value)} value={diabetic}>
-              <option value="" disabled>--isDiabetic--</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
-            </select>
-          </div>)
+          {
+            floor === "ground" && (<div className={styles.side}>
+              <label>IsDiabetic:</label>
+              <select onChange={(e) => handleDiabetic(e.target.value)} value={diabetic}>
+                <option value="" disabled>--isDiabetic--</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>)
           }
-          { 
+          {
             <div className={styles.side}>
-            <label>IsChild:</label>
-            <select onChange={(e) => handleChild(e.target.value)} value={isChild}>
-              <option value="" disabled>--isChild--</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
-            </select>
-          </div>
+              <label>IsChild:</label>
+              <select onChange={(e) => handleChild(e.target.value)} value={isChild}>
+                <option value="" disabled>--isChild--</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
           }
           <div className={styles.side}>
             <label>Floor:</label>
@@ -616,35 +616,35 @@ function Recorder() {
             </select>
           </div>
           <div className={styles.side}>
-            <div className={styles.image} style={{width:"40px",height:"40px",borderRadius:"50%",cursor:"pointer"}} onClick={()=> setUser(true)}>
-              <img src="/place_holder.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"50%"}}/>
+            <div className={styles.image} style={{ width: "40px", height: "40px", borderRadius: "50%", cursor: "pointer" }} onClick={() => setUser(true)}>
+              <img src="/place_holder.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
             </div>
           </div>
         </div>
       </div>
       <div className={cx(styles.overlay, next && styles.active)}>
         <div className={styles.next_stage}>
-            <div className={styles.close} onClick={()=> setNext(false)}>close</div>
-            <form>
-                <input 
-                type="text"
-                placeholder="Mr Number" 
-                value={mr_number}
-                onChange={e => setMrNumber(e.target.value.toUpperCase())}
-                />
-                {
-                    !fields.patName
-                    ? <p>Patient: -----</p>
-                    : <p>Patient: <span>{fields.patName}</span></p>
-                }
-                <div className={styles.buttons}>
-                <div onClick={nextToken} className={styles.button}>Search</div>
-                <div onClick={()=> found && finishToken(Number(fields.finish_id),"accounts",mr_number,fields.sex, currentUser.phone,fields.patName,fields.age, fields.category)} className={cx(styles.button,styles.finish, found && styles.found)}>Finish</div>
-                </div>
-            </form>
-            <div className={cx(styles.fin_loader,finLoading && styles.active)}>
-                <div className={styles.progress}></div>
+          <div className={styles.close} onClick={() => setNext(false)}>close</div>
+          <form onSubmit={nextToken}>
+            <input
+              type="text"
+              placeholder="Mr Number"
+              value={mr_number}
+              onChange={e => setMrNumber(e.target.value.toUpperCase())}
+            />
+            {
+              !fields.patName
+                ? <p>Patient: -----</p>
+                : <p>Patient: <span>{fields.patName}</span></p>
+            }
+            <div className={styles.buttons}>
+              <button type="submit" className={styles.button}>Search</button>
+              <button type="button" onClick={() => found && finishToken(Number(fields.finish_id), "accounts", mr_number, fields.sex, currentUser.phone, fields.patName, fields.age, fields.category)} className={cx(styles.button, styles.finish, found && styles.found)}>Finish</button>
             </div>
+          </form>
+          <div className={cx(styles.fin_loader, finLoading && styles.active)}>
+            <div className={styles.progress}></div>
+          </div>
         </div>
       </div>
       <div className={styles.list}>
@@ -666,7 +666,7 @@ function Recorder() {
                       <th>CreatedAt</th>
                       <th>Challenge</th>
                       {
-                        status ==="all" && (
+                        status === "all" && (
                           <th>Stage</th>
                         )
                       }
@@ -674,36 +674,36 @@ function Recorder() {
                     </tr>
                   </thead>
                   <tbody>
-                    {tokens.map((item:Token, index: number) => (
-                      <tr key={index} className={cx(index%2 === 0 && styles.even)}>
-                        <td>{index+1}</td>
+                    {tokens.map((item: Token, index: number) => (
+                      <tr key={index} className={cx(index % 2 === 0 && styles.even)}>
+                        <td>{index + 1}</td>
                         <td>{item.token.ticket_no}</td>
                         <td>{item.token.phone}</td>
                         <td>{item.token.status}</td>
                         <td><TimeAgo isoDate={new Date(item.token.createdAt).toISOString()} /></td>
-                        <td>{item.token.disability===""?"N/A":item.token.disability}</td>
+                        <td>{item.token.disability === "" ? "N/A" : item.token.disability}</td>
                         {
-                        status ==="all" && (
-                          <td>{item.token.stage}</td>
-                        )
+                          status === "all" && (
+                            <td>{item.token.stage}</td>
+                          )
                         }
                         <td>
                           <div className={styles.actions}>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,(loading && fields.calling_token===item.token.ticket_no.toString()) && styles.calling)} onClick={()=> prepareCall(item.token.ticket_no.toString(),"meds",floor,"http://192.168.30.246:5005/speaker/create_speaker",window,currentUser.phone)}>{loading && fields.calling_token===item.token.ticket_no.toString()?"calling..":"call"}/{item.token.calls===null?0:item.token.calls}</div>
+                              <div className={cx(styles.serve, (loading && fields.calling_token === item.token.ticket_no.toString()) && styles.calling)} onClick={() => prepareCall(item.token.ticket_no.toString(), "meds", floor, `${process.env.NEXT_PUBLIC_API_URL}/speaker/create_speaker`, window, currentUser.phone)}>{loading && fields.calling_token === item.token.ticket_no.toString() ? "calling.." : "call"}/{item.token.calls === null ? 0 : item.token.calls}</div>
                             </div>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.serving && styles.active, (item.token.serving && item.token.serving_id === currentUser.phone) && styles.owner)} onClick={()=> priotize(`${item.token.ticket_no}`,"serve",item.token.stage, "sasas",Number(currentUser.counter))}>{item.token.serving===true?"serving":"Serve"}</div>
+                              <div className={cx(styles.serve, item.token.serving && styles.active, (item.token.serving && item.token.serving_id === currentUser.phone) && styles.owner)} onClick={() => priotize(`${item.token.ticket_no}`, "serve", item.token.stage, "sasas", Number(currentUser.counter))}>{item.token.serving === true ? "serving" : "Serve"}</div>
                             </div>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve,item.token.disabled && styles.prioritya)} onClick={()=> priorReady(`${item.token.ticket_no}`,item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div>
+                              <div className={cx(styles.serve, item.token.disabled && styles.prioritya)} onClick={() => priorReady(`${item.token.ticket_no}`, item.token.stage)}>{item.token.disabled ? "prioritized" : "prioritize"}</div>
                               {/* <div className={cx(styles.serve,item.token.disabled && styles.priority)} onClick={()=> priotize(`${item.token.ticket_no}`,"priority",item.token.stage)}>{item.token.disabled?"prioritized":"prioritize"}</div> */}
                             </div>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve)} onClick={()=> editTicket(item.token.id, status==="pending"?"waiting":"pending")}>{item.token.status==="waiting"?"pend":"unpend"}</div>
+                              <div className={cx(styles.serve)} onClick={() => editTicket(item.token.id, status === "pending" ? "waiting" : "pending")}>{item.token.status === "waiting" ? "pend" : "unpend"}</div>
                             </div>
                             <div className={styles.action}>
-                              <div className={cx(styles.serve)} onClick={()=> prepareFinish(item.token.id)}>Finish</div>
+                              <div className={cx(styles.serve)} onClick={() => prepareFinish(item.token.id)}>Finish</div>
                             </div>
                           </div>
                         </td>
@@ -711,11 +711,11 @@ function Recorder() {
                     ))}
                   </tbody>
                   <div className={styles.pagination}>
-                  {Array.from({ length: Math.ceil(totalItems / pagesize) }).map((_, index) => (
-                  <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={cx(index+1===page && styles.active)}>
-                      {index + 1}
-                  </button>
-                  ))}
+                    {Array.from({ length: Math.ceil(totalItems / pagesize) }).map((_, index) => (
+                      <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={cx(index + 1 === page && styles.active)}>
+                        {index + 1}
+                      </button>
+                    ))}
                   </div>
                 </table>
               </div>
@@ -728,63 +728,63 @@ function Recorder() {
         )}
       </div>
       {
-        tokens.filter((item)=> item.token.serving===true && item.token.serving_id=== currentUser.phone).slice(0,1).map((item:Token,index:number)=> (
+        tokens.filter((item) => item.token.serving === true && item.token.serving_id === currentUser.phone).slice(0, 1).map((item: Token, index: number) => (
           <div
-        className={cx(
-          styles.serving,
-          tokens.length > 0 && !fetchLoading && styles.active
-        )}
-      >
-        <div className={styles.speaker}>
-        {
-            tokens.length > 0 && (
-              <div className={cx(styles.spika,loading && styles.active)} onClick={()=> setSpeaker(!isSpeaker)}>
-                <div className={styles.rounder} onClick={()=> createItem(item.token.ticket_no.toString(),"meds",floor,"http://192.168.30.246:5005/speaker/create_speaker",window,currentUser.phone)}>
-                  {
-                    !loading
-                    ? <HiOutlineSpeakerWave className={styles.icon} size={30}/>
-                    : <HiOutlineSpeakerXMark className={styles.icon} size={30}/>
-                  }
-                </div>
-                {/* <GptPlayer token={542} counter={4}/> */}
-                {/* <SequentialAudio token={`1005`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/> */}
+            className={cx(
+              styles.serving,
+              tokens.length > 0 && !fetchLoading && styles.active
+            )}
+          >
+            <div className={styles.speaker}>
+              {
+                tokens.length > 0 && (
+                  <div className={cx(styles.spika, loading && styles.active)} onClick={() => setSpeaker(!isSpeaker)}>
+                    <div className={styles.rounder} onClick={() => createItem(item.token.ticket_no.toString(), "meds", floor, `${process.env.NEXT_PUBLIC_API_URL}/speaker/create_speaker`, window, currentUser.phone)}>
+                      {
+                        !loading
+                          ? <HiOutlineSpeakerWave className={styles.icon} size={30} />
+                          : <HiOutlineSpeakerXMark className={styles.icon} size={30} />
+                      }
+                    </div>
+                    {/* <GptPlayer token={542} counter={4}/> */}
+                    {/* <SequentialAudio token={`1005`} counter={`${item.counter===undefined?"1":item.counter.namba}`} stage={item.token.stage} isButton={true} talking={isSpeaker}/> */}
+                  </div>
+                )
+                // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
+              }
+            </div>
+            <div className={styles.row}>
+              <div className={styles.row_item} onClick={() => editTicket(item.token.id, status === "pending" ? "waiting" : "pending")}>
+                <div className={styles.button}>{status === "pending" ? "Unpend" : "Pend"}</div>
               </div>
-            )
-            // tokens.length > 0 && (<SequentialAudioPlayer  token={`${item.token.ticket_no}`} counter={`${item.counter===undefined?"1":item.counter.namba}`}/>)
-        }
-        </div>
-        <div className={styles.row}>
-          <div className={styles.row_item} onClick={()=> editTicket(item.token.id, status==="pending"?"waiting":"pending")}>
-            <div className={styles.button}>{status==="pending"?"Unpend":"Pend"}</div>
-          </div>
-          {/* <div className={styles.row_item} onClick={nextToken}> */}
-          <div className={styles.row_item}>
-            <div className={styles.token}>{tokens.length> 0 && item.token.ticket_no}</div>
-          </div>
-          <div className={styles.row_item} onClick={()=> prepareFinish(item.token.id)}>
-            <div className={styles.button}>Finish</div>
-          </div>
-          {/* <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
+              {/* <div className={styles.row_item} onClick={nextToken}> */}
+              <div className={styles.row_item}>
+                <div className={styles.token}>{tokens.length > 0 && item.token.ticket_no}</div>
+              </div>
+              <div className={styles.row_item} onClick={() => prepareFinish(item.token.id)}>
+                <div className={styles.button}>Finish</div>
+              </div>
+              {/* <div className={styles.row_item} onClick={()=> penalize(item.token.id)}>
             <div className={styles.button}>Penalize</div>
           </div>
           <div className={styles.row_item} onClick={()=> preparePnF()}>
             <div className={styles.button}>Finish & Penalize</div>
           </div> */}
-        </div>
-      </div>
+            </div>
+          </div>
         ))
       }
       {tokens.length > 0 && (
         <div className={styles.chini}>
           <div className={styles.top}>
-            <div className={cx(styles.item,status==="waiting" && styles.active)} onClick={()=> handleStatus("waiting")}>
-              <p>On Queue: <span> <Ticket_Category_Length category="meds" status='waiting'/> </span> </p>
+            <div className={cx(styles.item, status === "waiting" && styles.active)} onClick={() => handleStatus("waiting")}>
+              <p>On Queue: <span> <Ticket_Category_Length category="meds" status='waiting' /> </span> </p>
             </div>
-            <div className={cx(styles.item,status==="pending" && styles.active)} onClick={()=> handleStatus("pending")}>
-              <p>Pending: <span><Ticket_Category_Length category="meds" status='pending'/></span> </p>
+            <div className={cx(styles.item, status === "pending" && styles.active)} onClick={() => handleStatus("pending")}>
+              <p>Pending: <span><Ticket_Category_Length category="meds" status='pending' /></span> </p>
             </div>
-            <div className={cx(styles.item,status==="all" && styles.active)} onClick={()=> handleStatus("all")}>
-              <p>All: <span><AllTickets/></span></p>
+            <div className={cx(styles.item, status === "all" && styles.active)} onClick={() => handleStatus("all")}>
+              <p>All: <span><AllTickets /></span></p>
             </div>
             <div className={styles.item_out}>
               <IoArrowRedoOutline className={styles.icon} />

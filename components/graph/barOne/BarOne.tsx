@@ -35,7 +35,7 @@ const BarGraphOne: React.FC = () => {
   },[])
 
   const getTicks = () => {
-    axios.get("http://192.168.30.246:5005/analytics/token_analytics")
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/analytics/token_analytics`)
       .then((data: any) => {
         console.log(data)
       })

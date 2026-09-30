@@ -27,13 +27,13 @@
 //   const [id, setId] = useState("");
 //   const setMessage = useSetRecoilState(messageState)
 //   const { data } = useFetchData(
-//     "http://192.168.30.246:5005/services/get_all_services"
+//     `${process.env.NEXT_PUBLIC_API_URL}/services/get_all_services`
 //   );
 //   const [isFull, setFull] = useState(false);
 //   const [desc, setDesc] = useState("");
 //   const [pages, setPages] = useState([]);
 //   const { data: clinics } = useFetchData(
-//     "http://192.168.30.246:5005/clinic/get_clinics"
+//     `${process.env.NEXT_PUBLIC_API_URL}/clinic/get_clinics`
 //   );
 //   const [isAddittion, setAddittion] = useState(false);
 //   const [attendantClinics, setAttendantClinics] = useState([]);
@@ -81,7 +81,7 @@
 
 //   const createClinic = (deviceId: string) => {
 //     axios
-//       .post(`http://192.168.30.246:5005/attendant_clinics/create_attendant_clinic`, {
+//       .post(`${process.env.NEXT_PUBLIC_API_URL}/attendant_clinics/create_attendant_clinic`, {
 //         clinic_code: fields.clinic_code,
 //         clinic: fields.clinic,
 //         attendant_id: deviceId,
@@ -112,7 +112,7 @@
 //   };
 //   const deleteClinic = (clinic_code: string, device_id: string) => {
 //     axios
-//       .get(`http://192.168.30.246:5005/attendant_clinics/delete_clinic`, {
+//       .get(`${process.env.NEXT_PUBLIC_API_URL}/attendant_clinics/delete_clinic`, {
 //         params: { clinic_code: clinic_code, attendant_id: device_id },
 //       })
 //       .then((data) => {
@@ -139,7 +139,7 @@
 //   };
 //   const getDocClinics = (device_id: string) => {
 //     axios
-//       .get(`http://192.168.30.246:5005/attendant_clinics/get_clinics`, {
+//       .get(`${process.env.NEXT_PUBLIC_API_URL}/attendant_clinics/get_clinics`, {
 //         params: { attendant_id: device_id },
 //       })
 //       .then((data) => {
@@ -167,7 +167,7 @@
 //     console.log(inputs)
 //     e.preventDefault();
 //     axios
-//       .get(`http://192.168.30.246:5005/network/edit_device`, {
+//       .get(`${process.env.NEXT_PUBLIC_API_URL}/network/edit_device`, {
 //         params: { page: inputs.page, id: id, deviceName: inputs.deviceName, deviceModel: inputs.deviceModel, manufucturer: inputs.manufucturer, window: inputs.window, floor: inputs.floor, isChild: inputs.isChild, isDiabetic: inputs.isDiabetic },
 //       })
 //       .then(() => {
@@ -192,7 +192,7 @@
 //   };
 //   const deleteService = () => {
 //     axios
-//       .get(`http://192.168.30.246:5005/network/delete_device`, {
+//       .get(`${process.env.NEXT_PUBLIC_API_URL}/network/delete_device`, {
 //         params: { id: id },
 //       })
 //       .then(() => {
@@ -237,7 +237,7 @@
 
 //   const getPages = () => {
 //     axios
-//       .get("http://192.168.30.246:3000/api/getPages")
+//       .get(`${process.env.NEXT_PUBLIC_API_URL}/api/getPages`)
 //       .then((data) => {
 //         const pags = data.data.pages.map((page: string) =>
 //           getFirstPathSegment(page)
@@ -256,7 +256,7 @@
 //   const getAttendants = () => {
 //     setFetchLoading(true);
 //     axios
-//       .get("http://192.168.30.246:5005/network/get_devices", {
+//       .get(`${process.env.NEXT_PUBLIC_API_URL}/network/get_devices`, {
 //         params: { page, pagesize },
 //       })
 //       .then((data) => {
@@ -642,13 +642,13 @@ export default function Admins() {
   const [id, setId] = useState("");
   const setMessage = useSetRecoilState(messageState)
   const { data } = useFetchData(
-    "http://192.168.30.246:5005/services/get_all_services"
+    `${process.env.NEXT_PUBLIC_API_URL}/services/get_all_services`
   );
   const [isFull, setFull] = useState(false);
   const [desc, setDesc] = useState("");
   const [pages, setPages] = useState([]);
   const { data: clinics } = useFetchData(
-    "http://192.168.30.246:5005/clinic/get_clinics"
+    `${process.env.NEXT_PUBLIC_API_URL}/clinic/get_clinics`
   );
   const [isAddittion, setAddittion] = useState(false);
   const [attendantClinics, setAttendantClinics] = useState([]);
@@ -699,7 +699,7 @@ export default function Admins() {
 
   const createClinic = (deviceId: string) => {
     axios
-      .post(`http://192.168.30.246:5005/attendant_clinics/create_attendant_clinic`, {
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/attendant_clinics/create_attendant_clinic`, {
         clinic_code: fields.clinic_code,
         clinic: fields.clinic,
         attendant_id: deviceId,
@@ -730,7 +730,7 @@ export default function Admins() {
   };
   const deleteClinic = (clinic_code: string, device_id: string) => {
     axios
-      .get(`http://192.168.30.246:5005/attendant_clinics/delete_clinic`, {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/attendant_clinics/delete_clinic`, {
         params: { clinic_code: clinic_code, attendant_id: device_id },
       })
       .then((data) => {
@@ -757,7 +757,7 @@ export default function Admins() {
   };
   const getDocClinics = (device_id: string) => {
     axios
-      .get(`http://192.168.30.246:5005/attendant_clinics/get_clinics`, {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/attendant_clinics/get_clinics`, {
         params: { attendant_id: device_id },
       })
       .then((data) => {
@@ -788,7 +788,7 @@ export default function Admins() {
     
     // Use POST instead of GET
     axios
-      .post(`http://192.168.30.246:5005/network/edit_device`, {
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/network/edit_device`, {
         page: inputs.page, 
         id: id, 
         deviceName: inputs.deviceName, 
@@ -843,7 +843,7 @@ export default function Admins() {
   
   const deleteService = () => {
     axios
-      .get(`http://192.168.30.246:5005/network/delete_device`, {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/network/delete_device`, {
         params: { id: id },
       })
       .then(() => {
@@ -900,7 +900,7 @@ export default function Admins() {
 
   const getPages = () => {
     axios
-      .get("http://192.168.30.246:3000/api/getPages")
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/getPages`)
       .then((data) => {
         const pags = data.data.pages.map((page: string) =>
           getFirstPathSegment(page)
@@ -921,7 +921,7 @@ export default function Admins() {
   const getAttendants = () => {
     setFetchLoading(true);
     axios
-      .get("http://192.168.30.246:5005/network/get_devices", {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/network/get_devices`, {
         params: { page, pagesize },
       })
       .then((data) => {
